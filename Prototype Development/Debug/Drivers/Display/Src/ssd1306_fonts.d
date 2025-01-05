@@ -1,8 +1,8 @@
 Drivers/Display/Src/ssd1306_fonts.o: \
  ../Drivers/Display/Src/ssd1306_fonts.c \
- C:/Users/aymanalamayri/Documents/GitHub/SR16-ChargingDash/Prototype\ Development/Drivers/Display/Inc/ssd1306_fonts.h \
- C:/Users/aymanalamayri/Documents/GitHub/SR16-ChargingDash/Prototype\ Development/Drivers/Display/Inc/ssd1306.h \
- C:/Users/aymanalamayri/Documents/GitHub/SR16-ChargingDash/Prototype\ Development/Drivers/Display/Inc/ssd1306_conf.h \
+ C:/Users/kevin/OneDrive/Desktop/SR16-ChargingDash/Prototype\ Development/Drivers/Display/Inc/ssd1306_fonts.h \
+ C:/Users/kevin/OneDrive/Desktop/SR16-ChargingDash/Prototype\ Development/Drivers/Display/Inc/ssd1306.h \
+ C:/Users/kevin/OneDrive/Desktop/SR16-ChargingDash/Prototype\ Development/Drivers/Display/Inc/ssd1306_conf.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal.h \
  ../Core/Inc/stm32l4xx_hal_conf.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_rcc.h \
@@ -31,9 +31,9 @@ Drivers/Display/Src/ssd1306_fonts.o: \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_pwr_ex.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart_ex.h
-C:/Users/aymanalamayri/Documents/GitHub/SR16-ChargingDash/Prototype\ Development/Drivers/Display/Inc/ssd1306_fonts.h:
-C:/Users/aymanalamayri/Documents/GitHub/SR16-ChargingDash/Prototype\ Development/Drivers/Display/Inc/ssd1306.h:
-C:/Users/aymanalamayri/Documents/GitHub/SR16-ChargingDash/Prototype\ Development/Drivers/Display/Inc/ssd1306_conf.h:
+C:/Users/kevin/OneDrive/Desktop/SR16-ChargingDash/Prototype\ Development/Drivers/Display/Inc/ssd1306_fonts.h:
+C:/Users/kevin/OneDrive/Desktop/SR16-ChargingDash/Prototype\ Development/Drivers/Display/Inc/ssd1306.h:
+C:/Users/kevin/OneDrive/Desktop/SR16-ChargingDash/Prototype\ Development/Drivers/Display/Inc/ssd1306_conf.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal.h:
 ../Core/Inc/stm32l4xx_hal_conf.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_rcc.h:
