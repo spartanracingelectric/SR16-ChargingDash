@@ -28,8 +28,8 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart_ex.h \
  ../Core/Inc/display.h \
- C:/Users/aymanalamayri/Documents/GitHub/SR16-ChargingDash/Prototype\ Development/Drivers/Display/Inc/ssd1306.h \
- C:/Users/aymanalamayri/Documents/GitHub/SR16-ChargingDash/Prototype\ Development/Drivers/Display/Inc/ssd1306_conf.h
+ C:/Users/daphn/Documents/SR16-ChargingDash/Prototype\ Development/Drivers/Display/Inc/ssd1306.h \
+ C:/Users/daphn/Documents/SR16-ChargingDash/Prototype\ Development/Drivers/Display/Inc/ssd1306_conf.h
 ../Core/Inc/main.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal.h:
 ../Core/Inc/stm32l4xx_hal_conf.h:
@@ -60,5 +60,5 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart_ex.h:
 ../Core/Inc/display.h:
-C:/Users/aymanalamayri/Documents/GitHub/SR16-ChargingDash/Prototype\ Development/Drivers/Display/Inc/ssd1306.h:
-C:/Users/aymanalamayri/Documents/GitHub/SR16-ChargingDash/Prototype\ Development/Drivers/Display/Inc/ssd1306_conf.h:
+C:/Users/daphn/Documents/SR16-ChargingDash/Prototype\ Development/Drivers/Display/Inc/ssd1306.h:
+C:/Users/daphn/Documents/SR16-ChargingDash/Prototype\ Development/Drivers/Display/Inc/ssd1306_conf.h:
