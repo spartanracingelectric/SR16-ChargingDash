@@ -57,10 +57,6 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define TSSI_FLT_LED_Pin GPIO_PIN_7
-#define TSSI_FLT_LED_GPIO_Port GPIOC
-#define TERM_PH_Pin GPIO_PIN_8
-#define TERM_PH_GPIO_Port GPIOC
 
 /* USER CODE BEGIN Private defines */
 
