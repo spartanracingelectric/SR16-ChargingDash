@@ -2,6 +2,7 @@
 #include <stdbool.h>
 #include "display.h"
 #include "ssd1306.h"
+#include "ssd1306_fonts.h"
 
 // Initialization function
 void SRE_Display_Init(bool test_mode) {
@@ -19,5 +20,39 @@ void SRE_Display_Test() {
 
 // Example function to display navigation
 void SRE_Display_Nav() {
+
+}
+
+void SRE_Display_Nav_Bar() {
+
+	int selectedButton = 1;
+
+	if (selectedButton == 0) {
+		ssd1306_FillRectangle(1, 52, 27, 62, White);
+		ssd1306_SetCursor(3, 54);
+		ssd1306_WriteString("Batt", Font_6x8, Black);
+	}
+	else {
+		ssd1306_DrawRectangle(1, 52, 27, 62, White);
+		ssd1306_SetCursor(3, 54);
+		ssd1306_WriteString("Batt", Font_6x8, White);
+	}
+
+	if (selectedButton == 1) {
+		ssd1306_FillRectangle(29, 52, 49, 62, White);
+		ssd1306_SetCursor(31, 54);
+		ssd1306_WriteString("Nav", Font_6x8, Black);
+	}
+	else {
+		ssd1306_DrawRectangle(29, 52, 49, 62, White);
+		ssd1306_SetCursor(31, 54);
+		ssd1306_WriteString("Nav", Font_6x8, White);
+	}
+
+
+
+
+	ssd1306_UpdateScreen();
+
 
 }
