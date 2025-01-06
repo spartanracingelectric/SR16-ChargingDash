@@ -21,7 +21,7 @@ void SRE_Display_Test() {
 void SRE_Display_Nav() {
 
 }
-
+//test
 // Example function to display charging 1
 void SRE_Display_Charging1() {
 	char charging1Title[] = "Charging 1";
