@@ -9,8 +9,7 @@
 void SRE_Display_Init(bool test_mode) {
 	ssd1306_Init();
 	if (test_mode) {
-		//SRE_Display_Test();
-		SRE_Display_Title_Bar("Home");
+		SRE_Display_Test();
 	}
 }
 
