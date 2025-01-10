@@ -21,3 +21,47 @@ void SRE_Display_Test() {
 void SRE_Display_Nav() {
 
 }
+
+void SRE_Display_Err() {
+	// Error title
+	char err[] = "Errors";
+	char retval;
+
+	ssd1306_SetCursor(1, 1);
+	retval = ssd1306_WriteString(err, Font_16x15, White);
+
+	// Draw line
+	ssd1306_Line(0, 10, 127, 10, White);
+
+	// Sample error msg
+	char err1[] = "Error message 1";
+	char retval;
+
+	ssd1306_SetCursor(3, 15);
+	retval = ssd1306_WriteString(err1, Font_16x15, White);
+
+	// Draw Rect
+	ssd1306_DrawRectangle(1, 13, 122, 11, White);
+
+	// Sample error 2 msg
+	char err2[] = "Error message 2";
+	char retval;
+
+	ssd1306_SetCursor(3, 28);
+	retval = ssd1306_WriteString(err2, Font_16x15, White);
+
+	// Draw Rect
+	ssd1306_DrawRectangle(1, 26, 122, 11, White);
+
+	// Sample error 3 msg
+	char err3[] = "Error message 3";
+	char retval;
+
+	ssd1306_SetCursor(3, 41);
+	retval = ssd1306_WriteString(err3, Font_16x15, White);
+
+	// Draw Rect
+	ssd1306_DrawRectangle(1, 39, 122, 11, White);
+
+	ssd1306_UpdateScreen();
+}
