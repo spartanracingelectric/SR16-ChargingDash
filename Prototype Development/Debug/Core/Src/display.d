@@ -28,7 +28,9 @@ Core/Src/display.o: ../Core/Src/display.c ../Core/Inc/display.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_pwr.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_pwr_ex.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart.h \
- ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart_ex.h
+ ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart_ex.h \
+ C:/Users/kevin/OneDrive/Desktop/SR16-ChargingDash/Prototype\ Development/Drivers/Display/Inc/ssd1306_fonts.h \
+ C:/Users/kevin/OneDrive/Desktop/SR16-ChargingDash/Prototype\ Development/Drivers/Display/Inc/ssd1306.h
 ../Core/Inc/display.h:
 C:/Users/kevin/OneDrive/Desktop/SR16-ChargingDash/Prototype\ Development/Drivers/Display/Inc/ssd1306.h:
 C:/Users/kevin/OneDrive/Desktop/SR16-ChargingDash/Prototype\ Development/Drivers/Display/Inc/ssd1306_conf.h:
@@ -60,3 +62,5 @@ C:/Users/kevin/OneDrive/Desktop/SR16-ChargingDash/Prototype\ Development/Drivers
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_pwr_ex.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart_ex.h:
+C:/Users/kevin/OneDrive/Desktop/SR16-ChargingDash/Prototype\ Development/Drivers/Display/Inc/ssd1306_fonts.h:
+C:/Users/kevin/OneDrive/Desktop/SR16-ChargingDash/Prototype\ Development/Drivers/Display/Inc/ssd1306.h:
