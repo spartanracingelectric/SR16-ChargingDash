@@ -98,7 +98,6 @@ int main(void)
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
   SRE_Display_Init(true);
-
   /* USER CODE END 2 */
 
   /* Infinite loop */
