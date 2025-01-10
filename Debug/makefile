@@ -60,8 +60,8 @@ all: main-build
 main-build: SR16-ChargingDash.elf secondary-outputs
 
 # Tool invocations
-SR16-ChargingDash.elf SR16-ChargingDash.map: $(OBJS) $(USER_OBJS) C:\Users\aymanalamayri\Documents\GitHub\SR16-ChargingDash\STM32F105RBTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "SR16-ChargingDash.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m3 -T"C:\Users\aymanalamayri\Documents\GitHub\SR16-ChargingDash\STM32F105RBTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="SR16-ChargingDash.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+SR16-ChargingDash.elf SR16-ChargingDash.map: $(OBJS) $(USER_OBJS) C:\Users\kevin\OneDrive\Desktop\SR16-ChargingDash\STM32F105RBTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "SR16-ChargingDash.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m3 -T"C:\Users\kevin\OneDrive\Desktop\SR16-ChargingDash\STM32F105RBTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="SR16-ChargingDash.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

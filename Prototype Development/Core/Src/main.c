@@ -48,6 +48,12 @@ I2C_HandleTypeDef hi2c1;
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
+int selectedButton = 0;
+bool selectPressed = false;
+uint32_t currentTime;
+uint32_t previousTime;
+
+
 
 /* USER CODE END PV */
 
@@ -56,12 +62,32 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_I2C1_Init(void);
-/* USER CODE BEGIN PFP */
 
+/* USER CODE BEGIN PFP */
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
+
+	currentTime = HAL_GetTick();
+
+	//debounce set at 200ms
+	if (currentTime - previousTime > 200) {
+		//rightmost button is GPIO_PIN_4, leftmost button is GPIO_PIN_11
+		if (GPIO_Pin == GPIO_PIN_4 && !selectPressed) {
+			selectedButton++;
+		}
+		else if (GPIO_Pin == GPIO_PIN_11 && !selectPressed) {
+			selectedButton--;
+		}
+		else if (GPIO_Pin == GPIO_PIN_5) {
+			selectPressed = true;
+		}
+		previousTime = currentTime;
+	}
+}
 
 /* USER CODE END 0 */
 
