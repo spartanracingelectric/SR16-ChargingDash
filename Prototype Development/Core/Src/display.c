@@ -3,13 +3,16 @@
 #include "display.h"
 #include "ssd1306.h"
 #include "ssd1306_fonts.h"
+#include <stdio.h>
+extern int selectedButton;
+extern bool selectPressed;
 
 // Initialization function
 void SRE_Display_Init(bool test_mode) {
 	ssd1306_Init();
 	if (test_mode) {
-		SRE_Display_Test();
-		//SRE_Display_Start_Charging();
+		//SRE_Display_Test();
+		SRE_Display_Start_Charging();
 	}
 }
 
@@ -36,8 +39,10 @@ void SRE_Display_Title_Bar(char title[]) {
 }
 
 void SRE_Display_Start_Charging() {
+
+	//defines an array of Profiles to be used as test data
 	struct Profile {
-		char profileName[5];
+		char name[5];
 		int current;
 		int voltage;
 		bool isBalancing;
@@ -49,47 +54,107 @@ void SRE_Display_Start_Charging() {
 	struct Profile p4 = {"P4", 10, 20, true};
 	struct Profile p5 = {"P5", 10, 400, true};
 	struct Profile p6 = {"P6", 10, 15, false};
+	struct Profile p7 = {"P7", 10, 400, true};
+	struct Profile p8 = {"P8", 10, 15, false};
 
-	struct Profile profiles[6];
+	int numOfProfiles = 6;
+	struct Profile profiles[numOfProfiles];
 	profiles[0] = p1;
 	profiles[1] = p2;
 	profiles[2] = p3;
 	profiles[3] = p4;
 	profiles[4] = p5;
 	profiles[5] = p6;
-
- 	SRE_Display_Title_Bar("Start Charging");
-
-	ssd1306_SetCursor(3, 15);
-	ssd1306_WriteString("P1: 10A 20V BAL ON", Font_6x8, White);
-	ssd1306_DrawRectangle(1,13, 122, 23, White);
-
-	ssd1306_SetCursor(3, 27);
-	ssd1306_WriteString("P2: 10A 400V BAL OFF", Font_6x8, White);
-	ssd1306_DrawRectangle(1,25, 122, 35, White);
-
-	ssd1306_SetCursor(3, 39);
-	ssd1306_WriteString("P3: 10A 400V BAL OFF", Font_6x8, White);
-	ssd1306_DrawRectangle(1,37, 122, 47, White);
-
-	ssd1306_DrawRectangle(124, 13, 126, 47, White);
-	ssd1306_Line(125, 30, 125, 46, White);
-
-	SRE_Display_Nav_Bar(0,1, 1);
-	ssd1306_SetCursor(53, 54);
-	ssd1306_WriteString("Start", Font_6x8, White);
-	ssd1306_DrawRectangle(51, 52, 83, 62, White);
+//	profiles[6] = p7;
+//	profiles[7] = p8;
 
 
-ssd1306_UpdateScreen();
+
+	while (!selectPressed) {
+		SRE_Display_Title_Bar("Start Charging");
+
+		ssd1306_FillRectangle(0,0,127,63, Black);
+
+		int currentScreen = selectedButton/3;
+		if (selectedButton > numOfProfiles -1) {
+			currentScreen = (numOfProfiles-1)/3;
+		}
+		int startIndex = currentScreen*3;
 
 
+
+		if (selectedButton > numOfProfiles-1) {
+			startIndex = (numOfProfiles-1)/3*3;
+			//startIndex = numOfProfiles-3;
+		}
+		if (selectedButton < 0) {
+			startIndex = 0;
+			selectedButton = numOfProfiles+2;
+		}
+		if (selectedButton > numOfProfiles+2) {
+			startIndex = 0;
+			selectedButton = 0;
+		}
+
+		int y1 = 15;
+		int y2 = 13;
+		int y3 = 23;
+
+		for (int i = startIndex; i < startIndex + 3 && i < numOfProfiles; i++) {
+			char profileString[50];
+			sprintf(profileString, "%s: %dA %dV BAL %s", profiles[i].name, profiles[i].current, profiles[i].voltage, profiles[i].isBalancing ? "ON" : "OFF");
+			ssd1306_SetCursor(3, y1);
+
+			if (selectedButton == i) {
+				ssd1306_FillRectangle(1,y2, 122, y3, White);
+				ssd1306_WriteString(profileString, Font_6x8, Black);
+			}
+			else {
+				ssd1306_DrawRectangle(1,y2, 122, y3, White);
+				ssd1306_WriteString(profileString, Font_6x8, White);
+			}
+
+
+			y1 = y1 + 12;
+			y2 = y2 + 12;
+			y3 = y3 + 12;
+
+		}
+		//numOfProiles + 2 ensures it will always round up
+		int numOfScreens = (numOfProfiles+2)/3;
+
+		if (numOfScreens > 1) {
+
+			int scrollContainerHeight = 35;
+			int scrollBarLength = scrollContainerHeight/numOfScreens;
+
+			int scrollY = 14+ (currentScreen*scrollBarLength);
+
+			ssd1306_DrawRectangle(124, 13, 126, 47, White);
+			ssd1306_Line(125, scrollY, 125, scrollY+scrollBarLength, White);
+		}
+
+
+		SRE_Display_Nav_Bar(numOfProfiles,numOfProfiles+1, numOfProfiles+2);
+		ssd1306_SetCursor(53, 54);
+		if (selectedButton == numOfProfiles+2) {
+			ssd1306_FillRectangle(51, 52, 83, 62, White);
+			ssd1306_WriteString("Start", Font_6x8, Black);
+
+		}
+		else {
+			ssd1306_DrawRectangle(51, 52, 83, 62, White);
+			ssd1306_WriteString("Start", Font_6x8, White);
+		}
+
+		ssd1306_UpdateScreen();
+
+	}
 }
 
 void SRE_Display_Nav_Bar(int battNumber, int navNumber, int maxSelectedButton) {
 
 	//the selectedButton values for nav bar will vary based on currenty displayed screen
-	int selectedButton = 0;
 
 	if (selectedButton == battNumber || (battNumber == 0 && selectedButton > maxSelectedButton)) {
 		ssd1306_FillRectangle(1, 52, 27, 62, White);
