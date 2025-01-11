@@ -57,7 +57,7 @@ void SRE_Display_Start_Charging() {
 	struct Profile p7 = {"P7", 10, 400, true};
 	struct Profile p8 = {"P8", 10, 15, false};
 
-	int numOfProfiles = 6;
+	int numOfProfiles = 8;
 	struct Profile profiles[numOfProfiles];
 	profiles[0] = p1;
 	profiles[1] = p2;
@@ -65,8 +65,8 @@ void SRE_Display_Start_Charging() {
 	profiles[3] = p4;
 	profiles[4] = p5;
 	profiles[5] = p6;
-//	profiles[6] = p7;
-//	profiles[7] = p8;
+    profiles[6] = p7;
+    profiles[7] = p8;
 
 
 	while (!selectPressed) {
