@@ -2,12 +2,13 @@
 #include <stdbool.h>
 #include "display.h"
 #include "ssd1306.h"
+#include "ssd1306_fonts.h"
 
 // Initialization function
 void SRE_Display_Init(bool test_mode) {
 	ssd1306_Init();
 	if (test_mode) {
-		SRE_Display_Test();
+		SRE_Display_Charging1();
 	}
 }
 
@@ -77,13 +78,14 @@ void SRE_Display_Charging1() {
 	//Writes next button
 		//Increase in 2 x and 1 y because box takes extra space.
 	ssd1306_SetCursor(3, 54);
-	ssd1306_WriteString(power, Font_6x8, White);
+	ssd1306_WriteString(nextButtonText, Font_6x8, White);
 		//draws rectangle surrounding next text
 		//x1, y1, x2, y2: from x-1 and y-52, to x-27. Definitely wrong.
 
 	//Called SetCursor for draw rectangle around.
-	ssd1306_DrawRectangle(1, 52, 27, 11, White);
+	ssd1306_DrawRectangle(1, 52, 27, 63, White);
 
+	ssd1306_UpdateScreen();
 
 
 }
