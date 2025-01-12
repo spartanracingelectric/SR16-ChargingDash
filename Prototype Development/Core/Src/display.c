@@ -32,9 +32,6 @@ void SRE_Display_Title_Bar(char title[]) {
 
 	SRE_Display_Charger_Symbol(88, 3);
 	SRE_Display_Error_Symbol(119,1);
-
-	ssd1306_UpdateScreen();
-
 }
 
 void SRE_Display_Charger_Symbol(int x, int y) {
