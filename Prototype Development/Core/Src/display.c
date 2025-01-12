@@ -40,7 +40,7 @@ void SRE_Display_Title_Bar(char title[]) {
 
 void SRE_Display_Start_Charging() {
 
-	//defines an array of Profiles to be used as test data
+	//sets up sample profiles to use for testing
 	struct Profile {
 		char name[5];
 		int current;
@@ -70,7 +70,11 @@ void SRE_Display_Start_Charging() {
 
 
 	while (!selectPressed) {
+
+		//resets screen
 		ssd1306_FillRectangle(0,0,127,63, Black);
+
+
 		SRE_Display_Title_Bar("Start Charging");
 
 
@@ -122,16 +126,7 @@ void SRE_Display_Start_Charging() {
 		//numOfProiles + 2 ensures it will always round up
 		int numOfScreens = (numOfProfiles+2)/3;
 
-		if (numOfScreens > 1) {
-
-			int scrollContainerHeight = 35;
-			int scrollBarLength = scrollContainerHeight/numOfScreens;
-
-			int scrollY = 14+ (currentScreen*scrollBarLength);
-
-			ssd1306_DrawRectangle(124, 13, 126, 47, White);
-			ssd1306_Line(125, scrollY, 125, scrollY+scrollBarLength, White);
-		}
+		SRE_Display_Short_Scroll_Bar(currentScreen, numOfScreens);
 
 
 		SRE_Display_Nav_Bar(numOfProfiles,numOfProfiles+1, numOfProfiles+2);
@@ -149,6 +144,23 @@ void SRE_Display_Start_Charging() {
 		ssd1306_UpdateScreen();
 
 	}
+}
+
+void SRE_Display_Short_Scroll_Bar(int currentScreen, int numOfScreens) {
+
+	//currentScreen is zero-indexed
+
+	if (numOfScreens > 1) {
+
+		int scrollContainerHeight = 35;
+		int scrollBarLength = scrollContainerHeight/numOfScreens;
+
+		int scrollBarStart = 14+ (currentScreen*scrollBarLength);
+
+		ssd1306_DrawRectangle(124, 13, 126, 47, White);
+		ssd1306_Line(125, scrollBarStart, 125, scrollBarStart+scrollBarLength, White);
+	}
+
 }
 
 void SRE_Display_Nav_Bar(int battNumber, int navNumber, int maxSelectedButton) {
