@@ -10,7 +10,7 @@ extern bool selectPressed;
 void SRE_Display_Init(bool test_mode) {
 	ssd1306_Init();
 	if (test_mode) {
-		SRE_Display_Balancing();
+		SRE_Display_StartBalancing();
 	}
 }
 
@@ -25,7 +25,8 @@ void SRE_Display_Nav() {
 
 }
 
-void SRE_Display_Balancing(){
+//Display Start Balancing
+void SRE_Display_StartBalancing(){
 			char balancingTitle[] = "Balancing";
 			char balancingOnOff[] = "Balancing is off";
 
