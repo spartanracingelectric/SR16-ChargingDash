@@ -78,31 +78,41 @@ void SRE_Display_Start_Charging() {
 		SRE_Display_Title_Bar("Start Charging");
 
 
+
 		int currentScreen = selectedButton/3;
-		if (selectedButton > numOfProfiles -1) {
+		int battButtonIndex = numOfProfiles;
+		int startButtonIndex = numOfProfiles + 2;
+		int navButtonIndex = numOfProfiles + 1;
+
+
+		//if the nav bar is selected, ensures that the currentScreen is the last screen of profiles
+		if (selectedButton > numOfProfiles-1) {
 			currentScreen = (numOfProfiles-1)/3;
 		}
 		int startIndex = currentScreen*3;
 
 
-
+		//ensures that the correct number of profiles are showed on the last screen
 		if (selectedButton > numOfProfiles-1) {
 			startIndex = (numOfProfiles-1)/3*3;
-			//startIndex = numOfProfiles-3;
 		}
+		//going up from first profile will go to Start button
 		if (selectedButton < 0) {
 			startIndex = 0;
-			selectedButton = numOfProfiles+2;
+			selectedButton = startButtonIndex;
 		}
-		if (selectedButton > numOfProfiles+2) {
+		//going down from start button will reset back to first profile being selected
+		if (selectedButton > startButtonIndex) {
 			startIndex = 0;
 			selectedButton = 0;
 		}
 
+		//initial y-positions used for calculating profile display boxes
 		int y1 = 15;
 		int y2 = 13;
-		int y3 = 23;
+		int y3 = 24;
 
+		//displays up to three profiles per screen
 		for (int i = startIndex; i < startIndex + 3 && i < numOfProfiles; i++) {
 			char profileString[50];
 			sprintf(profileString, "%s: %dA %dV BAL %s", profiles[i].name, profiles[i].current, profiles[i].voltage, profiles[i].isBalancing ? "ON" : "OFF");
@@ -123,15 +133,17 @@ void SRE_Display_Start_Charging() {
 			y3 = y3 + 12;
 
 		}
+
 		//numOfProiles + 2 ensures it will always round up
 		int numOfScreens = (numOfProfiles+2)/3;
 
 		SRE_Display_Short_Scroll_Bar(currentScreen, numOfScreens);
+		SRE_Display_Nav_Bar(battButtonIndex,navButtonIndex, startButtonIndex);
 
 
-		SRE_Display_Nav_Bar(numOfProfiles,numOfProfiles+1, numOfProfiles+2);
+		//draws Start button
 		ssd1306_SetCursor(53, 54);
-		if (selectedButton == numOfProfiles+2) {
+		if (selectedButton ==startButtonIndex) {
 			ssd1306_FillRectangle(51, 52, 83, 62, White);
 			ssd1306_WriteString("Start", Font_6x8, Black);
 
