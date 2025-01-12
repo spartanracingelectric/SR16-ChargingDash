@@ -27,6 +27,7 @@ void SRE_Display_Nav() {
 
 }
 
+//Displays Battery1 Screen
 void SRE_Display_Battery1(){
 	char battery1Title[] = "Battery 1";
 	char temperatureStats[] = "Tmp H/L:100.22/50.11C";

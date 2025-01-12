@@ -48,6 +48,8 @@ I2C_HandleTypeDef hi2c1;
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
+
+//Variables for button presses.
 int selectedButton = 0;
 bool selectPressed = false;
 uint32_t currentTime;
@@ -69,6 +71,8 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
+//Interrupt for button press.
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 
 	currentTime = HAL_GetTick();
