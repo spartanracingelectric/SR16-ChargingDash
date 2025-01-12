@@ -4,8 +4,7 @@
 #include "ssd1306.h"
 #include "ssd1306_fonts.h"
 #include <stdio.h>
-extern int selectedButton;
-extern bool selectPressed;
+
 
 // Initialization function
 void SRE_Display_Init(bool test_mode) {
@@ -27,16 +26,6 @@ void SRE_Display_Nav() {
 
 }
 
-void SRE_Display_Title_Bar(char title[]) {
-
-	ssd1306_SetCursor(1,1);
-	ssd1306_WriteString(title, Font_6x8, White);
-	ssd1306_Line(0, 10, 127, 10, White);
-
-
-	//ssd1306_UpdateScreen();
-
-}
 
 void SRE_Display_Start_Charging() {
 
@@ -68,7 +57,8 @@ void SRE_Display_Start_Charging() {
     profiles[6] = p7;
     profiles[7] = p8;
 
-
+    int selectedButton = 0;
+    bool selectPressed = false;
 	while (!selectPressed) {
 
 		//resets screen
@@ -175,29 +165,4 @@ void SRE_Display_Short_Scroll_Bar(int currentScreen, int numOfScreens) {
 
 }
 
-void SRE_Display_Nav_Bar(int battNumber, int navNumber, int maxSelectedButton) {
 
-	//the selectedButton values for nav bar will vary based on currenty displayed screen
-
-	if (selectedButton == battNumber || (battNumber == 0 && selectedButton > maxSelectedButton)) {
-		ssd1306_FillRectangle(1, 52, 27, 62, White);
-		ssd1306_SetCursor(3, 54);
-		ssd1306_WriteString("Batt", Font_6x8, Black);
-	}
-	else {
-		ssd1306_DrawRectangle(1, 52, 27, 62, White);
-		ssd1306_SetCursor(3, 54);
-		ssd1306_WriteString("Batt", Font_6x8, White);
-	}
-
-	if (selectedButton == navNumber || (navNumber == maxSelectedButton && selectedButton < 0)) {
-		ssd1306_FillRectangle(29, 52, 49, 62, White);
-		ssd1306_SetCursor(31, 54);
-		ssd1306_WriteString("Nav", Font_6x8, Black);
-	}
-	else {
-		ssd1306_DrawRectangle(29, 52, 49, 62, White);
-		ssd1306_SetCursor(31, 54);
-		ssd1306_WriteString("Nav", Font_6x8, White);
-	}
-}
