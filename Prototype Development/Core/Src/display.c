@@ -49,11 +49,4 @@ void SRE_Display_Nav_Bar(int battNumber, int navNumber, int maxSelectedButton) {
 		ssd1306_SetCursor(31, 54);
 		ssd1306_WriteString("Nav", Font_6x8, White);
 	}
-
-
-
-
-	ssd1306_UpdateScreen();
-
-
 }
