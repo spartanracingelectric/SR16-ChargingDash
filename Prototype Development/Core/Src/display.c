@@ -65,9 +65,8 @@ void SRE_Display_Start_Charging() {
 		SRE_Display_Title_Bar("Start Charging");
 
 		int currentScreen = selectedButton/3;
-		int battButtonIndex = numOfProfiles;
-		int startButtonIndex = numOfProfiles + 2;
 		int navStartIndex = numOfProfiles;
+		int navLastIndex = numOfProfiles +2;
 
 		//if the nav bar is selected, ensures that the currentScreen is the last screen of profiles
 		if (selectedButton > numOfProfiles-1) {
@@ -81,10 +80,10 @@ void SRE_Display_Start_Charging() {
 		//going up from first profile will go to Start button
 		if (selectedButton < 0) {
 			startIndex = 0;
-			selectedButton = startButtonIndex;
+			selectedButton = navLastIndex;
 		}
 		//going down from start button will reset back to first profile being selected
-		if (selectedButton > startButtonIndex) {
+		if (selectedButton > navLastIndex) {
 			startIndex = 0;
 			selectedButton = 0;
 		}
