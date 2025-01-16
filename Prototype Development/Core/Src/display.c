@@ -47,6 +47,7 @@ void SRE_Display_Start_Charging() {
 
 	int numOfProfiles = 8;
 	struct Profile profiles[numOfProfiles];
+
 	profiles[0] = p1;
 	profiles[1] = p2;
 	profiles[2] = p3;
@@ -56,31 +57,23 @@ void SRE_Display_Start_Charging() {
     profiles[6] = p7;
     profiles[7] = p8;
 
-    int selectedButton = 0;
-    bool selectPressed = false;
 	while (!selectPressed) {
 
 		//resets screen
 		ssd1306_FillRectangle(0,0,127,63, Black);
 
-
 		SRE_Display_Title_Bar("Start Charging");
-
-
 
 		int currentScreen = selectedButton/3;
 		int battButtonIndex = numOfProfiles;
 		int startButtonIndex = numOfProfiles + 2;
-		int navButtonIndex = numOfProfiles + 1;
-
+		int navStartIndex = numOfProfiles;
 
 		//if the nav bar is selected, ensures that the currentScreen is the last screen of profiles
 		if (selectedButton > numOfProfiles-1) {
 			currentScreen = (numOfProfiles-1)/3;
 		}
 		int startIndex = currentScreen*3;
-
-
 		//ensures that the correct number of profiles are showed on the last screen
 		if (selectedButton > numOfProfiles-1) {
 			startIndex = (numOfProfiles-1)/3*3;
@@ -116,31 +109,20 @@ void SRE_Display_Start_Charging() {
 				ssd1306_WriteString(profileString, Font_6x8, White);
 			}
 
-
 			y1 = y1 + 12;
 			y2 = y2 + 12;
 			y3 = y3 + 12;
-
 		}
 
 		//numOfProiles + 2 ensures it will always round up
 		int numOfScreens = (numOfProfiles+2)/3;
 
 		SRE_Display_Short_Scroll_Bar(currentScreen, numOfScreens);
-		SRE_Display_Nav_Bar(battButtonIndex,navButtonIndex, startButtonIndex);
+
+		char *navBarButtons[] = {"Batt", "Nav", "Start"};
+		SRE_Display_Nav_Bar(navBarButtons,3, navStartIndex);
 
 
-		//draws Start button
-		ssd1306_SetCursor(53, 54);
-		if (selectedButton ==startButtonIndex) {
-			ssd1306_FillRectangle(51, 52, 83, 62, White);
-			ssd1306_WriteString("Start", Font_6x8, Black);
-
-		}
-		else {
-			ssd1306_DrawRectangle(51, 52, 83, 62, White);
-			ssd1306_WriteString("Start", Font_6x8, White);
-		}
 
 		ssd1306_UpdateScreen();
 
