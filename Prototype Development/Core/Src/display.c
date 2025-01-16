@@ -2,6 +2,9 @@
 #include <stdbool.h>
 #include "display.h"
 #include "ssd1306.h"
+extern int selectedButton;
+extern bool selectPressed;
+
 
 // Initialization function
 void SRE_Display_Init(bool test_mode) {
