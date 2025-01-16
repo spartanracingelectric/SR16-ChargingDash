@@ -28,6 +28,7 @@ void SRE_Display_Nav() {
 
 		//only two buttons on this screen so this ensures that the selectedButton doesn't go out of range
 		//if the selectedButton reaches the end, resets to the beginning and vice versa
+		//home, battery
 		if (selectedButton > 1) {
 			selectedButton = 0;
 		}
