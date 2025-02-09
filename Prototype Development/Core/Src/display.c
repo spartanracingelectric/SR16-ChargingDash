@@ -5,13 +5,11 @@
 #include "ssd1306_fonts.h"
 #include <string.h>
 
-
-
 // Initialization function
 void SRE_Display_Init(bool test_mode) {
 	ssd1306_Init();
 	if (test_mode) {
-		 SRE_Display_Charger_Stats();
+		 SRE_Display_Display_Test();
 	}
 }
 
