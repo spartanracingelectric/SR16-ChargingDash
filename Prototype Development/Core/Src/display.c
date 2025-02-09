@@ -34,7 +34,7 @@ void SRE_Display_Nav() {
 	char retval;
 
 	// 4 buttons: home, charging, balancing, battery
-	while(!selectPress) {
+	while(!selectedPress) {
 		if (selectedButton > 3){
 			selectedButton = 0;
 		}
@@ -99,8 +99,8 @@ void SRE_Display_Nav() {
 		ssd1306_UpdateScreen();
 	}
 
-	if (selectPressed) {
-		selectPressed = false;
+	if (selectedPress) {
+		selectedPress = false;
 
 		if (selectedButton > 3) {
 			selectedButton = 0;
