@@ -110,18 +110,18 @@ void SRE_Display_Nav() {
 		}
 
 		// Populate with the function name that corresponds to each button number respectively later.
-		if (selectButton == 0) {
+		if (selectedButton == 0) {
 			// Goes to home
 		}
-		else if (selectButton == 1) {
+		else if (selectedButton == 1) {
 			// Goes to Charging
 
 		}
-		else if (selectButton == 2) {
+		else if (selectedButton == 2) {
 			// Goes to Balancing
 
 		}
-		else if (selectButton == 3) {
+		else if (selectedButton == 3) {
 			// Goes to Battery
 
 		}
