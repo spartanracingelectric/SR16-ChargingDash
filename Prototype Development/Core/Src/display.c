@@ -28,13 +28,15 @@ void SRE_Display_Nav() {
 }
 
 void SRE_Display_Home() {
+	selectedButton = 0;
+
 	char home[] = "Home";
 	char soc[] = "SOC: 85.7%";
 	char charger_temp[] = "Charger Tmp: 100.1C";
 	char balancing[] = "Balancing Off";
 	char retval;
 
-	while (!selectPressed) {
+	while (!selectedPress) {
 
 		ssd1306_FillRectangle(0, 0, 127, 63, Black);
 
@@ -64,8 +66,8 @@ void SRE_Display_Home() {
 		ssd1306_UpdateScreen();
 	}
 
-	if (selectPressed) {
-		selectPressed = false;
+	if (selectedPress) {
+		selectedPress = false;
 
 		if (selectedButton > 1) {
 			selectedButton = 0;
