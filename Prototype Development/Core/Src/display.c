@@ -41,6 +41,7 @@ void SRE_Display_Charging_Instructions() {
 	// [todo] Once finished, goes to Charger 1 stats
 
 	while (!selectedPress) {
+		ssd1306_FillRectangle(0, 0, 127, 63, Black);
 		if (selectedButton >= 1 || selectedButton < 0) {
 			selectedButton = 0;
 		}
