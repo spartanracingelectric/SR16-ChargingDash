@@ -35,6 +35,8 @@ void SRE_Display_Nav() {
 
 	// 4 buttons: home, charging, balancing, battery
 	while(!selectedPress) {
+		ssd1306_FillRectangle(0, 0, 127, 63, Black);
+
 		if (selectedButton > 3){
 			selectedButton = 0;
 		}
