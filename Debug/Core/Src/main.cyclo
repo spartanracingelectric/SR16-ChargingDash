@@ -3,5 +3,5 @@
 ../Core/Src/main.c:180:13:MX_CAN1_Init	2
 ../Core/Src/main.c:217:13:MX_I2C2_Init	2
 ../Core/Src/main.c:251:13:MX_GPIO_Init	1
-../Core/Src/main.c:276:19:I2C_SendMessage	1
-../Core/Src/main.c:286:6:Error_Handler	1
+../Core/Src/main.c:300:19:I2C_SendMessage	1
+../Core/Src/main.c:310:6:Error_Handler	1

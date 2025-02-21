@@ -55,8 +55,8 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_CAN1_Init(void);
 static void MX_I2C2_Init(void);
-HAL_StatusTypeDef I2C_SendMessage(uint8_t devAddr, uint8_t *data, uint16_t size);
 /* USER CODE BEGIN PFP */
+HAL_StatusTypeDef I2C_SendMessage(uint8_t devAddr, uint8_t *data, uint16_t size);
 
 /* USER CODE END PFP */
 
@@ -107,23 +107,23 @@ int main(void)
   {
 	  //	  ssd1306_DrawCircle(25, 25, 5, White);
 	  //	  ssd1306_UpdateScreen();
-	  	  char message[] = {00000001};
-	  	  /*
-	  	   * First 3 bits are faults (bms, imd, etc)
-	  	   * Next 3 bits are soc
-	  	   * Last 2 are reserved
-	  	   */
-	  	  uint8_t deviceAddress = 0x3A << 1;  // Atiny address
-	  	  HAL_StatusTypeDef status = I2C_SendMessage(deviceAddress, message, sizeof(message));
-	  	  if (status == HAL_OK) {
-	  //		  HAL_GPIO_TogglePin(BRUHLIGHT_GPIO_Port, BRUHLIGHT_Pin);
-	  //		  HAL_Delay(100);
-	  //		  HAL_GPIO_TogglePin(BRUHLIGHT_GPIO_Port, BRUHLIGHT_Pin);
-	  //		  HAL_Delay(100);
-	  	  } else {
-	  //		  HAL_GPIO_TogglePin(BRUHLIGHT_GPIO_Port, BRUHLIGHT_Pin);
-	  //		  HAL_Delay(100);
-	  	  }
+//	  	  char message[] = {00000001};
+//	  	  /*
+//	  	   * First 3 bits are faults (bms, imd, etc)
+//	  	   * Next 3 bits are soc
+//	  	   * Last 2 are reserved
+//	  	   */
+//	  	  uint8_t deviceAddress = 0x3A << 1;  // Atiny address
+//	  	  HAL_StatusTypeDef status = I2C_SendMessage(deviceAddress, message, sizeof(message));
+//	  	  if (status == HAL_OK) {
+//	  //		  HAL_GPIO_TogglePin(BRUHLIGHT_GPIO_Port, BRUHLIGHT_Pin);
+//	  //		  HAL_Delay(100);
+//	  //		  HAL_GPIO_TogglePin(BRUHLIGHT_GPIO_Port, BRUHLIGHT_Pin);
+//	  //		  HAL_Delay(100);
+//	  	  } else {
+//	  //		  HAL_GPIO_TogglePin(BRUHLIGHT_GPIO_Port, BRUHLIGHT_Pin);
+//	  //		  HAL_Delay(100);
+//	  	  }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -225,7 +225,7 @@ static void MX_I2C2_Init(void)
 
   /* USER CODE END I2C2_Init 1 */
   hi2c2.Instance = I2C2;
-  hi2c2.Init.ClockSpeed = 100000;
+  hi2c2.Init.ClockSpeed = 400000;
   hi2c2.Init.DutyCycle = I2C_DUTYCYCLE_2;
   hi2c2.Init.OwnAddress1 = 0;
   hi2c2.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
@@ -257,16 +257,40 @@ static void MX_GPIO_Init(void)
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
+  __HAL_RCC_GPIOC_CLK_ENABLE();
+  __HAL_RCC_GPIOD_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(BAL_INDICATOR_GPIO_Port, BAL_INDICATOR_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, LED_HV_Pin|LED_BAL_Pin|LED_CP_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pin : BAL_INDICATOR_Pin */
-  GPIO_InitStruct.Pin = BAL_INDICATOR_Pin;
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(LED_TC_FLT_GPIO_Port, LED_TC_FLT_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pins : LED_HV_Pin LED_BAL_Pin LED_CP_Pin */
+  GPIO_InitStruct.Pin = LED_HV_Pin|LED_BAL_Pin|LED_CP_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(BAL_INDICATOR_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : LED_TC_FLT_Pin */
+  GPIO_InitStruct.Pin = LED_TC_FLT_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(LED_TC_FLT_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : BTN_TOP_Pin BTN_BCK_Pin BTN_SEL_Pin */
+  GPIO_InitStruct.Pin = BTN_TOP_Pin|BTN_BCK_Pin|BTN_SEL_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : BTN_BTM_Pin */
+  GPIO_InitStruct.Pin = BTN_BTM_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(BTN_BTM_GPIO_Port, &GPIO_InitStruct);
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
 /* USER CODE END MX_GPIO_Init_2 */

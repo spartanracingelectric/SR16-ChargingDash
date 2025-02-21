@@ -1,6 +1,6 @@
-Core/Src/ssd1306_fonts.o: ../Core/Src/ssd1306_fonts.c \
- ../Core/Src/ssd1306_fonts.h ../Core/Src/ssd1306.h \
- ../Core/Src/ssd1306_conf.h \
+Drivers/Display/ssd1306_fonts.o: ../Drivers/Display/ssd1306_fonts.c \
+ ../Drivers/Display/ssd1306_fonts.h ../Drivers/Display/ssd1306.h \
+ ../Drivers/Display/ssd1306_conf.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h \
  ../Core/Inc/stm32f1xx_hal_conf.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc.h \
@@ -25,9 +25,9 @@ Core/Src/ssd1306_fonts.o: ../Core/Src/ssd1306_fonts.c \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_i2c.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h
-../Core/Src/ssd1306_fonts.h:
-../Core/Src/ssd1306.h:
-../Core/Src/ssd1306_conf.h:
+../Drivers/Display/ssd1306_fonts.h:
+../Drivers/Display/ssd1306.h:
+../Drivers/Display/ssd1306_conf.h:
 ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h:
 ../Core/Inc/stm32f1xx_hal_conf.h:
 ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc.h:
