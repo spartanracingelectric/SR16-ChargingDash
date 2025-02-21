@@ -4,6 +4,9 @@
 #include "ssd1306.h"
 #include "ssd1306_fonts.h"
 #include <string.h>
+extern int selectedButton;
+extern bool selectPressed;
+extern int backPressed;
 
 // Initialization function
 void SRE_Display_Init(bool test_mode) {
@@ -25,7 +28,6 @@ void SRE_Display_Nav() {
 void SRE_Display_Nav_Bar(char *buttons[], int numOfButtons, int firstButtonIndex) {
 
 	//the selectedButton values for nav bar will vary based on currenty displayed screen
-	int selectedButton = 0; //REMOVE THIS
 	int maxSelectedButtonIndex = firstButtonIndex + numOfButtons-1;
 	int buttonIndex = firstButtonIndex;
 

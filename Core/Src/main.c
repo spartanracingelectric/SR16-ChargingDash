@@ -48,7 +48,11 @@ CAN_HandleTypeDef hcan1;
 I2C_HandleTypeDef hi2c2;
 
 /* USER CODE BEGIN PV */
-
+int selectedButton = 0;
+bool selectPressed = false;
+bool backPressed = false;
+uint32_t currentTime;
+uint32_t previousTime;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -58,12 +62,35 @@ static void MX_CAN1_Init(void);
 static void MX_I2C2_Init(void);
 /* USER CODE BEGIN PFP */
 HAL_StatusTypeDef I2C_SendMessage(uint8_t devAddr, uint8_t *data, uint16_t size);
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);
+
 
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 
+	currentTime = HAL_GetTick();
+
+	//debounce set at 200ms
+	if (currentTime - previousTime > 200) {
+		//rightmost button is GPIO_PIN_4, leftmost button is GPIO_PIN_11
+		if (GPIO_Pin == GPIO_PIN_10 && !selectPressed) {
+			selectedButton++;
+		}
+		else if (GPIO_Pin == GPIO_PIN_12) {
+			selectPressed = true;
+		}
+		else if (GPIO_Pin == GPIO_PIN_11 && !selectPressed) {
+			backPressed = true;
+		}
+		else if (GPIO_Pin == GPIO_PIN_2 && !selectPressed) {
+			selectedButton--;
+		}
+		previousTime = currentTime;
+	}
+}
 /* USER CODE END 0 */
 
 /**
