@@ -25,6 +25,57 @@ void SRE_Display_Nav() {
 
 }
 
+void SRE_Display_Charging_Instructions() {
+	selectedButton = 0;
+
+	char instruct[] = "How to Charge";
+	char step1[] = "Press the red button";
+	char step2[] = "Placeholder";
+	char step3[] = "Placeholder 2";
+
+	char retval;
+
+	// [todo] Make detection to check if step instruction is completed -> Go to new screen
+	// [todo] Cancel -> goes to some page
+	// [todo] Once finished, goes to Charger 1 stats
+
+	while (!selectPressed) {
+		ssd1306_FillRectangle(0, 0, 127, 63, Black);
+		if (selectedButton >= 1 || selectedButton < 0) {
+			selectedButton = 0;
+		}
+
+		ssd1306_SetCursor(1, 1);
+		retval = ssd1306_WriteString(instruct, Font_16x15, White);
+		ssd1306_Line(0, 10, 127, 10, White);
+
+		ssd1306_SetCursor(1, 13);
+		retval = ssd1306_WriteString(step1, Font_16x15, White);
+
+		ssd1306_SetCursor(1, 22);
+		retval = ssd1306_WriteString(step2, Font_16x15, White);
+
+		ssd1306_SetCursor(1, 31);
+		retval = ssd1306_WriteString(step3, Font_16x15, White);
+
+		char *navBarButtons[] = {"Cancel"};
+
+		SRE_Display_Nav_Bar(navBarButtons, 1, 0);
+
+		ssd1306_UpdateScreen();
+	}
+
+	if (selectPressed) {
+		selectPressed = false;
+
+		if (selectedButton >= 1 || selectedButton < 0) {
+			selectedButton = 0;
+		}
+
+		// Goes to some page after abort
+	}
+}
+
 void SRE_Display_Nav_Bar(char *buttons[], int numOfButtons, int firstButtonIndex) {
 
 	//the selectedButton values for nav bar will vary based on currenty displayed screen
