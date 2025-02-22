@@ -57,3 +57,45 @@ void SRE_Display_Nav_Bar(char *buttons[], int numOfButtons, int firstButtonIndex
 
 	ssd1306_UpdateScreen();
 }
+
+void SRE_Display_Charging2(){
+	char charging2Title[] = "Charging 2";
+	char packVoltStats[] = "Pack Volt: 400.22V";
+	char socStats[] = "SOC: 92.7%";
+	char timeRemaining[] = "Time Remaining: 120m";
+
+	char charging1Button[] = "Charging 1";
+
+	//Writes "Charging 1"
+	ssd1306_SetCursor(1, 1);
+	ssd1306_WriteString(charging2Title, Font_6x8, White);
+
+
+	ssd1306_Line(0, 10, 127, 10, White);
+
+	//Everything appears to be incremented by Y = 10, so font is roughly 8 squares.
+	//Writes Pack Volt Stats
+	ssd1306_SetCursor(1, 13);
+	ssd1306_WriteString(packVoltStats, Font_6x8, White);
+
+	//Writes SOC Stats
+	ssd1306_SetCursor(1, 23);
+	ssd1306_WriteString(socStats, Font_6x8, White);
+
+	//Writes timeRemaining
+	ssd1306_SetCursor(1, 33);
+	ssd1306_WriteString(timeRemaining, Font_6x8, White);
+
+
+	//Writes charging1 button
+		//Increase in 2 x and 1 y because box takes extra space.
+	ssd1306_SetCursor(3, 54);
+	ssd1306_WriteString(charging1Button, Font_6x8, Black);
+		//draws rectangle surrounding next text
+		//x1, y1, x2, y2:
+
+	ssd1306_DrawRectangle(1, 52, 64, 63, White);
+
+	ssd1306_UpdateScreen();
+
+}
