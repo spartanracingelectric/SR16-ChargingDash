@@ -9,4 +9,9 @@ void SRE_Display_Nav();
 void SRE_Display_Nav_Bar(char *buttons[], int numOfButtons, int firstButtonIndex);
 void SRE_Display_Start_Charging();
 void SRE_Display_Short_Scroll_Bar(int currentScreen, int numOfScreens);
+void SRE_Display_Charger_Stats();
+void SRE_Display_Battery1();
+void SRE_Display_Title_Bar(char title[]);
+void SRE_Display_Charger_Symbol(int x, int y);
+void SRE_Display_Error_Symbol(int x, int y);
 #endif
