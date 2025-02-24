@@ -14,4 +14,5 @@ void SRE_Display_Battery1();
 void SRE_Display_Title_Bar(char title[]);
 void SRE_Display_Charger_Symbol(int x, int y);
 void SRE_Display_Error_Symbol(int x, int y);
+void SRE_Display_Charging1();
 #endif
