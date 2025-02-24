@@ -17,7 +17,9 @@ void SRE_Display_Init(bool test_mode) {
 }
 // Function to test display
 void SRE_Display_Test() {
-	ssd1306_Fill(White);
+	//ssd1306_Fill(White);
+	char *navButtons[] = {"Nav", "Batt", "Start"};
+	SRE_Display_Nav_Bar(navButtons, 3, 0);
 	ssd1306_UpdateScreen();
 }
 // Example function to display navigation
@@ -67,7 +69,6 @@ void SRE_Display_StartBalancing(){
 	char navButtonText[] = "Nav";
 	char switchBalText[] = "Start Bal";
 
-
 	//NOTE: Parameters of drawLine and rectangle may be off. Might need to set Cursor
 		//for them also before calling them.
 		//Can't really test without working OLED.
@@ -87,35 +88,64 @@ void SRE_Display_StartBalancing(){
 			//Makes a straight line separating title and text.
 			ssd1306_Line(0, 10, 127, 10, White);
 
-
 			ssd1306_SetCursor(1, 13);
 			ssd1306_WriteString(balancingOnOff, Font_6x8, White);
 
-
 			//3px spacing between buttons.
 			//2px between box and text.
-
 			//Writes button for Batt.
 			ssd1306_SetCursor(3, 54);
 			ssd1306_WriteString(battButtonText, Font_6x8, White);
 			ssd1306_DrawRectangle(1, 52, 27, 63, White);
-
 
 			//nav button
 			ssd1306_SetCursor(32, 54);
 			ssd1306_WriteString(navButtonText, Font_6x8, White);
 			ssd1306_DrawRectangle(30, 52, 51, 63, White);
 
-
 			//Switch button
 			ssd1306_SetCursor(56, 54);
 			ssd1306_WriteString(switchBalText, Font_6x8, White);
 			ssd1306_DrawRectangle(54, 52, 110, 63, White);
-
-
-
-
+    
 			ssd1306_UpdateScreen();
 	}
 
 }
+
+void SRE_Display_Title_Bar(char title[]) {
+
+	ssd1306_SetCursor(1,1);
+	ssd1306_WriteString(title, Font_6x8, White);
+	ssd1306_Line(0, 10, 127, 10, White);
+
+	SRE_Display_Charger_Symbol(88, 3);
+	SRE_Display_Error_Symbol(119,1);
+}
+
+void SRE_Display_Charger_Symbol(int x, int y) {
+	//point of origin (x,y) is the top left of battery
+	ssd1306_Line(x, y, x+4, y, White);
+	ssd1306_Line(x, y, x, y+4, White);
+	ssd1306_Line(x, y+4, x+4, y+4, White);
+
+	ssd1306_Line(x+12, y, x+16, y, White);
+	ssd1306_Line(x+16, y, x+16, y+4, White);
+	ssd1306_Line(x+12, y+4, x+16, y+4, White);
+	ssd1306_Line(x+17, y+1, x+17, y+3, White);
+
+	ssd1306_Line(x+6, y+2, x+10, y+2, White);
+	ssd1306_Line(x+6, y+2, x+9, y-1, White);
+	ssd1306_Line(x+10, y+2, x+7, y+5, White);
+}
+
+void SRE_Display_Error_Symbol(int x, int y) {
+	//point of origin (x,y) is the top of the triangle
+	ssd1306_Line(x, y, x+7, y+7, White);
+	ssd1306_Line(x, y, x-7, y+7, White);
+	ssd1306_Line(x-7, y+7, x+7, y+7, White);
+
+	ssd1306_Line(x, y+2, x, y+4, White);
+	ssd1306_Line(x, y+6, x, y+6, White);
+}
+
