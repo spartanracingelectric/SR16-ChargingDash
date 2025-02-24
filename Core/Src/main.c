@@ -76,7 +76,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 	//debounce set at 200ms
 	if (currentTime - previousTime > 200) {
 		//rightmost button is GPIO_PIN_4, leftmost button is GPIO_PIN_11
-		if (GPIO_Pin == GPIO_PIN_10 && !selectPressed) {
+		if (GPIO_Pin == BTN_TOP_Pin && !selectPressed) {
 			selectedButton++;
 		}
 		else if (GPIO_Pin == GPIO_PIN_12) {
@@ -85,7 +85,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 		else if (GPIO_Pin == GPIO_PIN_11 && !selectPressed) {
 			backPressed = true;
 		}
-		else if (GPIO_Pin == GPIO_PIN_2 && !selectPressed) {
+		else if (GPIO_Pin == BTN_BTM_Pin && !selectPressed) {
 			selectedButton--;
 		}
 		previousTime = currentTime;
@@ -126,6 +126,7 @@ int main(void)
   MX_I2C2_Init();
   /* USER CODE BEGIN 2 */
   ssd1306_Init();
+  SRE_Display_Test();
 
   /* USER CODE END 2 */
 

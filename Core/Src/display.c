@@ -17,7 +17,9 @@ void SRE_Display_Init(bool test_mode) {
 }
 // Function to test display
 void SRE_Display_Test() {
-	ssd1306_Fill(White);
+	//ssd1306_Fill(White);
+	char *navButtons[] = {"Nav", "Batt", "Start"};
+	SRE_Display_Nav_Bar(navButtons, 3, 0);
 	ssd1306_UpdateScreen();
 }
 // Example function to display navigation
@@ -58,6 +60,7 @@ void SRE_Display_Nav_Bar(char *buttons[], int numOfButtons, int firstButtonIndex
 	ssd1306_UpdateScreen();
 }
 
+
 void SRE_Display_Battery2(){
 	char battery2Title[] = "Battery 2";
 	char socStats[] = "SOC: 95.1%";
@@ -71,12 +74,9 @@ void SRE_Display_Battery2(){
 	uint8_t x2 = 5, y2 = 33;  // Vertex 2
 	uint8_t x3 = 10, y3 = 40;  // Vertex 3
 
-
-
 	char balancingStats[] = "Balancing: 20.22V";
 	char navButtonText[] = "Nav";
 	char battery1ButtonText[] = "Battery 1";
-
 
 	while(!selectPressed){
 		if (selectedButton > 1) {
@@ -106,7 +106,6 @@ void SRE_Display_Battery2(){
 
 			ssd1306_SetCursor(15, 33);
 			ssd1306_WriteString(balancingStats, Font_6x8, White);
-
 
 			//Writes button for Nav and selects.
 			if(selectedButton == 0 || selectedButton > 1){
@@ -138,3 +137,40 @@ void SRE_Display_Battery2(){
 	}
 
 }
+
+void SRE_Display_Title_Bar(char title[]) {
+
+	ssd1306_SetCursor(1,1);
+	ssd1306_WriteString(title, Font_6x8, White);
+	ssd1306_Line(0, 10, 127, 10, White);
+
+	SRE_Display_Charger_Symbol(88, 3);
+	SRE_Display_Error_Symbol(119,1);
+}
+
+void SRE_Display_Charger_Symbol(int x, int y) {
+	//point of origin (x,y) is the top left of battery
+	ssd1306_Line(x, y, x+4, y, White);
+	ssd1306_Line(x, y, x, y+4, White);
+	ssd1306_Line(x, y+4, x+4, y+4, White);
+
+	ssd1306_Line(x+12, y, x+16, y, White);
+	ssd1306_Line(x+16, y, x+16, y+4, White);
+	ssd1306_Line(x+12, y+4, x+16, y+4, White);
+	ssd1306_Line(x+17, y+1, x+17, y+3, White);
+
+	ssd1306_Line(x+6, y+2, x+10, y+2, White);
+	ssd1306_Line(x+6, y+2, x+9, y-1, White);
+	ssd1306_Line(x+10, y+2, x+7, y+5, White);
+}
+
+void SRE_Display_Error_Symbol(int x, int y) {
+	//point of origin (x,y) is the top of the triangle
+	ssd1306_Line(x, y, x+7, y+7, White);
+	ssd1306_Line(x, y, x-7, y+7, White);
+	ssd1306_Line(x-7, y+7, x+7, y+7, White);
+
+	ssd1306_Line(x, y+2, x, y+4, White);
+	ssd1306_Line(x, y+6, x, y+6, White);
+}
+
