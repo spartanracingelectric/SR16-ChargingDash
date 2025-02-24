@@ -17,7 +17,9 @@ void SRE_Display_Init(bool test_mode) {
 }
 // Function to test display
 void SRE_Display_Test() {
-	ssd1306_Fill(White);
+	//ssd1306_Fill(White);
+	char *navButtons[] = {"Nav", "Batt", "Start"};
+	SRE_Display_Nav_Bar(navButtons, 3, 0);
 	ssd1306_UpdateScreen();
 }
 // Example function to display navigation
@@ -54,23 +56,20 @@ void SRE_Display_Nav_Bar(char *buttons[], int numOfButtons, int firstButtonIndex
 		x1 = x2 + 2;
 	}
 
-
 	ssd1306_UpdateScreen();
 }
+
 
 void SRE_Display_Charging2(){
 	char charging2Title[] = "Charging 2";
 	char packVoltStats[] = "Pack Volt: 400.22V";
 	char socStats[] = "SOC: 92.7%";
 	char timeRemaining[] = "Time Remaining: 120m";
-
 	char charging1Button[] = "Charging 1";
 
 	//Writes "Charging 1"
 	ssd1306_SetCursor(1, 1);
 	ssd1306_WriteString(charging2Title, Font_6x8, White);
-
-
 	ssd1306_Line(0, 10, 127, 10, White);
 
 	//Everything appears to be incremented by Y = 10, so font is roughly 8 squares.
@@ -85,17 +84,50 @@ void SRE_Display_Charging2(){
 	//Writes timeRemaining
 	ssd1306_SetCursor(1, 33);
 	ssd1306_WriteString(timeRemaining, Font_6x8, White);
-
-
+  
 	//Writes charging1 button
 		//Increase in 2 x and 1 y because box takes extra space.
 	ssd1306_SetCursor(3, 54);
 	ssd1306_WriteString(charging1Button, Font_6x8, Black);
 		//draws rectangle surrounding next text
 		//x1, y1, x2, y2:
-
 	ssd1306_DrawRectangle(1, 52, 64, 63, White);
-
 	ssd1306_UpdateScreen();
 
 }
+
+void SRE_Display_Title_Bar(char title[]) {
+
+	ssd1306_SetCursor(1,1);
+	ssd1306_WriteString(title, Font_6x8, White);
+	ssd1306_Line(0, 10, 127, 10, White);
+	SRE_Display_Charger_Symbol(88, 3);
+	SRE_Display_Error_Symbol(119,1);
+}
+
+void SRE_Display_Charger_Symbol(int x, int y) {
+	//point of origin (x,y) is the top left of battery
+	ssd1306_Line(x, y, x+4, y, White);
+	ssd1306_Line(x, y, x, y+4, White);
+	ssd1306_Line(x, y+4, x+4, y+4, White);
+
+	ssd1306_Line(x+12, y, x+16, y, White);
+	ssd1306_Line(x+16, y, x+16, y+4, White);
+	ssd1306_Line(x+12, y+4, x+16, y+4, White);
+	ssd1306_Line(x+17, y+1, x+17, y+3, White);
+
+	ssd1306_Line(x+6, y+2, x+10, y+2, White);
+	ssd1306_Line(x+6, y+2, x+9, y-1, White);
+	ssd1306_Line(x+10, y+2, x+7, y+5, White);
+}
+
+void SRE_Display_Error_Symbol(int x, int y) {
+	//point of origin (x,y) is the top of the triangle
+	ssd1306_Line(x, y, x+7, y+7, White);
+	ssd1306_Line(x, y, x-7, y+7, White);
+	ssd1306_Line(x-7, y+7, x+7, y+7, White);
+
+	ssd1306_Line(x, y+2, x, y+4, White);
+	ssd1306_Line(x, y+6, x, y+6, White);
+}
+
