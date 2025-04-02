@@ -19,13 +19,10 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include <stdbool.h>
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include <stdio.h>
-
-#include "display.h"
-#include "kanoa.h"
 
 /* USER CODE END Includes */
 
@@ -53,10 +50,11 @@ UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN PV */
 int selectedButton = 0;
-bool selectPressed = false;
 bool backPressed = false;
-uint32_t currentTime;
-uint32_t previousTime;
+bool selectPressed = false;
+bool atinyCommEnable = false;
+bool isElconFault = false;
+bool isBalancing = false;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -119,7 +117,7 @@ HAL_StatusTypeDef CAN_Send(struct CANMessage *ptr) {
 	return HAL_CAN_AddTxMessage(&hcan1, &ptr->TxHeader, (uint8_t*) ptr->data, &ptr->TxMailbox);
 }
 
-int charging_limit_volts = 395;
+int charging_limit_volts = 400;
 int charging_limit_amps = 20;
 
 void CAN_Charge(struct CANMessage *ptr, bool charge_enable) {
@@ -141,7 +139,7 @@ void CAN_Charge(struct CANMessage *ptr, bool charge_enable) {
 //    }
 
     ptr->data[0] = 0x0F;
-    ptr->data[1] = 0x6E;
+    ptr->data[1] = 0xA0;
     ptr->data[2] = 0x00;
     ptr->data[3] = 0xC8;
     ptr->data[4] = (charge_enable) ? 0x00 : 0x01;
@@ -154,27 +152,24 @@ void CAN_Charge(struct CANMessage *ptr, bool charge_enable) {
 
 // CAN test end
 
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
-
-	currentTime = HAL_GetTick();
-	//debounce set at 200ms
-	if (currentTime - previousTime > 200) {
-		//rightmost button is GPIO_PIN_4, leftmost button is GPIO_PIN_11
-		if (GPIO_Pin == BTN_BTM_Pin && !selectPressed) {
-			selectedButton++;
-		}
-		else if (GPIO_Pin == GPIO_PIN_12) {
-			selectPressed = true;
-		}
-		else if (GPIO_Pin == GPIO_PIN_11 && !selectPressed) {
-			backPressed = true;
-		}
-		else if (GPIO_Pin == BTN_TOP_Pin && !selectPressed) {
-			selectedButton--;
-		}
-		previousTime = currentTime;
-	}
-}
+//void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
+//	if (GPIO_Pin == BTN_BTM_Pin && !selectPressed) {
+//		selectedButton++;
+//		HAL_Delay(100);
+//	}
+//	else if (GPIO_Pin == GPIO_PIN_12) {
+//		selectPressed = true;
+//		HAL_Delay(100);
+//	}
+//	else if (GPIO_Pin == GPIO_PIN_11 && !selectPressed) {
+//		backPressed = true;
+//		HAL_Delay(100);
+//	}
+//	else if (GPIO_Pin == BTN_TOP_Pin && !selectPressed) {
+//		selectedButton--;
+//		HAL_Delay(100);
+//	}
+//}
 /* USER CODE END 0 */
 
 /**
@@ -210,7 +205,7 @@ int main(void)
   MX_I2C2_Init();
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
-  ssd1306_Init();
+//  ssd1306_Init();
 
   // CAN TEST BEGIN
   struct CANMessage msg;
@@ -218,31 +213,16 @@ int main(void)
   // CAN TEST END
 
   HAL_Delay(1000); // Wait for inits to finish
+//  DISP_KanoaSplash(); //call this in the UI init instead
+//  HAL_Delay(2000);
 
-  // LOL BEGIN
-  {
-	  ssd1306_Fill(Black);
-	  ssd1306_UpdateScreen();
-	  ssd1306_SetCursor(0, 0);
-	  ssd1306_DrawBitmap(0, 0, kanoaBootImage, 128, 64, White);
-	  ssd1306_SetCursor(70, 15);
-	  ssd1306_WriteString("KANOA OS", Font_6x8, White);
-	  ssd1306_SetCursor(70, 25);
-	  ssd1306_WriteString("v0.1.0", Font_6x8, White);
-	  ssd1306_SetCursor(70, 35);
-	  ssd1306_WriteString("charging", Font_6x8, White);
-	  ssd1306_SetCursor(70, 45);
-	  ssd1306_WriteString("solutions", Font_6x8, White);
-	  ssd1306_UpdateScreen();
-	  HAL_Delay(2000);
-  }
-  // LOL END
-
-  GPIO_PinState HVIL_SW_STATE;
+  GPIO_PinState IN_HVIL_SW_STATE;
   GPIO_PinState RTC_SW_STATE;
 
-  char chargingString[30];
-  sprintf(chargingString, "%d volts @ %d amps", charging_limit_volts, charging_limit_amps);
+//  char chargingString[30];
+//  sprintf(chargingString, "%d volts @ %d amps", charging_limit_volts, charging_limit_amps);
+
+//  SRE_Display_Test();
 
   /* USER CODE END 2 */
 
@@ -250,48 +230,86 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+//	  ssd1306_Fill(Black);
+//	  ssd1306_UpdateScreen();
 
-	  HVIL_SW_STATE = HAL_GPIO_ReadPin(HVIL_SW_GPIO_Port, HVIL_SW_Pin);
+	  IN_HVIL_SW_STATE = HAL_GPIO_ReadPin(IN_HVIL_F_SW_GPIO_Port, IN_HVIL_F_SW_Pin);
 	  RTC_SW_STATE = HAL_GPIO_ReadPin(RTC_SW_GPIO_Port, RTC_SW_Pin);
 
-	  ssd1306_Fill(Black);
-	  ssd1306_UpdateScreen();
-
-	  if(HVIL_SW_STATE && !RTC_SW_STATE) {
-		  CAN_Charge(&msg, true);
-		  ssd1306_SetCursor(5, 5);
-		  ssd1306_WriteString("Charging:", Font_6x8, White);
-		  ssd1306_SetCursor(10, 5);
-		  ssd1306_WriteString(chargingString, Font_6x8, White);
-		  ssd1306_UpdateScreen();
+	  if(IN_HVIL_SW_STATE) {
+		  HAL_GPIO_WritePin(HVIL_CTRL_GPIO_Port, HVIL_CTRL_Pin, GPIO_PIN_SET);
+		  HAL_GPIO_WritePin(GPIOA, LED_HV_Pin, GPIO_PIN_SET);
+		  if(!RTC_SW_STATE) {
+			  CAN_Charge(&msg, true);
+		  } else {
+			  CAN_Charge(&msg, false);
+		  }
+//		  ssd1306_SetCursor(5, 5);
+//		  ssd1306_WriteString("Charging:", Font_6x8, White);
+//		  ssd1306_SetCursor(10, 5);
+//		  ssd1306_WriteString(chargingString, Font_6x8, White);
+//		  ssd1306_UpdateScreen();
 	  } else {
-		  CAN_Charge(&msg, false);
-		  ssd1306_SetCursor(5, 5);
-		  ssd1306_WriteString("Not charging", Font_6x8, White);
-		  ssd1306_UpdateScreen();
+		  HAL_GPIO_WritePin(HVIL_CTRL_GPIO_Port, HVIL_CTRL_Pin, GPIO_PIN_RESET);
+		  HAL_GPIO_WritePin(GPIOA, LED_HV_Pin, GPIO_PIN_RESET);
+//		  ssd1306_SetCursor(5, 5);
+//		  ssd1306_WriteString("Not charging", Font_6x8, White);
+//		  ssd1306_UpdateScreen();
 	  }
 
-	  HAL_Delay(1000);
+//	  // LED control
+//	  {
+//		  // Balance LED control
+//		  {
+//			  if (!isBalancing)
+//				  HAL_GPIO_WritePin(GPIOA, LED_BAL_Pin, GPIO_PIN_RESET);
+//			  else
+//				  HAL_GPIO_WritePin(GPIOA, LED_BAL_Pin, GPIO_PIN_SET);
+//		  }
+//
+//		  // Elcon fault LED control
+//		  {
+//			  if(!isElconFault)
+//				  HAL_GPIO_WritePin(LED_TC_FLT_GPIO_Port, LED_TC_FLT_Pin, GPIO_PIN_RESET);
+//			  else
+//				  HAL_GPIO_WritePin(LED_TC_FLT_GPIO_Port, LED_TC_FLT_Pin, GPIO_PIN_SET);
+//
+//		  }
+//
+//		  // HV LED control
+//		  {
+//			  if (!isBalancing)
+//				  HAL_GPIO_WritePin(GPIOA, LED_HV_Pin, GPIO_PIN_RESET);
+//			  else
+//				  HAL_GPIO_WritePin(GPIOA, LED_HV_Pin, GPIO_PIN_SET);
+//		  }
+//
+//	  }
 
-//	  uint8_t message[] = {"0x3E"};
-//	  /*
-//	   * First 3 bits are faults (bms, imd, etc)
-//	   * Next 3 bits are soc
-//	   * Last 2 are reserved
-//	  */
-//	  uint8_t deviceAddress = 0x3A << 1;  // Atiny address
-//	  HAL_StatusTypeDef status = I2C_SendMessage(deviceAddress, message, 5);
+//	  // Atiny comm
+//	  if (atinyCommEnable) {
+//		  uint8_t message[] = {"0x3E"};
+//		  /*
+//		   * First 3 bits are faults (bms, imd, etc)
+//		   * Next 3 bits are soc
+//		   * Last 2 are reserved
+//		  */
+//		  uint8_t deviceAddress = 0x3A << 1;  // Atiny address
+//		  HAL_StatusTypeDef status = HAL_I2C_Master_Transmit(&hi2c2, deviceAddress, message, 5, 500);
+//	  	  if (status == HAL_OK) {
+//	  		  // good
+//	  	  } else {
+//	  		  // fault
+//	  	  }
+//	  }
+
+//	  HAL_GPIO_TogglePin(HVIL_CTRL_GPIO_Port, HVIL_CTRL_Pin);
+//	  HAL_Delay(1000);
+
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-//	  if (HAL_GPIO_ReadPin(GPIOC, BTN_SEL_Pin) == GPIO_PIN_RESET)
-//	  {
-//		 HAL_Delay(500);
-//		 HAL_GPIO_TogglePin(GPIOA, LED_BAL_Pin);
-//		 while (HAL_GPIO_ReadPin(GPIOC, BTN_SEL_Pin) == GPIO_PIN_RESET);
-//	  }
-	  //HAL_GPIO_TogglePin(GPIOA, LED_BAL_Pin);
-
   }
   /* USER CODE END 3 */
 }
@@ -435,7 +453,7 @@ static void MX_USART1_UART_Init(void)
   huart1.Init.StopBits = UART_STOPBITS_1;
   huart1.Init.Parity = UART_PARITY_NONE;
   huart1.Init.Mode = UART_MODE_TX_RX;
-  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart1.Init.HwFlowCtl = UART_HWCONTROL_RTS_CTS;
   huart1.Init.OverSampling = UART_OVERSAMPLING_16;
   if (HAL_UART_Init(&huart1) != HAL_OK)
   {
@@ -465,57 +483,91 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOC_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, LED_HV_Pin|LED_BAL_Pin|LED_CP_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, LED_HV_Pin|LED_BAL_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(LED_TC_FLT_GPIO_Port, LED_TC_FLT_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(LED_ELCON_FLT_GPIO_Port, LED_ELCON_FLT_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pins : LED_HV_Pin LED_BAL_Pin LED_CP_Pin */
-  GPIO_InitStruct.Pin = LED_HV_Pin|LED_BAL_Pin|LED_CP_Pin;
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(LED_TSAL_FLT_GPIO_Port, LED_TSAL_FLT_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(HVIL_CTRL_GPIO_Port, HVIL_CTRL_Pin, GPIO_PIN_SET);
+
+  /*Configure GPIO pins : IN_HVIL_ACUM_Pin IN_HVIL_CHAR_Pin IN_HVIL_ESTOP_Pin */
+  GPIO_InitStruct.Pin = IN_HVIL_ACUM_Pin|IN_HVIL_CHAR_Pin|IN_HVIL_ESTOP_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : LED_HV_Pin LED_BAL_Pin */
+  GPIO_InitStruct.Pin = LED_HV_Pin|LED_BAL_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : HVIL_SW_Pin */
-  GPIO_InitStruct.Pin = HVIL_SW_Pin;
+  /*Configure GPIO pin : CP_SIG_Pin */
+  GPIO_InitStruct.Pin = CP_SIG_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+  HAL_GPIO_Init(CP_SIG_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : IN_HVIL_F_SW_Pin */
+  GPIO_InitStruct.Pin = IN_HVIL_F_SW_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_PULLDOWN;
-  HAL_GPIO_Init(HVIL_SW_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(IN_HVIL_F_SW_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : LED_TC_FLT_Pin */
-  GPIO_InitStruct.Pin = LED_TC_FLT_Pin;
+  /*Configure GPIO pins : IN_BMS_FLT_LED_Pin IN_IMD_FLT_LED_Pin RTC_SW_Pin */
+  GPIO_InitStruct.Pin = IN_BMS_FLT_LED_Pin|IN_IMD_FLT_LED_Pin|RTC_SW_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : THERM_2_SIG_Pin THERM_1_SIG_Pin FAN_CRTL_Pin */
+  GPIO_InitStruct.Pin = THERM_2_SIG_Pin|THERM_1_SIG_Pin|FAN_CRTL_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : LED_ELCON_FLT_Pin */
+  GPIO_InitStruct.Pin = LED_ELCON_FLT_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(LED_TC_FLT_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(LED_ELCON_FLT_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : BTN_TOP_Pin BTN_SEL_Pin BTN_BACK_Pin */
-  GPIO_InitStruct.Pin = BTN_TOP_Pin|BTN_SEL_Pin|BTN_BACK_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  /*Configure GPIO pin : SHUNT_SIG_Pin */
+  GPIO_InitStruct.Pin = SHUNT_SIG_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+  HAL_GPIO_Init(SHUNT_SIG_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : LED_TSAL_FLT_Pin */
+  GPIO_InitStruct.Pin = LED_TSAL_FLT_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(LED_TSAL_FLT_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : HVIL_CTRL_Pin */
+  GPIO_InitStruct.Pin = HVIL_CTRL_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(HVIL_CTRL_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : BTN_1_Pin BTN_2_Pin BTN_3_Pin */
+  GPIO_InitStruct.Pin = BTN_1_Pin|BTN_2_Pin|BTN_3_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : BTN_BTM_Pin */
-  GPIO_InitStruct.Pin = BTN_BTM_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
-  HAL_GPIO_Init(BTN_BTM_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : RTC_SW_Pin */
-  GPIO_InitStruct.Pin = RTC_SW_Pin;
+  /*Configure GPIO pin : BTN_4_Pin */
+  GPIO_InitStruct.Pin = BTN_4_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
-  HAL_GPIO_Init(RTC_SW_GPIO_Port, &GPIO_InitStruct);
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(BTN_4_GPIO_Port, &GPIO_InitStruct);
 
-    /* EXTI interrupt init*/
-  HAL_NVIC_SetPriority(EXTI2_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(EXTI2_IRQn);
-
-  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
-
-/* USER CODE BEGIN MX_GPIO_Init_2 */
+  /* USER CODE BEGIN MX_GPIO_Init_2 */
   /* USER CODE END MX_GPIO_Init_2 */
 }
 

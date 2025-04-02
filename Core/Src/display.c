@@ -1,8 +1,25 @@
 // Written by Ayman Alamayri in Dec 2024
 #include "display.h"
+
 extern int selectedButton;
 extern bool selectPressed;
 extern int backPressed;
+
+//void DISP_KanoaSplash() {
+//	ssd1306_Fill(Black);
+//	ssd1306_UpdateScreen();
+//	ssd1306_SetCursor(0, 0);
+//	ssd1306_DrawBitmap(0, 0, kanoaBootImage, 128, 64, White);
+//	ssd1306_SetCursor(70, 15);
+//	ssd1306_WriteString("KANOA OS", Font_6x8, White);
+//	ssd1306_SetCursor(70, 25);
+//	ssd1306_WriteString("v0.1.0", Font_6x8, White);
+//	ssd1306_SetCursor(70, 35);
+//	ssd1306_WriteString("charging", Font_6x8, White);
+//	ssd1306_SetCursor(70, 45);
+//	ssd1306_WriteString("solutions", Font_6x8, White);
+//	ssd1306_UpdateScreen();
+//}
 
 // Initialization function
 void SRE_Display_Init(bool test_mode) {
@@ -389,8 +406,9 @@ void SRE_Display_Start_Charging() {
 		if (selectedButton == navStartIndex) {
 			SRE_Display_Battery1();
 		}
-		else if (selectedButton == navStartIndex + 1);
+		else if (selectedButton == navStartIndex + 1) {
 			SRE_Display_Nav();
+		}
 	}
 }
 
