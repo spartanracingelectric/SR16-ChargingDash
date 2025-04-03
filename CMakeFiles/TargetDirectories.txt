@@ -1,0 +1,6 @@
+C:/Users/Owner/Documents/Github/SR16-ChargingDash/CMakeFiles/SR16-ChargingDash.dir
+C:/Users/Owner/Documents/Github/SR16-ChargingDash/CMakeFiles/edit_cache.dir
+C:/Users/Owner/Documents/Github/SR16-ChargingDash/CMakeFiles/rebuild_cache.dir
+C:/Users/Owner/Documents/Github/SR16-ChargingDash/cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir
+C:/Users/Owner/Documents/Github/SR16-ChargingDash/cmake/stm32cubemx/CMakeFiles/edit_cache.dir
+C:/Users/Owner/Documents/Github/SR16-ChargingDash/cmake/stm32cubemx/CMakeFiles/rebuild_cache.dir
