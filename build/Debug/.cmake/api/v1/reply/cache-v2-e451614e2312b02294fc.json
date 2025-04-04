@@ -179,7 +179,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "c:/Users/Owner/Documents/GitHub/SR16-ChargingDash/build/Debug"
+			"value" : "c:/Users/Bhuv/Desktop/SR16-ChargingDash/build/Debug"
 		},
 		{
 			"name" : "CMAKE_CACHE_MAJOR_VERSION",
@@ -491,7 +491,7 @@
 				}
 			],
 			"type" : "FILEPATH",
-			"value" : "CMAKE_DLLTOOL-NOTFOUND"
+			"value" : "C:/Strawberry/c/bin/dlltool.exe"
 		},
 		{
 			"name" : "CMAKE_EDIT_COMMAND",
@@ -619,7 +619,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "C:/Users/Owner/Documents/GitHub/SR16-ChargingDash/build/Debug/CMakeFiles/pkgRedirects"
+			"value" : "C:/Users/Bhuv/Desktop/SR16-ChargingDash/build/Debug/CMakeFiles/pkgRedirects"
 		},
 		{
 			"name" : "CMAKE_GENERATOR",
@@ -679,7 +679,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "C:/Users/Owner/Documents/Github/SR16-ChargingDash"
+			"value" : "C:/Users/Bhuv/Desktop/SR16-ChargingDash"
 		},
 		{
 			"name" : "CMAKE_INSTALL_PREFIX",
@@ -1155,11 +1155,11 @@
 			[
 				{
 					"name" : "HELPSTRING",
-					"value" : "No help, variable specified on the command line."
+					"value" : "The CMake toolchain file"
 				}
 			],
-			"type" : "UNINITIALIZED",
-			"value" : "C:/Users/Owner/Documents/GitHub/SR16-ChargingDash/cmake/gcc-arm-none-eabi.cmake"
+			"type" : "FILEPATH",
+			"value" : "C:/Users/Bhuv/Desktop/SR16-ChargingDash/cmake/gcc-arm-none-eabi.cmake"
 		},
 		{
 			"name" : "CMAKE_VERBOSE_MAKEFILE",
@@ -1187,7 +1187,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "C:/Users/Owner/Documents/GitHub/SR16-ChargingDash/build/Debug"
+			"value" : "C:/Users/Bhuv/Desktop/SR16-ChargingDash/build/Debug"
 		},
 		{
 			"name" : "SR16-ChargingDash_IS_TOP_LEVEL",
@@ -1211,7 +1211,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "C:/Users/Owner/Documents/GitHub/SR16-ChargingDash"
+			"value" : "C:/Users/Bhuv/Desktop/SR16-ChargingDash"
 		}
 	],
 	"kind" : "cache",
