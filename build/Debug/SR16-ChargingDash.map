@@ -2904,10 +2904,6 @@ Discarded input sections
  .text          0x00000000        0x0 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
  .data          0x00000000        0x0 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
  .bss           0x00000000        0x0 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
- .bss.atinyCommEnable
-                0x00000000        0x1 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
- .bss.isElconFault
-                0x00000000        0x1 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
  .text.__io_putchar
                 0x00000000       0x24 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
  .debug_macro   0x00000000      0xacc CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
@@ -3364,8 +3360,6 @@ Discarded input sections
  .text          0x00000000        0x0 CMakeFiles/SR16-ChargingDash.dir/Core/Src/display.c.obj
  .data          0x00000000        0x0 CMakeFiles/SR16-ChargingDash.dir/Core/Src/display.c.obj
  .bss           0x00000000        0x0 CMakeFiles/SR16-ChargingDash.dir/Core/Src/display.c.obj
- .text.SRE_Display_Init
-                0x00000000       0x20 CMakeFiles/SR16-ChargingDash.dir/Core/Src/display.c.obj
  .text.SRE_Display_Home
                 0x00000000      0x154 CMakeFiles/SR16-ChargingDash.dir/Core/Src/display.c.obj
  .text.SRE_Display_Charging_Instructions
@@ -3918,7 +3912,7 @@ LOAD C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/
                 0x08000000                g_pfnVectors
                 0x080001e4                        . = ALIGN (0x4)
 
-.text           0x080001e4     0x6d1c
+.text           0x080001e4     0x6d4c
                 0x080001e4                        . = ALIGN (0x4)
  *(.text)
  .text          0x080001e4       0x40 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7-m/nofp/crtbegin.o
@@ -4128,408 +4122,411 @@ LOAD C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/
                 0x08003cb8                HAL_UART_Init
  .text.UART_SetConfig
                 0x08003d58      0x11c cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_uart.c.obj
- .text.CAN_Start
-                0x08003e74       0x14 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
-                0x08003e74                CAN_Start
- .text.CAN_Activate
-                0x08003e88       0x18 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
-                0x08003e88                CAN_Activate
- .text.CAN_SettingsInit
-                0x08003ea0       0x42 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
-                0x08003ea0                CAN_SettingsInit
- .text.Set_CAN_Id
-                0x08003ee2       0x2c CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
-                0x08003ee2                Set_CAN_Id
- *fill*         0x08003f0e        0x2 
- .text.CAN_Send
-                0x08003f10       0x28 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
-                0x08003f10                CAN_Send
- .text.CAN_Balance
-                0x08003f38       0x38 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
-                0x08003f38                CAN_Balance
- .text.CAN_Charge
-                0x08003f70       0x9c CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
-                0x08003f70                CAN_Charge
  .text.HAL_GPIO_EXTI_Callback
-                0x0800400c       0xc0 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
-                0x0800400c                HAL_GPIO_EXTI_Callback
- .text.main     0x080040cc      0x1bc CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
-                0x080040cc                main
+                0x08003e74       0xc0 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
+                0x08003e74                HAL_GPIO_EXTI_Callback
+ .text.CAN_Start
+                0x08003f34       0x14 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
+                0x08003f34                CAN_Start
+ .text.CAN_Activate
+                0x08003f48       0x18 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
+                0x08003f48                CAN_Activate
+ .text.CAN_Send
+                0x08003f60       0x28 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
+                0x08003f60                CAN_Send
+ .text.CAN_SettingsInit
+                0x08003f88       0x42 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
+                0x08003f88                CAN_SettingsInit
+ .text.Set_CAN_Id
+                0x08003fca       0x2c CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
+                0x08003fca                Set_CAN_Id
+ .text.CAN_Balance
+                0x08003ff6       0x38 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
+                0x08003ff6                CAN_Balance
+ *fill*         0x0800402e        0x2 
+ .text.CAN_Charge
+                0x08004030       0xa8 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
+                0x08004030                CAN_Charge
+ .text.main     0x080040d8      0x1dc CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
+                0x080040d8                main
  .text.SystemClock_Config
-                0x08004288       0xd4 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
-                0x08004288                SystemClock_Config
+                0x080042b4       0xd4 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
+                0x080042b4                SystemClock_Config
  .text.MX_ADC1_Init
-                0x0800435c       0xcc CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
+                0x08004388       0xcc CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
  .text.MX_CAN1_Init
-                0x08004428       0x6c CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
+                0x08004454       0x6c CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
  .text.MX_I2C2_Init
-                0x08004494       0x5c CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
+                0x080044c0       0x5c CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
  .text.MX_TIM2_Init
-                0x080044f0       0xe8 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
+                0x0800451c       0xe8 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
  .text.MX_TIM3_Init
-                0x080045d8       0x98 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
+                0x08004604       0x98 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
  .text.MX_USART1_UART_Init
-                0x08004670       0x54 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
+                0x0800469c       0x54 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
  .text.MX_DMA_Init
-                0x080046c4       0x3c CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
+                0x080046f0       0x3c CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
  .text.MX_GPIO_Init
-                0x08004700      0x1d0 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
+                0x0800472c      0x1d0 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
  .text.Error_Handler
-                0x080048d0        0xc CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
-                0x080048d0                Error_Handler
+                0x080048fc        0xc CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
+                0x080048fc                Error_Handler
  .text.NMI_Handler
-                0x080048dc        0x8 CMakeFiles/SR16-ChargingDash.dir/Core/Src/stm32f1xx_it.c.obj
-                0x080048dc                NMI_Handler
+                0x08004908        0x8 CMakeFiles/SR16-ChargingDash.dir/Core/Src/stm32f1xx_it.c.obj
+                0x08004908                NMI_Handler
  .text.HardFault_Handler
-                0x080048e4        0x8 CMakeFiles/SR16-ChargingDash.dir/Core/Src/stm32f1xx_it.c.obj
-                0x080048e4                HardFault_Handler
+                0x08004910        0x8 CMakeFiles/SR16-ChargingDash.dir/Core/Src/stm32f1xx_it.c.obj
+                0x08004910                HardFault_Handler
  .text.MemManage_Handler
-                0x080048ec        0x8 CMakeFiles/SR16-ChargingDash.dir/Core/Src/stm32f1xx_it.c.obj
-                0x080048ec                MemManage_Handler
+                0x08004918        0x8 CMakeFiles/SR16-ChargingDash.dir/Core/Src/stm32f1xx_it.c.obj
+                0x08004918                MemManage_Handler
  .text.BusFault_Handler
-                0x080048f4        0x8 CMakeFiles/SR16-ChargingDash.dir/Core/Src/stm32f1xx_it.c.obj
-                0x080048f4                BusFault_Handler
+                0x08004920        0x8 CMakeFiles/SR16-ChargingDash.dir/Core/Src/stm32f1xx_it.c.obj
+                0x08004920                BusFault_Handler
  .text.UsageFault_Handler
-                0x080048fc        0x8 CMakeFiles/SR16-ChargingDash.dir/Core/Src/stm32f1xx_it.c.obj
-                0x080048fc                UsageFault_Handler
+                0x08004928        0x8 CMakeFiles/SR16-ChargingDash.dir/Core/Src/stm32f1xx_it.c.obj
+                0x08004928                UsageFault_Handler
  .text.SVC_Handler
-                0x08004904        0xc CMakeFiles/SR16-ChargingDash.dir/Core/Src/stm32f1xx_it.c.obj
-                0x08004904                SVC_Handler
+                0x08004930        0xc CMakeFiles/SR16-ChargingDash.dir/Core/Src/stm32f1xx_it.c.obj
+                0x08004930                SVC_Handler
  .text.DebugMon_Handler
-                0x08004910        0xc CMakeFiles/SR16-ChargingDash.dir/Core/Src/stm32f1xx_it.c.obj
-                0x08004910                DebugMon_Handler
+                0x0800493c        0xc CMakeFiles/SR16-ChargingDash.dir/Core/Src/stm32f1xx_it.c.obj
+                0x0800493c                DebugMon_Handler
  .text.PendSV_Handler
-                0x0800491c        0xc CMakeFiles/SR16-ChargingDash.dir/Core/Src/stm32f1xx_it.c.obj
-                0x0800491c                PendSV_Handler
+                0x08004948        0xc CMakeFiles/SR16-ChargingDash.dir/Core/Src/stm32f1xx_it.c.obj
+                0x08004948                PendSV_Handler
  .text.SysTick_Handler
-                0x08004928        0xc CMakeFiles/SR16-ChargingDash.dir/Core/Src/stm32f1xx_it.c.obj
-                0x08004928                SysTick_Handler
+                0x08004954        0xc CMakeFiles/SR16-ChargingDash.dir/Core/Src/stm32f1xx_it.c.obj
+                0x08004954                SysTick_Handler
  .text.EXTI2_IRQHandler
-                0x08004934        0xe CMakeFiles/SR16-ChargingDash.dir/Core/Src/stm32f1xx_it.c.obj
-                0x08004934                EXTI2_IRQHandler
- *fill*         0x08004942        0x2 
+                0x08004960        0xe CMakeFiles/SR16-ChargingDash.dir/Core/Src/stm32f1xx_it.c.obj
+                0x08004960                EXTI2_IRQHandler
+ *fill*         0x0800496e        0x2 
  .text.DMA1_Channel1_IRQHandler
-                0x08004944       0x14 CMakeFiles/SR16-ChargingDash.dir/Core/Src/stm32f1xx_it.c.obj
-                0x08004944                DMA1_Channel1_IRQHandler
+                0x08004970       0x14 CMakeFiles/SR16-ChargingDash.dir/Core/Src/stm32f1xx_it.c.obj
+                0x08004970                DMA1_Channel1_IRQHandler
  .text.EXTI15_10_IRQHandler
-                0x08004958       0x20 CMakeFiles/SR16-ChargingDash.dir/Core/Src/stm32f1xx_it.c.obj
-                0x08004958                EXTI15_10_IRQHandler
+                0x08004984       0x20 CMakeFiles/SR16-ChargingDash.dir/Core/Src/stm32f1xx_it.c.obj
+                0x08004984                EXTI15_10_IRQHandler
  .text.HAL_MspInit
-                0x08004978       0x64 CMakeFiles/SR16-ChargingDash.dir/Core/Src/stm32f1xx_hal_msp.c.obj
-                0x08004978                HAL_MspInit
+                0x080049a4       0x64 CMakeFiles/SR16-ChargingDash.dir/Core/Src/stm32f1xx_hal_msp.c.obj
+                0x080049a4                HAL_MspInit
  .text.HAL_ADC_MspInit
-                0x080049dc      0x130 CMakeFiles/SR16-ChargingDash.dir/Core/Src/stm32f1xx_hal_msp.c.obj
-                0x080049dc                HAL_ADC_MspInit
+                0x08004a08      0x130 CMakeFiles/SR16-ChargingDash.dir/Core/Src/stm32f1xx_hal_msp.c.obj
+                0x08004a08                HAL_ADC_MspInit
  .text.HAL_CAN_MspInit
-                0x08004b0c       0xc0 CMakeFiles/SR16-ChargingDash.dir/Core/Src/stm32f1xx_hal_msp.c.obj
-                0x08004b0c                HAL_CAN_MspInit
+                0x08004b38       0xc0 CMakeFiles/SR16-ChargingDash.dir/Core/Src/stm32f1xx_hal_msp.c.obj
+                0x08004b38                HAL_CAN_MspInit
  .text.HAL_I2C_MspInit
-                0x08004bcc       0x80 CMakeFiles/SR16-ChargingDash.dir/Core/Src/stm32f1xx_hal_msp.c.obj
-                0x08004bcc                HAL_I2C_MspInit
+                0x08004bf8       0x80 CMakeFiles/SR16-ChargingDash.dir/Core/Src/stm32f1xx_hal_msp.c.obj
+                0x08004bf8                HAL_I2C_MspInit
  .text.HAL_TIM_Base_MspInit
-                0x08004c4c       0xc8 CMakeFiles/SR16-ChargingDash.dir/Core/Src/stm32f1xx_hal_msp.c.obj
-                0x08004c4c                HAL_TIM_Base_MspInit
+                0x08004c78       0xc8 CMakeFiles/SR16-ChargingDash.dir/Core/Src/stm32f1xx_hal_msp.c.obj
+                0x08004c78                HAL_TIM_Base_MspInit
  .text.HAL_TIM_MspPostInit
-                0x08004d14       0x60 CMakeFiles/SR16-ChargingDash.dir/Core/Src/stm32f1xx_hal_msp.c.obj
-                0x08004d14                HAL_TIM_MspPostInit
+                0x08004d40       0x60 CMakeFiles/SR16-ChargingDash.dir/Core/Src/stm32f1xx_hal_msp.c.obj
+                0x08004d40                HAL_TIM_MspPostInit
  .text.HAL_UART_MspInit
-                0x08004d74       0x98 CMakeFiles/SR16-ChargingDash.dir/Core/Src/stm32f1xx_hal_msp.c.obj
-                0x08004d74                HAL_UART_MspInit
- .text._sbrk    0x08004e0c       0x6c CMakeFiles/SR16-ChargingDash.dir/Core/Src/sysmem.c.obj
-                0x08004e0c                _sbrk
+                0x08004da0       0x98 CMakeFiles/SR16-ChargingDash.dir/Core/Src/stm32f1xx_hal_msp.c.obj
+                0x08004da0                HAL_UART_MspInit
+ .text._sbrk    0x08004e38       0x6c CMakeFiles/SR16-ChargingDash.dir/Core/Src/sysmem.c.obj
+                0x08004e38                _sbrk
  .text.Reset_Handler
-                0x08004e78       0x48 CMakeFiles/SR16-ChargingDash.dir/startup_stm32f105xc.s.obj
-                0x08004e78                Reset_Handler
+                0x08004ea4       0x48 CMakeFiles/SR16-ChargingDash.dir/startup_stm32f105xc.s.obj
+                0x08004ea4                Reset_Handler
  .text.Default_Handler
-                0x08004ec0        0x2 CMakeFiles/SR16-ChargingDash.dir/startup_stm32f105xc.s.obj
-                0x08004ec0                RTC_Alarm_IRQHandler
-                0x08004ec0                TIM1_CC_IRQHandler
-                0x08004ec0                TIM6_IRQHandler
-                0x08004ec0                PVD_IRQHandler
-                0x08004ec0                CAN2_RX1_IRQHandler
-                0x08004ec0                EXTI3_IRQHandler
-                0x08004ec0                EXTI0_IRQHandler
-                0x08004ec0                I2C2_EV_IRQHandler
-                0x08004ec0                CAN1_RX0_IRQHandler
-                0x08004ec0                CAN2_SCE_IRQHandler
-                0x08004ec0                ADC1_2_IRQHandler
-                0x08004ec0                SPI1_IRQHandler
-                0x08004ec0                TAMPER_IRQHandler
-                0x08004ec0                CAN2_RX0_IRQHandler
-                0x08004ec0                DMA2_Channel2_IRQHandler
-                0x08004ec0                DMA1_Channel4_IRQHandler
-                0x08004ec0                USART3_IRQHandler
-                0x08004ec0                RTC_IRQHandler
-                0x08004ec0                DMA1_Channel7_IRQHandler
-                0x08004ec0                CAN1_RX1_IRQHandler
-                0x08004ec0                UART5_IRQHandler
-                0x08004ec0                TIM4_IRQHandler
-                0x08004ec0                DMA2_Channel1_IRQHandler
-                0x08004ec0                I2C1_EV_IRQHandler
-                0x08004ec0                DMA1_Channel6_IRQHandler
-                0x08004ec0                UART4_IRQHandler
-                0x08004ec0                DMA2_Channel4_IRQHandler
-                0x08004ec0                TIM3_IRQHandler
-                0x08004ec0                RCC_IRQHandler
-                0x08004ec0                TIM1_TRG_COM_IRQHandler
-                0x08004ec0                Default_Handler
-                0x08004ec0                TIM7_IRQHandler
-                0x08004ec0                CAN2_TX_IRQHandler
-                0x08004ec0                TIM5_IRQHandler
-                0x08004ec0                EXTI9_5_IRQHandler
-                0x08004ec0                SPI2_IRQHandler
-                0x08004ec0                CAN1_TX_IRQHandler
-                0x08004ec0                DMA2_Channel5_IRQHandler
-                0x08004ec0                DMA1_Channel5_IRQHandler
-                0x08004ec0                EXTI4_IRQHandler
-                0x08004ec0                DMA1_Channel3_IRQHandler
-                0x08004ec0                TIM1_UP_IRQHandler
-                0x08004ec0                WWDG_IRQHandler
-                0x08004ec0                TIM2_IRQHandler
-                0x08004ec0                OTG_FS_WKUP_IRQHandler
-                0x08004ec0                TIM1_BRK_IRQHandler
-                0x08004ec0                EXTI1_IRQHandler
-                0x08004ec0                USART2_IRQHandler
-                0x08004ec0                I2C2_ER_IRQHandler
-                0x08004ec0                DMA1_Channel2_IRQHandler
-                0x08004ec0                CAN1_SCE_IRQHandler
-                0x08004ec0                FLASH_IRQHandler
-                0x08004ec0                USART1_IRQHandler
-                0x08004ec0                OTG_FS_IRQHandler
-                0x08004ec0                SPI3_IRQHandler
-                0x08004ec0                I2C1_ER_IRQHandler
-                0x08004ec0                DMA2_Channel3_IRQHandler
- *fill*         0x08004ec2        0x2 
+                0x08004eec        0x2 CMakeFiles/SR16-ChargingDash.dir/startup_stm32f105xc.s.obj
+                0x08004eec                RTC_Alarm_IRQHandler
+                0x08004eec                TIM1_CC_IRQHandler
+                0x08004eec                TIM6_IRQHandler
+                0x08004eec                PVD_IRQHandler
+                0x08004eec                CAN2_RX1_IRQHandler
+                0x08004eec                EXTI3_IRQHandler
+                0x08004eec                EXTI0_IRQHandler
+                0x08004eec                I2C2_EV_IRQHandler
+                0x08004eec                CAN1_RX0_IRQHandler
+                0x08004eec                CAN2_SCE_IRQHandler
+                0x08004eec                ADC1_2_IRQHandler
+                0x08004eec                SPI1_IRQHandler
+                0x08004eec                TAMPER_IRQHandler
+                0x08004eec                CAN2_RX0_IRQHandler
+                0x08004eec                DMA2_Channel2_IRQHandler
+                0x08004eec                DMA1_Channel4_IRQHandler
+                0x08004eec                USART3_IRQHandler
+                0x08004eec                RTC_IRQHandler
+                0x08004eec                DMA1_Channel7_IRQHandler
+                0x08004eec                CAN1_RX1_IRQHandler
+                0x08004eec                UART5_IRQHandler
+                0x08004eec                TIM4_IRQHandler
+                0x08004eec                DMA2_Channel1_IRQHandler
+                0x08004eec                I2C1_EV_IRQHandler
+                0x08004eec                DMA1_Channel6_IRQHandler
+                0x08004eec                UART4_IRQHandler
+                0x08004eec                DMA2_Channel4_IRQHandler
+                0x08004eec                TIM3_IRQHandler
+                0x08004eec                RCC_IRQHandler
+                0x08004eec                TIM1_TRG_COM_IRQHandler
+                0x08004eec                Default_Handler
+                0x08004eec                TIM7_IRQHandler
+                0x08004eec                CAN2_TX_IRQHandler
+                0x08004eec                TIM5_IRQHandler
+                0x08004eec                EXTI9_5_IRQHandler
+                0x08004eec                SPI2_IRQHandler
+                0x08004eec                CAN1_TX_IRQHandler
+                0x08004eec                DMA2_Channel5_IRQHandler
+                0x08004eec                DMA1_Channel5_IRQHandler
+                0x08004eec                EXTI4_IRQHandler
+                0x08004eec                DMA1_Channel3_IRQHandler
+                0x08004eec                TIM1_UP_IRQHandler
+                0x08004eec                WWDG_IRQHandler
+                0x08004eec                TIM2_IRQHandler
+                0x08004eec                OTG_FS_WKUP_IRQHandler
+                0x08004eec                TIM1_BRK_IRQHandler
+                0x08004eec                EXTI1_IRQHandler
+                0x08004eec                USART2_IRQHandler
+                0x08004eec                I2C2_ER_IRQHandler
+                0x08004eec                DMA1_Channel2_IRQHandler
+                0x08004eec                CAN1_SCE_IRQHandler
+                0x08004eec                FLASH_IRQHandler
+                0x08004eec                USART1_IRQHandler
+                0x08004eec                OTG_FS_IRQHandler
+                0x08004eec                SPI3_IRQHandler
+                0x08004eec                I2C1_ER_IRQHandler
+                0x08004eec                DMA2_Channel3_IRQHandler
+ *fill*         0x08004eee        0x2 
  .text.DISP_KanoaSplash
-                0x08004ec4       0xa8 CMakeFiles/SR16-ChargingDash.dir/Core/Src/display.c.obj
-                0x08004ec4                DISP_KanoaSplash
+                0x08004ef0       0x8c CMakeFiles/SR16-ChargingDash.dir/Core/Src/display.c.obj
+                0x08004ef0                DISP_KanoaSplash
+ .text.SRE_Display_Init
+                0x08004f7c       0x20 CMakeFiles/SR16-ChargingDash.dir/Core/Src/display.c.obj
+                0x08004f7c                SRE_Display_Init
  .text.SRE_Display_Test
-                0x08004f6c       0x10 CMakeFiles/SR16-ChargingDash.dir/Core/Src/display.c.obj
-                0x08004f6c                SRE_Display_Test
+                0x08004f9c       0x10 CMakeFiles/SR16-ChargingDash.dir/Core/Src/display.c.obj
+                0x08004f9c                SRE_Display_Test
  .text.SRE_Display_Nav
-                0x08004f7c      0x1cc CMakeFiles/SR16-ChargingDash.dir/Core/Src/display.c.obj
-                0x08004f7c                SRE_Display_Nav
+                0x08004fac      0x1cc CMakeFiles/SR16-ChargingDash.dir/Core/Src/display.c.obj
+                0x08004fac                SRE_Display_Nav
  .text.SRE_Display_Nav_Bar
-                0x08005148      0x11c CMakeFiles/SR16-ChargingDash.dir/Core/Src/display.c.obj
-                0x08005148                SRE_Display_Nav_Bar
+                0x08005178      0x11c CMakeFiles/SR16-ChargingDash.dir/Core/Src/display.c.obj
+                0x08005178                SRE_Display_Nav_Bar
  .text.SRE_Display_Start_Charging
-                0x08005264      0x444 CMakeFiles/SR16-ChargingDash.dir/Core/Src/display.c.obj
-                0x08005264                SRE_Display_Start_Charging
+                0x08005294      0x444 CMakeFiles/SR16-ChargingDash.dir/Core/Src/display.c.obj
+                0x08005294                SRE_Display_Start_Charging
  .text.SRE_Display_Short_Scroll_Bar
-                0x080056a8       0x5e CMakeFiles/SR16-ChargingDash.dir/Core/Src/display.c.obj
-                0x080056a8                SRE_Display_Short_Scroll_Bar
+                0x080056d8       0x5e CMakeFiles/SR16-ChargingDash.dir/Core/Src/display.c.obj
+                0x080056d8                SRE_Display_Short_Scroll_Bar
  .text.SRE_Display_Long_Scroll_Bar
-                0x08005706       0x5e CMakeFiles/SR16-ChargingDash.dir/Core/Src/display.c.obj
-                0x08005706                SRE_Display_Long_Scroll_Bar
+                0x08005736       0x5e CMakeFiles/SR16-ChargingDash.dir/Core/Src/display.c.obj
+                0x08005736                SRE_Display_Long_Scroll_Bar
  .text.SRE_Display_Charger_Stats
-                0x08005764      0x14c CMakeFiles/SR16-ChargingDash.dir/Core/Src/display.c.obj
-                0x08005764                SRE_Display_Charger_Stats
+                0x08005794      0x14c CMakeFiles/SR16-ChargingDash.dir/Core/Src/display.c.obj
+                0x08005794                SRE_Display_Charger_Stats
  .text.SRE_Display_Battery1
-                0x080058b0      0x16c CMakeFiles/SR16-ChargingDash.dir/Core/Src/display.c.obj
-                0x080058b0                SRE_Display_Battery1
+                0x080058e0      0x16c CMakeFiles/SR16-ChargingDash.dir/Core/Src/display.c.obj
+                0x080058e0                SRE_Display_Battery1
  .text.SRE_Display_Battery2
-                0x08005a1c      0x1c4 CMakeFiles/SR16-ChargingDash.dir/Core/Src/display.c.obj
-                0x08005a1c                SRE_Display_Battery2
+                0x08005a4c      0x1c4 CMakeFiles/SR16-ChargingDash.dir/Core/Src/display.c.obj
+                0x08005a4c                SRE_Display_Battery2
  .text.SRE_Display_Start_Balancing
-                0x08005be0      0x110 CMakeFiles/SR16-ChargingDash.dir/Core/Src/display.c.obj
-                0x08005be0                SRE_Display_Start_Balancing
+                0x08005c10      0x110 CMakeFiles/SR16-ChargingDash.dir/Core/Src/display.c.obj
+                0x08005c10                SRE_Display_Start_Balancing
  .text.SRE_Display_Title_Bar
-                0x08005cf0       0x4c CMakeFiles/SR16-ChargingDash.dir/Core/Src/display.c.obj
-                0x08005cf0                SRE_Display_Title_Bar
+                0x08005d20       0x4c CMakeFiles/SR16-ChargingDash.dir/Core/Src/display.c.obj
+                0x08005d20                SRE_Display_Title_Bar
  .text.SRE_Display_Charger_Symbol
-                0x08005d3c      0x17a CMakeFiles/SR16-ChargingDash.dir/Core/Src/display.c.obj
-                0x08005d3c                SRE_Display_Charger_Symbol
+                0x08005d6c      0x17a CMakeFiles/SR16-ChargingDash.dir/Core/Src/display.c.obj
+                0x08005d6c                SRE_Display_Charger_Symbol
  .text.SRE_Display_Error_Symbol
-                0x08005eb6       0xba CMakeFiles/SR16-ChargingDash.dir/Core/Src/display.c.obj
-                0x08005eb6                SRE_Display_Error_Symbol
+                0x08005ee6       0xba CMakeFiles/SR16-ChargingDash.dir/Core/Src/display.c.obj
+                0x08005ee6                SRE_Display_Error_Symbol
  .text.SRE_Display_Err
-                0x08005f70      0x180 CMakeFiles/SR16-ChargingDash.dir/Core/Src/display.c.obj
-                0x08005f70                SRE_Display_Err
+                0x08005fa0      0x180 CMakeFiles/SR16-ChargingDash.dir/Core/Src/display.c.obj
+                0x08005fa0                SRE_Display_Err
  .text.ssd1306_Reset
-                0x080060f0        0xc CMakeFiles/SR16-ChargingDash.dir/Drivers/Display/ssd1306.c.obj
-                0x080060f0                ssd1306_Reset
+                0x08006120        0xc CMakeFiles/SR16-ChargingDash.dir/Drivers/Display/ssd1306.c.obj
+                0x08006120                ssd1306_Reset
  .text.ssd1306_WriteCommand
-                0x080060fc       0x30 CMakeFiles/SR16-ChargingDash.dir/Drivers/Display/ssd1306.c.obj
-                0x080060fc                ssd1306_WriteCommand
+                0x0800612c       0x30 CMakeFiles/SR16-ChargingDash.dir/Drivers/Display/ssd1306.c.obj
+                0x0800612c                ssd1306_WriteCommand
  .text.ssd1306_WriteData
-                0x0800612c       0x34 CMakeFiles/SR16-ChargingDash.dir/Drivers/Display/ssd1306.c.obj
-                0x0800612c                ssd1306_WriteData
+                0x0800615c       0x34 CMakeFiles/SR16-ChargingDash.dir/Drivers/Display/ssd1306.c.obj
+                0x0800615c                ssd1306_WriteData
  .text.ssd1306_Init
-                0x08006160       0xd4 CMakeFiles/SR16-ChargingDash.dir/Drivers/Display/ssd1306.c.obj
-                0x08006160                ssd1306_Init
+                0x08006190       0xd4 CMakeFiles/SR16-ChargingDash.dir/Drivers/Display/ssd1306.c.obj
+                0x08006190                ssd1306_Init
  .text.ssd1306_Fill
-                0x08006234       0x30 CMakeFiles/SR16-ChargingDash.dir/Drivers/Display/ssd1306.c.obj
-                0x08006234                ssd1306_Fill
+                0x08006264       0x30 CMakeFiles/SR16-ChargingDash.dir/Drivers/Display/ssd1306.c.obj
+                0x08006264                ssd1306_Fill
  .text.ssd1306_UpdateScreen
-                0x08006264       0x50 CMakeFiles/SR16-ChargingDash.dir/Drivers/Display/ssd1306.c.obj
-                0x08006264                ssd1306_UpdateScreen
+                0x08006294       0x50 CMakeFiles/SR16-ChargingDash.dir/Drivers/Display/ssd1306.c.obj
+                0x08006294                ssd1306_UpdateScreen
  .text.ssd1306_DrawPixel
-                0x080062b4       0xa4 CMakeFiles/SR16-ChargingDash.dir/Drivers/Display/ssd1306.c.obj
-                0x080062b4                ssd1306_DrawPixel
+                0x080062e4       0xa4 CMakeFiles/SR16-ChargingDash.dir/Drivers/Display/ssd1306.c.obj
+                0x080062e4                ssd1306_DrawPixel
  .text.ssd1306_WriteChar
-                0x08006358      0x120 CMakeFiles/SR16-ChargingDash.dir/Drivers/Display/ssd1306.c.obj
-                0x08006358                ssd1306_WriteChar
+                0x08006388      0x120 CMakeFiles/SR16-ChargingDash.dir/Drivers/Display/ssd1306.c.obj
+                0x08006388                ssd1306_WriteChar
  .text.ssd1306_WriteString
-                0x08006478       0x4c CMakeFiles/SR16-ChargingDash.dir/Drivers/Display/ssd1306.c.obj
-                0x08006478                ssd1306_WriteString
+                0x080064a8       0x4c CMakeFiles/SR16-ChargingDash.dir/Drivers/Display/ssd1306.c.obj
+                0x080064a8                ssd1306_WriteString
  .text.ssd1306_SetCursor
-                0x080064c4       0x30 CMakeFiles/SR16-ChargingDash.dir/Drivers/Display/ssd1306.c.obj
-                0x080064c4                ssd1306_SetCursor
+                0x080064f4       0x30 CMakeFiles/SR16-ChargingDash.dir/Drivers/Display/ssd1306.c.obj
+                0x080064f4                ssd1306_SetCursor
  .text.ssd1306_Line
-                0x080064f4       0xd8 CMakeFiles/SR16-ChargingDash.dir/Drivers/Display/ssd1306.c.obj
-                0x080064f4                ssd1306_Line
+                0x08006524       0xd8 CMakeFiles/SR16-ChargingDash.dir/Drivers/Display/ssd1306.c.obj
+                0x08006524                ssd1306_Line
  .text.ssd1306_DrawRectangle
-                0x080065cc       0x6e CMakeFiles/SR16-ChargingDash.dir/Drivers/Display/ssd1306.c.obj
-                0x080065cc                ssd1306_DrawRectangle
+                0x080065fc       0x6e CMakeFiles/SR16-ChargingDash.dir/Drivers/Display/ssd1306.c.obj
+                0x080065fc                ssd1306_DrawRectangle
  .text.ssd1306_FillRectangle
-                0x0800663a       0x9c CMakeFiles/SR16-ChargingDash.dir/Drivers/Display/ssd1306.c.obj
-                0x0800663a                ssd1306_FillRectangle
+                0x0800666a       0x9c CMakeFiles/SR16-ChargingDash.dir/Drivers/Display/ssd1306.c.obj
+                0x0800666a                ssd1306_FillRectangle
  .text.ssd1306_DrawBitmap
-                0x080066d6       0xb6 CMakeFiles/SR16-ChargingDash.dir/Drivers/Display/ssd1306.c.obj
-                0x080066d6                ssd1306_DrawBitmap
+                0x08006706       0xb6 CMakeFiles/SR16-ChargingDash.dir/Drivers/Display/ssd1306.c.obj
+                0x08006706                ssd1306_DrawBitmap
  .text.ssd1306_SetContrast
-                0x0800678c       0x26 CMakeFiles/SR16-ChargingDash.dir/Drivers/Display/ssd1306.c.obj
-                0x0800678c                ssd1306_SetContrast
- *fill*         0x080067b2        0x2 
+                0x080067bc       0x26 CMakeFiles/SR16-ChargingDash.dir/Drivers/Display/ssd1306.c.obj
+                0x080067bc                ssd1306_SetContrast
+ *fill*         0x080067e2        0x2 
  .text.ssd1306_SetDisplayOn
-                0x080067b4       0x3c CMakeFiles/SR16-ChargingDash.dir/Drivers/Display/ssd1306.c.obj
-                0x080067b4                ssd1306_SetDisplayOn
- .text.sprintf  0x080067f0       0x44 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-sprintf.o)
-                0x080067f0                siprintf
-                0x080067f0                sprintf
- .text.__errno  0x08006834        0xc C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-errno.o)
-                0x08006834                __errno
- .text.memcpy   0x08006840       0x1c C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-memcpy-stub.o)
-                0x08006840                memcpy
+                0x080067e4       0x3c CMakeFiles/SR16-ChargingDash.dir/Drivers/Display/ssd1306.c.obj
+                0x080067e4                ssd1306_SetDisplayOn
+ .text.sprintf  0x08006820       0x44 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-sprintf.o)
+                0x08006820                siprintf
+                0x08006820                sprintf
+ .text.__errno  0x08006864        0xc C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-errno.o)
+                0x08006864                __errno
+ .text.memcpy   0x08006870       0x1c C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-memcpy-stub.o)
+                0x08006870                memcpy
  .text.__ssputs_r
-                0x0800685c       0xb6 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-nano-svfprintf.o)
-                0x0800685c                __ssputs_r
- *fill*         0x08006912        0x2 
+                0x0800688c       0xb6 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-nano-svfprintf.o)
+                0x0800688c                __ssputs_r
+ *fill*         0x08006942        0x2 
  .text._svfprintf_r
-                0x08006914      0x1f8 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-nano-svfprintf.o)
-                0x08006914                _svfiprintf_r
-                0x08006914                _svfprintf_r
+                0x08006944      0x1f8 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-nano-svfprintf.o)
+                0x08006944                _svfiprintf_r
+                0x08006944                _svfprintf_r
  .text._printf_common
-                0x08006b0c       0xe4 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-nano-vfprintf_i.o)
-                0x08006b0c                _printf_common
+                0x08006b3c       0xe4 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-nano-vfprintf_i.o)
+                0x08006b3c                _printf_common
  .text._printf_i
-                0x08006bf0      0x23c C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-nano-vfprintf_i.o)
-                0x08006bf0                _printf_i
- .text.memmove  0x08006e2c       0x34 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-memmove.o)
-                0x08006e2c                memmove
- .text.memchr   0x08006e60       0x1c C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-memchr-stub.o)
-                0x08006e60                memchr
+                0x08006c20      0x23c C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-nano-vfprintf_i.o)
+                0x08006c20                _printf_i
+ .text.memmove  0x08006e5c       0x34 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-memmove.o)
+                0x08006e5c                memmove
+ .text.memchr   0x08006e90       0x1c C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-memchr-stub.o)
+                0x08006e90                memchr
  .text._realloc_r
-                0x08006e7c       0x5c C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-reallocr.o)
-                0x08006e7c                _realloc_r
+                0x08006eac       0x5c C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-reallocr.o)
+                0x08006eac                _realloc_r
  .text._malloc_usable_size_r
-                0x08006ed8       0x10 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-msizer.o)
-                0x08006ed8                _malloc_usable_size_r
+                0x08006f08       0x10 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-msizer.o)
+                0x08006f08                _malloc_usable_size_r
  *(.glue_7)
- .glue_7        0x08006ee8        0x0 linker stubs
+ .glue_7        0x08006f18        0x0 linker stubs
  *(.glue_7t)
- .glue_7t       0x08006ee8        0x0 linker stubs
+ .glue_7t       0x08006f18        0x0 linker stubs
  *(.eh_frame)
- .eh_frame      0x08006ee8        0x0 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7-m/nofp/crtbegin.o
+ .eh_frame      0x08006f18        0x0 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7-m/nofp/crtbegin.o
  *(.init)
- .init          0x08006ee8        0x4 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7-m/nofp/crti.o
-                0x08006ee8                _init
- .init          0x08006eec        0x8 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7-m/nofp/crtn.o
+ .init          0x08006f18        0x4 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7-m/nofp/crti.o
+                0x08006f18                _init
+ .init          0x08006f1c        0x8 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7-m/nofp/crtn.o
  *(.fini)
- .fini          0x08006ef4        0x4 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7-m/nofp/crti.o
-                0x08006ef4                _fini
- .fini          0x08006ef8        0x8 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7-m/nofp/crtn.o
-                0x08006f00                        . = ALIGN (0x4)
-                0x08006f00                        _etext = .
+ .fini          0x08006f24        0x4 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7-m/nofp/crti.o
+                0x08006f24                _fini
+ .fini          0x08006f28        0x8 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7-m/nofp/crtn.o
+                0x08006f30                        . = ALIGN (0x4)
+                0x08006f30                        _etext = .
 
-.vfp11_veneer   0x08006f00        0x0
- .vfp11_veneer  0x08006f00        0x0 linker stubs
+.vfp11_veneer   0x08006f30        0x0
+ .vfp11_veneer  0x08006f30        0x0 linker stubs
 
-.v4_bx          0x08006f00        0x0
- .v4_bx         0x08006f00        0x0 linker stubs
+.v4_bx          0x08006f30        0x0
+ .v4_bx         0x08006f30        0x0 linker stubs
 
-.iplt           0x08006f00        0x0
- .iplt          0x08006f00        0x0 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7-m/nofp/crtbegin.o
+.iplt           0x08006f30        0x0
+ .iplt          0x08006f30        0x0 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7-m/nofp/crtbegin.o
 
-.rodata         0x08006f00      0xdc4
-                0x08006f00                        . = ALIGN (0x4)
+.rodata         0x08006f30      0xdb8
+                0x08006f30                        . = ALIGN (0x4)
  *(.rodata)
- .rodata        0x08006f00       0x3d CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
- *fill*         0x08006f3d        0x3 
- .rodata        0x08006f40      0x31c CMakeFiles/SR16-ChargingDash.dir/Core/Src/display.c.obj
+ .rodata        0x08006f30       0x51 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
+ *fill*         0x08006f81        0x3 
+ .rodata        0x08006f84      0x2fc CMakeFiles/SR16-ChargingDash.dir/Core/Src/display.c.obj
  *(.rodata*)
  .rodata.AHBPrescTable
-                0x0800725c       0x10 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Core/Src/system_stm32f1xx.c.obj
-                0x0800725c                AHBPrescTable
+                0x08007280       0x10 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Core/Src/system_stm32f1xx.c.obj
+                0x08007280                AHBPrescTable
  .rodata.APBPrescTable
-                0x0800726c        0x8 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Core/Src/system_stm32f1xx.c.obj
-                0x0800726c                APBPrescTable
+                0x08007290        0x8 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Core/Src/system_stm32f1xx.c.obj
+                0x08007290                APBPrescTable
  .rodata.aPLLMULFactorTable.1
-                0x08007274        0xe cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc.c.obj
- *fill*         0x08007282        0x2 
+                0x08007298        0xe cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc.c.obj
+ *fill*         0x080072a6        0x2 
  .rodata.aPredivFactorTable.0
-                0x08007284       0x10 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc.c.obj
+                0x080072a8       0x10 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc.c.obj
  .rodata.kanoaBootImage
-                0x08007294      0x400 CMakeFiles/SR16-ChargingDash.dir/Core/Src/graphics.c.obj
-                0x08007294                kanoaBootImage
+                0x080072b8      0x400 CMakeFiles/SR16-ChargingDash.dir/Core/Src/graphics.c.obj
+                0x080072b8                kanoaBootImage
  .rodata.Font6x8
-                0x08007694      0x5f0 CMakeFiles/SR16-ChargingDash.dir/Drivers/Display/ssd1306_fonts.c.obj
+                0x080076b8      0x5f0 CMakeFiles/SR16-ChargingDash.dir/Drivers/Display/ssd1306_fonts.c.obj
  .rodata.Font_6x8
-                0x08007c84        0xc CMakeFiles/SR16-ChargingDash.dir/Drivers/Display/ssd1306_fonts.c.obj
-                0x08007c84                Font_6x8
+                0x08007ca8        0xc CMakeFiles/SR16-ChargingDash.dir/Drivers/Display/ssd1306_fonts.c.obj
+                0x08007ca8                Font_6x8
  .rodata._svfprintf_r.str1.1
-                0x08007c90       0x33 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-nano-svfprintf.o)
+                0x08007cb4       0x33 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-nano-svfprintf.o)
                                  0x11 (size before relaxing)
  .rodata._printf_i.str1.1
-                0x08007cc3       0x22 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-nano-vfprintf_i.o)
+                0x08007ce7       0x22 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-nano-vfprintf_i.o)
+                0x08007d0c                        . = ALIGN (0x4)
+ *fill*         0x08007ce7        0x1 
+
+.ARM.extab      0x08007ce8        0x0
                 0x08007ce8                        . = ALIGN (0x4)
- *fill*         0x08007cc3        0x1 
-
-.ARM.extab      0x08007cc4        0x0
-                0x08007cc4                        . = ALIGN (0x4)
  *(.ARM.extab* .gnu.linkonce.armextab.*)
-                0x08007cc4                        . = ALIGN (0x4)
+                0x08007ce8                        . = ALIGN (0x4)
 
-.ARM            0x08007cc4        0x8
-                0x08007cc4                        . = ALIGN (0x4)
-                0x08007cc4                        __exidx_start = .
+.ARM            0x08007ce8        0x8
+                0x08007ce8                        . = ALIGN (0x4)
+                0x08007ce8                        __exidx_start = .
  *(.ARM.exidx*)
- .ARM.exidx     0x08007cc4        0x8 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7-m/nofp\libgcc.a(_udivmoddi4.o)
- .ARM.exidx     0x08007ccc        0x0 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-strlen.o)
+ .ARM.exidx     0x08007ce8        0x8 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7-m/nofp\libgcc.a(_udivmoddi4.o)
+ .ARM.exidx     0x08007cf0        0x0 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-strlen.o)
                                   0x8 (size before relaxing)
-                0x08007ccc                        __exidx_end = .
-                0x08007ccc                        . = ALIGN (0x4)
+                0x08007cf0                        __exidx_end = .
+                0x08007cf0                        . = ALIGN (0x4)
 
-.preinit_array  0x08007ccc        0x0
-                0x08007ccc                        . = ALIGN (0x4)
-                0x08007ccc                        PROVIDE (__preinit_array_start = .)
+.preinit_array  0x08007cf0        0x0
+                0x08007cf0                        . = ALIGN (0x4)
+                0x08007cf0                        PROVIDE (__preinit_array_start = .)
  *(.preinit_array*)
-                0x08007ccc                        PROVIDE (__preinit_array_end = .)
-                0x08007ccc                        . = ALIGN (0x4)
+                0x08007cf0                        PROVIDE (__preinit_array_end = .)
+                0x08007cf0                        . = ALIGN (0x4)
 
-.init_array     0x08007ccc        0x4
-                0x08007ccc                        . = ALIGN (0x4)
-                0x08007ccc                        PROVIDE (__init_array_start = .)
+.init_array     0x08007cf0        0x4
+                0x08007cf0                        . = ALIGN (0x4)
+                0x08007cf0                        PROVIDE (__init_array_start = .)
  *(SORT_BY_NAME(.init_array.*))
  *(.init_array*)
- .init_array    0x08007ccc        0x4 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7-m/nofp/crtbegin.o
-                0x08007cd0                        PROVIDE (__init_array_end = .)
-                0x08007cd0                        . = ALIGN (0x4)
+ .init_array    0x08007cf0        0x4 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7-m/nofp/crtbegin.o
+                0x08007cf4                        PROVIDE (__init_array_end = .)
+                0x08007cf4                        . = ALIGN (0x4)
 
-.fini_array     0x08007cd0        0x4
-                0x08007cd0                        . = ALIGN (0x4)
+.fini_array     0x08007cf4        0x4
+                0x08007cf4                        . = ALIGN (0x4)
                 [!provide]                        PROVIDE (__fini_array_start = .)
  *(SORT_BY_NAME(.fini_array.*))
  *(.fini_array*)
- .fini_array    0x08007cd0        0x4 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7-m/nofp/crtbegin.o
+ .fini_array    0x08007cf4        0x4 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7-m/nofp/crtbegin.o
                 [!provide]                        PROVIDE (__fini_array_end = .)
-                0x08007cd4                        . = ALIGN (0x4)
-                0x08007cd4                        _sidata = LOADADDR (.data)
+                0x08007cf8                        . = ALIGN (0x4)
+                0x08007cf8                        _sidata = LOADADDR (.data)
 
-.rel.dyn        0x08007cd4        0x0
- .rel.iplt      0x08007cd4        0x0 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7-m/nofp/crtbegin.o
+.rel.dyn        0x08007cf8        0x0
+ .rel.iplt      0x08007cf8        0x0 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7-m/nofp/crtbegin.o
 
-.data           0x20000000       0x5c load address 0x08007cd4
+.data           0x20000000       0x6c load address 0x08007cf8
                 0x20000000                        . = ALIGN (0x4)
                 0x20000000                        _sdata = .
  *(.data)
@@ -4549,103 +4546,111 @@ LOAD C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/
  .data.uwTickFreq
                 0x20000058        0x1 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.c.obj
                 0x20000058                uwTickFreq
+ *fill*         0x20000059        0x3 
+ .data.codeBranch
+                0x2000005c        0x6 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
+                0x2000005c                codeBranch
+ *fill*         0x20000062        0x2 
+ .data.codeVersion
+                0x20000064        0x5 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
+                0x20000064                codeVersion
  *(.RamFunc)
  *(.RamFunc*)
-                0x2000005c                        . = ALIGN (0x4)
- *fill*         0x20000059        0x3 
-                0x2000005c                        _edata = .
+                0x2000006c                        . = ALIGN (0x4)
+ *fill*         0x20000069        0x3 
+                0x2000006c                        _edata = .
 
-.igot.plt       0x2000005c        0x0 load address 0x08007d30
- .igot.plt      0x2000005c        0x0 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7-m/nofp/crtbegin.o
-                0x2000005c                        . = ALIGN (0x4)
+.igot.plt       0x2000006c        0x0 load address 0x08007d64
+ .igot.plt      0x2000006c        0x0 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7-m/nofp/crtbegin.o
+                0x2000006c                        . = ALIGN (0x4)
 
-.bss            0x2000005c      0x754 load address 0x08007d30
-                0x2000005c                        _sbss = .
-                0x2000005c                        __bss_start__ = _sbss
+.bss            0x2000006c      0x754 load address 0x08007d64
+                0x2000006c                        _sbss = .
+                0x2000006c                        __bss_start__ = _sbss
  *(.bss)
- .bss           0x2000005c       0x1c C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7-m/nofp/crtbegin.o
+ .bss           0x2000006c       0x1c C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7-m/nofp/crtbegin.o
  *(.bss*)
- .bss.__sf      0x20000078      0x138 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libc_nano.a(libc_a-findfp.o)
-                0x20000078                __sf
- .bss.errno     0x200001b0        0x4 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libc_nano.a(libc_a-reent.o)
-                0x200001b0                errno
+ .bss.__sf      0x20000088      0x138 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libc_nano.a(libc_a-findfp.o)
+                0x20000088                __sf
+ .bss.errno     0x200001c0        0x4 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libc_nano.a(libc_a-reent.o)
+                0x200001c0                errno
  .bss.__lock___malloc_recursive_mutex
-                0x200001b4        0x1 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libc_nano.a(libc_a-lock.o)
-                0x200001b4                __lock___malloc_recursive_mutex
- *fill*         0x200001b5        0x3 
+                0x200001c4        0x1 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libc_nano.a(libc_a-lock.o)
+                0x200001c4                __lock___malloc_recursive_mutex
+ *fill*         0x200001c5        0x3 
  .bss.__malloc_sbrk_start
-                0x200001b8        0x4 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libc_nano.a(libc_a-mallocr.o)
-                0x200001b8                __malloc_sbrk_start
+                0x200001c8        0x4 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libc_nano.a(libc_a-mallocr.o)
+                0x200001c8                __malloc_sbrk_start
  .bss.__malloc_free_list
-                0x200001bc        0x4 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libc_nano.a(libc_a-mallocr.o)
-                0x200001bc                __malloc_free_list
- .bss.uwTick    0x200001c0        0x4 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.c.obj
-                0x200001c0                uwTick
- .bss.hadc1     0x200001c4       0x30 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
-                0x200001c4                hadc1
+                0x200001cc        0x4 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libc_nano.a(libc_a-mallocr.o)
+                0x200001cc                __malloc_free_list
+ .bss.uwTick    0x200001d0        0x4 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.c.obj
+                0x200001d0                uwTick
+ .bss.hadc1     0x200001d4       0x30 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
+                0x200001d4                hadc1
  .bss.hdma_adc1
-                0x200001f4       0x44 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
-                0x200001f4                hdma_adc1
- .bss.hcan1     0x20000238       0x28 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
-                0x20000238                hcan1
- .bss.hi2c2     0x20000260       0x54 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
-                0x20000260                hi2c2
- .bss.htim2     0x200002b4       0x48 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
-                0x200002b4                htim2
- .bss.htim3     0x200002fc       0x48 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
-                0x200002fc                htim3
- .bss.huart1    0x20000344       0x48 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
-                0x20000344                huart1
+                0x20000204       0x44 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
+                0x20000204                hdma_adc1
+ .bss.hcan1     0x20000248       0x28 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
+                0x20000248                hcan1
+ .bss.hi2c2     0x20000270       0x54 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
+                0x20000270                hi2c2
+ .bss.htim2     0x200002c4       0x48 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
+                0x200002c4                htim2
+ .bss.htim3     0x2000030c       0x48 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
+                0x2000030c                htim3
+ .bss.huart1    0x20000354       0x48 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
+                0x20000354                huart1
  .bss.selectedButton
-                0x2000038c        0x4 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
-                0x2000038c                selectedButton
+                0x2000039c        0x4 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
+                0x2000039c                selectedButton
  .bss.backPressed
-                0x20000390        0x1 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
-                0x20000390                backPressed
+                0x200003a0        0x1 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
+                0x200003a0                backPressed
  .bss.selectPressed
-                0x20000391        0x1 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
-                0x20000391                selectPressed
- *fill*         0x20000392        0x2 
+                0x200003a1        0x1 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
+                0x200003a1                selectPressed
+ *fill*         0x200003a2        0x2 
  .bss.CURRENT_TIME
-                0x20000394        0x4 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
-                0x20000394                CURRENT_TIME
+                0x200003a4        0x4 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
+                0x200003a4                CURRENT_TIME
  .bss.PREVIOUS_TIME
-                0x20000398        0x4 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
-                0x20000398                PREVIOUS_TIME
- .bss.charging_limit_volts
-                0x2000039c        0x2 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
-                0x2000039c                charging_limit_volts
- .bss.charging_limit_amps
-                0x2000039e        0x2 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
-                0x2000039e                charging_limit_amps
+                0x200003a8        0x4 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
+                0x200003a8                PREVIOUS_TIME
+ .bss.LIMIT_VOLTS
+                0x200003ac        0x2 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
+                0x200003ac                LIMIT_VOLTS
+ .bss.LIMIT_AMPS
+                0x200003ae        0x2 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
+                0x200003ae                LIMIT_AMPS
  .bss.__sbrk_heap_end
-                0x200003a0        0x4 CMakeFiles/SR16-ChargingDash.dir/Core/Src/sysmem.c.obj
+                0x200003b0        0x4 CMakeFiles/SR16-ChargingDash.dir/Core/Src/sysmem.c.obj
  .bss.isBalancing
-                0x200003a4        0x1 CMakeFiles/SR16-ChargingDash.dir/Core/Src/display.c.obj
-                0x200003a4                isBalancing
+                0x200003b4        0x1 CMakeFiles/SR16-ChargingDash.dir/Core/Src/display.c.obj
+                0x200003b4                isBalancing
  .bss.isBalancingControl
-                0x200003a5        0x1 CMakeFiles/SR16-ChargingDash.dir/Core/Src/display.c.obj
-                0x200003a5                isBalancingControl
- *fill*         0x200003a6        0x2 
+                0x200003b5        0x1 CMakeFiles/SR16-ChargingDash.dir/Core/Src/display.c.obj
+                0x200003b5                isBalancingControl
+ *fill*         0x200003b6        0x2 
  .bss.SSD1306_Buffer
-                0x200003a8      0x400 CMakeFiles/SR16-ChargingDash.dir/Drivers/Display/ssd1306.c.obj
- .bss.SSD1306   0x200007a8        0x6 CMakeFiles/SR16-ChargingDash.dir/Drivers/Display/ssd1306.c.obj
+                0x200003b8      0x400 CMakeFiles/SR16-ChargingDash.dir/Drivers/Display/ssd1306.c.obj
+ .bss.SSD1306   0x200007b8        0x6 CMakeFiles/SR16-ChargingDash.dir/Drivers/Display/ssd1306.c.obj
  *(COMMON)
-                0x200007b0                        . = ALIGN (0x4)
- *fill*         0x200007ae        0x2 
-                0x200007b0                        _ebss = .
-                0x200007b0                        __bss_end__ = _ebss
+                0x200007c0                        . = ALIGN (0x4)
+ *fill*         0x200007be        0x2 
+                0x200007c0                        _ebss = .
+                0x200007c0                        __bss_end__ = _ebss
 
 ._user_heap_stack
-                0x200007b0      0x600 load address 0x08007d30
-                0x200007b0                        . = ALIGN (0x8)
+                0x200007c0      0x600 load address 0x08007d64
+                0x200007c0                        . = ALIGN (0x8)
                 [!provide]                        PROVIDE (end = .)
-                0x200007b0                        PROVIDE (_end = .)
-                0x200009b0                        . = (. + _Min_Heap_Size)
- *fill*         0x200007b0      0x200 
-                0x20000db0                        . = (. + _Min_Stack_Size)
- *fill*         0x200009b0      0x400 
-                0x20000db0                        . = ALIGN (0x8)
+                0x200007c0                        PROVIDE (_end = .)
+                0x200009c0                        . = (. + _Min_Heap_Size)
+ *fill*         0x200007c0      0x200 
+                0x20000dc0                        . = (. + _Min_Stack_Size)
+ *fill*         0x200009c0      0x400 
+                0x20000dc0                        . = ALIGN (0x8)
 
 /DISCARD/
  libc.a(*)
@@ -4830,7 +4835,7 @@ LOAD C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/
  .debug_frame   0x0000587c       0x3c C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-reallocr.o)
  .debug_frame   0x000058b8       0x20 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-msizer.o)
 
-.debug_info     0x00000000    0x17e9a
+.debug_info     0x00000000    0x17eeb
  .debug_info    0x00000000      0x257 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Core/Src/system_stm32f1xx.c.obj
  .debug_info    0x00000257      0xc50 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_adc.c.obj
  .debug_info    0x00000ea7      0x780 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.c.obj
@@ -4844,27 +4849,27 @@ LOAD C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/
  .debug_info    0x00006ff2     0x2959 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim.c.obj
  .debug_info    0x0000994b     0x149b cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim_ex.c.obj
  .debug_info    0x0000ade6     0x2eed cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_uart.c.obj
- .debug_info    0x0000dcd3     0x21a1 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
- .debug_info    0x0000fe74      0x3a8 CMakeFiles/SR16-ChargingDash.dir/Core/Src/stm32f1xx_it.c.obj
- .debug_info    0x0001021c     0x172a CMakeFiles/SR16-ChargingDash.dir/Core/Src/stm32f1xx_hal_msp.c.obj
- .debug_info    0x00011946      0x168 CMakeFiles/SR16-ChargingDash.dir/Core/Src/sysmem.c.obj
- .debug_info    0x00011aae       0x30 CMakeFiles/SR16-ChargingDash.dir/startup_stm32f105xc.s.obj
- .debug_info    0x00011ade      0xc78 CMakeFiles/SR16-ChargingDash.dir/Core/Src/display.c.obj
- .debug_info    0x00012756       0x7a CMakeFiles/SR16-ChargingDash.dir/Core/Src/graphics.c.obj
- .debug_info    0x000127d0     0x122b CMakeFiles/SR16-ChargingDash.dir/Drivers/Display/ssd1306.c.obj
- .debug_info    0x000139fb      0x2a4 CMakeFiles/SR16-ChargingDash.dir/Drivers/Display/ssd1306_fonts.c.obj
- .debug_info    0x00013c9f      0x885 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-sprintf.o)
- .debug_info    0x00014524      0x6fb C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-errno.o)
- .debug_info    0x00014c1f      0x121 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-memcpy-stub.o)
- .debug_info    0x00014d40       0x31 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-strlen.o)
- .debug_info    0x00014d71     0x10c7 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-nano-svfprintf.o)
- .debug_info    0x00015e38      0xde2 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-nano-vfprintf_i.o)
- .debug_info    0x00016c1a      0x10f C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-memmove.o)
- .debug_info    0x00016d29      0x110 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-memchr-stub.o)
- .debug_info    0x00016e39      0x8cd C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-reallocr.o)
- .debug_info    0x00017706      0x794 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-msizer.o)
+ .debug_info    0x0000dcd3     0x21ca CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
+ .debug_info    0x0000fe9d      0x3a8 CMakeFiles/SR16-ChargingDash.dir/Core/Src/stm32f1xx_it.c.obj
+ .debug_info    0x00010245     0x172a CMakeFiles/SR16-ChargingDash.dir/Core/Src/stm32f1xx_hal_msp.c.obj
+ .debug_info    0x0001196f      0x168 CMakeFiles/SR16-ChargingDash.dir/Core/Src/sysmem.c.obj
+ .debug_info    0x00011ad7       0x30 CMakeFiles/SR16-ChargingDash.dir/startup_stm32f105xc.s.obj
+ .debug_info    0x00011b07      0xca0 CMakeFiles/SR16-ChargingDash.dir/Core/Src/display.c.obj
+ .debug_info    0x000127a7       0x7a CMakeFiles/SR16-ChargingDash.dir/Core/Src/graphics.c.obj
+ .debug_info    0x00012821     0x122b CMakeFiles/SR16-ChargingDash.dir/Drivers/Display/ssd1306.c.obj
+ .debug_info    0x00013a4c      0x2a4 CMakeFiles/SR16-ChargingDash.dir/Drivers/Display/ssd1306_fonts.c.obj
+ .debug_info    0x00013cf0      0x885 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-sprintf.o)
+ .debug_info    0x00014575      0x6fb C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-errno.o)
+ .debug_info    0x00014c70      0x121 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-memcpy-stub.o)
+ .debug_info    0x00014d91       0x31 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-strlen.o)
+ .debug_info    0x00014dc2     0x10c7 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-nano-svfprintf.o)
+ .debug_info    0x00015e89      0xde2 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-nano-vfprintf_i.o)
+ .debug_info    0x00016c6b      0x10f C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-memmove.o)
+ .debug_info    0x00016d7a      0x110 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-memchr-stub.o)
+ .debug_info    0x00016e8a      0x8cd C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-reallocr.o)
+ .debug_info    0x00017757      0x794 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-msizer.o)
 
-.debug_abbrev   0x00000000     0x3bbc
+.debug_abbrev   0x00000000     0x3bba
  .debug_abbrev  0x00000000      0x11a cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Core/Src/system_stm32f1xx.c.obj
  .debug_abbrev  0x0000011a      0x225 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_adc.c.obj
  .debug_abbrev  0x0000033f      0x201 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.c.obj
@@ -4878,25 +4883,25 @@ LOAD C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/
  .debug_abbrev  0x00001531      0x277 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim.c.obj
  .debug_abbrev  0x000017a8      0x282 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim_ex.c.obj
  .debug_abbrev  0x00001a2a      0x2f8 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_uart.c.obj
- .debug_abbrev  0x00001d22      0x39e CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
- .debug_abbrev  0x000020c0      0x183 CMakeFiles/SR16-ChargingDash.dir/Core/Src/stm32f1xx_it.c.obj
- .debug_abbrev  0x00002243      0x270 CMakeFiles/SR16-ChargingDash.dir/Core/Src/stm32f1xx_hal_msp.c.obj
- .debug_abbrev  0x000024b3       0xbc CMakeFiles/SR16-ChargingDash.dir/Core/Src/sysmem.c.obj
- .debug_abbrev  0x0000256f       0x24 CMakeFiles/SR16-ChargingDash.dir/startup_stm32f105xc.s.obj
- .debug_abbrev  0x00002593      0x271 CMakeFiles/SR16-ChargingDash.dir/Core/Src/display.c.obj
- .debug_abbrev  0x00002804       0x5f CMakeFiles/SR16-ChargingDash.dir/Core/Src/graphics.c.obj
- .debug_abbrev  0x00002863      0x371 CMakeFiles/SR16-ChargingDash.dir/Drivers/Display/ssd1306.c.obj
- .debug_abbrev  0x00002bd4       0xcf CMakeFiles/SR16-ChargingDash.dir/Drivers/Display/ssd1306_fonts.c.obj
- .debug_abbrev  0x00002ca3      0x21c C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-sprintf.o)
- .debug_abbrev  0x00002ebf      0x15e C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-errno.o)
- .debug_abbrev  0x0000301d       0xc1 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-memcpy-stub.o)
- .debug_abbrev  0x000030de       0x28 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-strlen.o)
- .debug_abbrev  0x00003106      0x31e C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-nano-svfprintf.o)
- .debug_abbrev  0x00003424      0x28e C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-nano-vfprintf_i.o)
- .debug_abbrev  0x000036b2       0xac C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-memmove.o)
- .debug_abbrev  0x0000375e       0xb1 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-memchr-stub.o)
- .debug_abbrev  0x0000380f      0x217 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-reallocr.o)
- .debug_abbrev  0x00003a26      0x196 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-msizer.o)
+ .debug_abbrev  0x00001d22      0x39c CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
+ .debug_abbrev  0x000020be      0x183 CMakeFiles/SR16-ChargingDash.dir/Core/Src/stm32f1xx_it.c.obj
+ .debug_abbrev  0x00002241      0x270 CMakeFiles/SR16-ChargingDash.dir/Core/Src/stm32f1xx_hal_msp.c.obj
+ .debug_abbrev  0x000024b1       0xbc CMakeFiles/SR16-ChargingDash.dir/Core/Src/sysmem.c.obj
+ .debug_abbrev  0x0000256d       0x24 CMakeFiles/SR16-ChargingDash.dir/startup_stm32f105xc.s.obj
+ .debug_abbrev  0x00002591      0x271 CMakeFiles/SR16-ChargingDash.dir/Core/Src/display.c.obj
+ .debug_abbrev  0x00002802       0x5f CMakeFiles/SR16-ChargingDash.dir/Core/Src/graphics.c.obj
+ .debug_abbrev  0x00002861      0x371 CMakeFiles/SR16-ChargingDash.dir/Drivers/Display/ssd1306.c.obj
+ .debug_abbrev  0x00002bd2       0xcf CMakeFiles/SR16-ChargingDash.dir/Drivers/Display/ssd1306_fonts.c.obj
+ .debug_abbrev  0x00002ca1      0x21c C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-sprintf.o)
+ .debug_abbrev  0x00002ebd      0x15e C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-errno.o)
+ .debug_abbrev  0x0000301b       0xc1 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-memcpy-stub.o)
+ .debug_abbrev  0x000030dc       0x28 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-strlen.o)
+ .debug_abbrev  0x00003104      0x31e C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-nano-svfprintf.o)
+ .debug_abbrev  0x00003422      0x28e C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-nano-vfprintf_i.o)
+ .debug_abbrev  0x000036b0       0xac C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-memmove.o)
+ .debug_abbrev  0x0000375c       0xb1 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-memchr-stub.o)
+ .debug_abbrev  0x0000380d      0x217 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-reallocr.o)
+ .debug_abbrev  0x00003a24      0x196 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-msizer.o)
 
 .debug_aranges  0x00000000     0x14f0
  .debug_aranges
@@ -5120,7 +5125,7 @@ LOAD C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/
  .debug_macro   0x00020771      0x19b CMakeFiles/SR16-ChargingDash.dir/Drivers/Display/ssd1306.c.obj
  .debug_macro   0x0002090c      0x221 CMakeFiles/SR16-ChargingDash.dir/Drivers/Display/ssd1306_fonts.c.obj
 
-.debug_line     0x00000000    0x18c19
+.debug_line     0x00000000    0x18c1f
  .debug_line    0x00000000      0x797 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Core/Src/system_stm32f1xx.c.obj
  .debug_line    0x00000797      0xfb6 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_adc.c.obj
  .debug_line    0x0000174d      0x993 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.c.obj
@@ -5134,60 +5139,60 @@ LOAD C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/
  .debug_line    0x0000b186     0x34cc cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim.c.obj
  .debug_line    0x0000e652     0x1889 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim_ex.c.obj
  .debug_line    0x0000fedb     0x24ad cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_uart.c.obj
- .debug_line    0x00012388      0xd6e CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
- .debug_line    0x000130f6      0x7da CMakeFiles/SR16-ChargingDash.dir/Core/Src/stm32f1xx_it.c.obj
- .debug_line    0x000138d0      0x8ee CMakeFiles/SR16-ChargingDash.dir/Core/Src/stm32f1xx_hal_msp.c.obj
- .debug_line    0x000141be      0x35b CMakeFiles/SR16-ChargingDash.dir/Core/Src/sysmem.c.obj
- .debug_line    0x00014519       0x78 CMakeFiles/SR16-ChargingDash.dir/startup_stm32f105xc.s.obj
- .debug_line    0x00014591      0xfaf CMakeFiles/SR16-ChargingDash.dir/Core/Src/display.c.obj
- .debug_line    0x00015540       0xaf CMakeFiles/SR16-ChargingDash.dir/Core/Src/graphics.c.obj
- .debug_line    0x000155ef     0x107c CMakeFiles/SR16-ChargingDash.dir/Drivers/Display/ssd1306.c.obj
- .debug_line    0x0001666b      0x723 CMakeFiles/SR16-ChargingDash.dir/Drivers/Display/ssd1306_fonts.c.obj
- .debug_line    0x00016d8e      0x2bd C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-sprintf.o)
- .debug_line    0x0001704b      0x185 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-errno.o)
- .debug_line    0x000171d0      0x207 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-memcpy-stub.o)
- .debug_line    0x000173d7       0x4f C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-strlen.o)
- .debug_line    0x00017426      0x89f C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-nano-svfprintf.o)
- .debug_line    0x00017cc5      0x722 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-nano-vfprintf_i.o)
- .debug_line    0x000183e7      0x1bb C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-memmove.o)
- .debug_line    0x000185a2      0x1fe C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-memchr-stub.o)
- .debug_line    0x000187a0      0x274 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-reallocr.o)
- .debug_line    0x00018a14      0x205 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-msizer.o)
+ .debug_line    0x00012388      0xd76 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
+ .debug_line    0x000130fe      0x7da CMakeFiles/SR16-ChargingDash.dir/Core/Src/stm32f1xx_it.c.obj
+ .debug_line    0x000138d8      0x8ee CMakeFiles/SR16-ChargingDash.dir/Core/Src/stm32f1xx_hal_msp.c.obj
+ .debug_line    0x000141c6      0x35b CMakeFiles/SR16-ChargingDash.dir/Core/Src/sysmem.c.obj
+ .debug_line    0x00014521       0x78 CMakeFiles/SR16-ChargingDash.dir/startup_stm32f105xc.s.obj
+ .debug_line    0x00014599      0xfad CMakeFiles/SR16-ChargingDash.dir/Core/Src/display.c.obj
+ .debug_line    0x00015546       0xaf CMakeFiles/SR16-ChargingDash.dir/Core/Src/graphics.c.obj
+ .debug_line    0x000155f5     0x107c CMakeFiles/SR16-ChargingDash.dir/Drivers/Display/ssd1306.c.obj
+ .debug_line    0x00016671      0x723 CMakeFiles/SR16-ChargingDash.dir/Drivers/Display/ssd1306_fonts.c.obj
+ .debug_line    0x00016d94      0x2bd C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-sprintf.o)
+ .debug_line    0x00017051      0x185 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-errno.o)
+ .debug_line    0x000171d6      0x207 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-memcpy-stub.o)
+ .debug_line    0x000173dd       0x4f C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-strlen.o)
+ .debug_line    0x0001742c      0x89f C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-nano-svfprintf.o)
+ .debug_line    0x00017ccb      0x722 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-nano-vfprintf_i.o)
+ .debug_line    0x000183ed      0x1bb C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-memmove.o)
+ .debug_line    0x000185a8      0x1fe C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-memchr-stub.o)
+ .debug_line    0x000187a6      0x274 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-reallocr.o)
+ .debug_line    0x00018a1a      0x205 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-msizer.o)
 
-.debug_str      0x00000000    0xbfa91
- .debug_str     0x00000000    0xbfa91 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Core/Src/system_stm32f1xx.c.obj
+.debug_str      0x00000000    0xbfa7d
+ .debug_str     0x00000000    0xbfa7d cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Core/Src/system_stm32f1xx.c.obj
                               0xb4a8b (size before relaxing)
- .debug_str     0x000bfa91    0xb5134 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_adc.c.obj
- .debug_str     0x000bfa91    0xb5265 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.c.obj
- .debug_str     0x000bfa91    0xb4efa cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc.c.obj
- .debug_str     0x000bfa91    0xb4d08 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc_ex.c.obj
- .debug_str     0x000bfa91    0xb4de4 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio.c.obj
- .debug_str     0x000bfa91    0xb4df9 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_dma.c.obj
- .debug_str     0x000bfa91    0xb51a3 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_cortex.c.obj
- .debug_str     0x000bfa91    0xb5258 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_can.c.obj
- .debug_str     0x000bfa91    0xb5b17 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_i2c.c.obj
- .debug_str     0x000bfa91    0xb5e81 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim.c.obj
- .debug_str     0x000bfa91    0xb568d cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim_ex.c.obj
- .debug_str     0x000bfa91    0xb54f0 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_uart.c.obj
- .debug_str     0x000bfa91    0xb9e42 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
- .debug_str     0x000bfa91    0xb5181 CMakeFiles/SR16-ChargingDash.dir/Core/Src/stm32f1xx_it.c.obj
- .debug_str     0x000bfa91    0xb5d66 CMakeFiles/SR16-ChargingDash.dir/Core/Src/stm32f1xx_hal_msp.c.obj
- .debug_str     0x000bfa91     0x70fe CMakeFiles/SR16-ChargingDash.dir/Core/Src/sysmem.c.obj
- .debug_str     0x000bfa91       0xa2 CMakeFiles/SR16-ChargingDash.dir/startup_stm32f105xc.s.obj
- .debug_str     0x000bfa91    0xb7daa CMakeFiles/SR16-ChargingDash.dir/Core/Src/display.c.obj
- .debug_str     0x000bfa91     0x2e77 CMakeFiles/SR16-ChargingDash.dir/Core/Src/graphics.c.obj
- .debug_str     0x000bfa91    0xb89c1 CMakeFiles/SR16-ChargingDash.dir/Drivers/Display/ssd1306.c.obj
- .debug_str     0x000bfa91    0xb5015 CMakeFiles/SR16-ChargingDash.dir/Drivers/Display/ssd1306_fonts.c.obj
- .debug_str     0x000bfa91      0x568 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-sprintf.o)
- .debug_str     0x000bfa91      0x523 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-errno.o)
- .debug_str     0x000bfa91      0x227 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-memcpy-stub.o)
- .debug_str     0x000bfa91       0xef C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-strlen.o)
- .debug_str     0x000bfa91      0x872 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-nano-svfprintf.o)
- .debug_str     0x000bfa91      0x808 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-nano-vfprintf_i.o)
- .debug_str     0x000bfa91      0x224 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-memmove.o)
- .debug_str     0x000bfa91      0x223 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-memchr-stub.o)
- .debug_str     0x000bfa91      0x59f C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-reallocr.o)
- .debug_str     0x000bfa91      0x572 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-msizer.o)
+ .debug_str     0x000bfa7d    0xb5134 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_adc.c.obj
+ .debug_str     0x000bfa7d    0xb5265 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.c.obj
+ .debug_str     0x000bfa7d    0xb4efa cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc.c.obj
+ .debug_str     0x000bfa7d    0xb4d08 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc_ex.c.obj
+ .debug_str     0x000bfa7d    0xb4de4 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio.c.obj
+ .debug_str     0x000bfa7d    0xb4df9 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_dma.c.obj
+ .debug_str     0x000bfa7d    0xb51a3 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_cortex.c.obj
+ .debug_str     0x000bfa7d    0xb5258 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_can.c.obj
+ .debug_str     0x000bfa7d    0xb5b17 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_i2c.c.obj
+ .debug_str     0x000bfa7d    0xb5e81 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim.c.obj
+ .debug_str     0x000bfa7d    0xb568d cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim_ex.c.obj
+ .debug_str     0x000bfa7d    0xb54f0 cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_uart.c.obj
+ .debug_str     0x000bfa7d    0xb9e32 CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj
+ .debug_str     0x000bfa7d    0xb5181 CMakeFiles/SR16-ChargingDash.dir/Core/Src/stm32f1xx_it.c.obj
+ .debug_str     0x000bfa7d    0xb5d66 CMakeFiles/SR16-ChargingDash.dir/Core/Src/stm32f1xx_hal_msp.c.obj
+ .debug_str     0x000bfa7d     0x70fe CMakeFiles/SR16-ChargingDash.dir/Core/Src/sysmem.c.obj
+ .debug_str     0x000bfa7d       0xa2 CMakeFiles/SR16-ChargingDash.dir/startup_stm32f105xc.s.obj
+ .debug_str     0x000bfa7d    0xb7daf CMakeFiles/SR16-ChargingDash.dir/Core/Src/display.c.obj
+ .debug_str     0x000bfa7d     0x2e77 CMakeFiles/SR16-ChargingDash.dir/Core/Src/graphics.c.obj
+ .debug_str     0x000bfa7d    0xb89c1 CMakeFiles/SR16-ChargingDash.dir/Drivers/Display/ssd1306.c.obj
+ .debug_str     0x000bfa7d    0xb5015 CMakeFiles/SR16-ChargingDash.dir/Drivers/Display/ssd1306_fonts.c.obj
+ .debug_str     0x000bfa7d      0x568 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-sprintf.o)
+ .debug_str     0x000bfa7d      0x523 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-errno.o)
+ .debug_str     0x000bfa7d      0x227 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-memcpy-stub.o)
+ .debug_str     0x000bfa7d       0xef C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-strlen.o)
+ .debug_str     0x000bfa7d      0x872 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-nano-svfprintf.o)
+ .debug_str     0x000bfa7d      0x808 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-nano-vfprintf_i.o)
+ .debug_str     0x000bfa7d      0x224 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-memmove.o)
+ .debug_str     0x000bfa7d      0x223 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-memchr-stub.o)
+ .debug_str     0x000bfa7d      0x59f C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-reallocr.o)
+ .debug_str     0x000bfa7d      0x572 C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libg_nano.a(libc_a-msizer.o)
 
 .debug_line_str
                 0x00000000      0x160

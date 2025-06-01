@@ -60,16 +60,18 @@ UART_HandleTypeDef huart1;
 int selectedButton = 0;
 bool backPressed = false;
 bool selectPressed = false;
-bool atinyCommEnable = false;
-bool isElconFault = false;
+
+uint32_t CURRENT_TIME = 0;
+uint32_t PREVIOUS_TIME = 0;
+
+uint16_t LIMIT_VOLTS = 0;
+uint16_t LIMIT_AMPS = 0;
+
+char codeBranch[6] = "Release";
+char codeVersion[5] = "0.3.3";
+
 extern bool isBalancing;
 extern bool isBalancingControl;
-
-uint32_t CURRENT_TIME;
-uint32_t PREVIOUS_TIME;
-
-uint16_t charging_limit_volts = 0;
-uint16_t charging_limit_amps = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -103,7 +105,27 @@ PUTCHAR_PROTOTYPE
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-// CAN test begin
+// INTERRUPTS FOR KEYS
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
+	// TODO: fix debouncing
+	CURRENT_TIME = HAL_GetTick();
+	int DEB_TIME_THRES = 200;
+	int TIME_DIFF = CURRENT_TIME - PREVIOUS_TIME;
+	if (TIME_DIFF > DEB_TIME_THRES) {
+		if (GPIO_Pin == BTN_UP_Pin && !selectPressed) {
+			selectedButton--;
+		} else if (GPIO_Pin == BTN_DWN_Pin && !selectPressed) {
+			selectedButton++;
+		} else if (GPIO_Pin == BTN_SEL_Pin) {
+			selectPressed = true;
+		} else if (GPIO_Pin == BTN_BCK_Pin && !selectPressed) {
+			backPressed = true;
+		}
+		PREVIOUS_TIME = CURRENT_TIME;
+	}
+}
+
+// CAN STUFF BEGIN
 
 struct CANMessage {
 	CAN_TxHeaderTypeDef TxHeader;
@@ -117,6 +139,10 @@ HAL_StatusTypeDef CAN_Start() {
 
 HAL_StatusTypeDef CAN_Activate() {
 	return HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING);
+}
+
+HAL_StatusTypeDef CAN_Send(struct CANMessage *ptr) {
+	return HAL_CAN_AddTxMessage(&hcan1, &ptr->TxHeader, (uint8_t*) ptr->data, &ptr->TxMailbox);
 }
 
 void CAN_SettingsInit(struct CANMessage *ptr, bool isExtended, uint16_t dlc_length) {
@@ -136,10 +162,6 @@ void Set_CAN_Id(struct CANMessage *ptr, uint32_t id, bool isExtended) {
   }
 }
 
-HAL_StatusTypeDef CAN_Send(struct CANMessage *ptr) {
-	return HAL_CAN_AddTxMessage(&hcan1, &ptr->TxHeader, (uint8_t*) ptr->data, &ptr->TxMailbox);
-}
-
 void CAN_Balance(struct CANMessage *ptr, bool balancing_enabled) {
   uint32_t CAN_ID = 0x604;
   Set_CAN_Id(ptr, CAN_ID, false);
@@ -149,11 +171,11 @@ void CAN_Balance(struct CANMessage *ptr, bool balancing_enabled) {
 }
 
 void CAN_Charge(struct CANMessage *ptr, uint16_t chargingLimitsVolts, uint16_t chargingLimitsAmps, bool charge_enable) {
-
   uint32_t CAN_ID = 0x1806E5F4;
   Set_CAN_Id(ptr, CAN_ID, true);
 
   chargingLimitsVolts *= 10;
+  chargingLimitsAmps *= 10;
 
   ptr->data[0] = (chargingLimitsVolts >> 8) & 0xFF;
   ptr->data[1] = chargingLimitsVolts & 0xFF;
@@ -167,39 +189,8 @@ void CAN_Charge(struct CANMessage *ptr, uint16_t chargingLimitsVolts, uint16_t c
   HAL_Delay(10);
   CAN_Send(ptr);
 }
+// CAN STUFF END
 
-// CAN test end
-
-// // 1 for inlet, 2 for outlet
-// double pull_therm(int therm_number) {
-//   if (therm_number == 1) {
-
-//   } else if (therm_number == 2) {
-    
-//   }
-// }
-
-// double pull_stm_therm() {
-// }
-
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
-	// TODO: fix debouncing
-	CURRENT_TIME = HAL_GetTick();
-	int DEB_TIME_THRES = 200;
-	int TIME_DIFF = CURRENT_TIME - PREVIOUS_TIME;
-	if (TIME_DIFF > DEB_TIME_THRES) {
-		if (GPIO_Pin == BTN_UP_Pin && !selectPressed) {
-			selectedButton--;
-		} else if (GPIO_Pin == BTN_DWN_Pin && !selectPressed) {
-			selectedButton++;
-		} else if (GPIO_Pin == BTN_SEL_Pin) {
-			selectPressed = true;
-		} else if (GPIO_Pin == BTN_BCK_Pin && !selectPressed) {
-			backPressed = true;
-		}
-		PREVIOUS_TIME = CURRENT_TIME;
-	}
-}
 /* USER CODE END 0 */
 
 /**
@@ -240,66 +231,29 @@ int main(void)
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
 
-  ssd1306_Init();
+  // INIT DISPLAY
+  SRE_Display_Init(false);
 
-// Fan test
-// HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
-// HAL_Delay(500);
-// TIM3->CCR1 = 0;
-// HAL_Delay(1000);
-// TIM3->CCR1 = 1;
-// HAL_Delay(1000);
-// TIM3->CCR1 = 2;
-// HAL_Delay(1000);
-// TIM3->CCR1 = 3;
-// HAL_Delay(1000);
-// TIM3->CCR1 = 4;
-// HAL_Delay(1000);
-// TIM3->CCR1 = 5;
-// HAL_Delay(1000);
-// TIM3->CCR1 = 6;
-// HAL_Delay(1000);
-// TIM3->CCR1 = 7;
-// HAL_Delay(1000);
-// TIM3->CCR1 = 8;
-// HAL_Delay(1000);
-// TIM3->CCR1 = 9;
-// HAL_Delay(1000);
+  // INIT CHARGING CAN STRUCT
+  struct CANMessage charging_msg;
+  CAN_SettingsInit(&charging_msg, true, 8);
 
-// Pump test
-// {
-//   HAL_GPIO_WritePin(HVIL_CTRL_GPIO_Port, HVIL_CTRL_Pin, GPIO_PIN_SET);
-//   HAL_Delay(3000);
-//   HAL_GPIO_WritePin(HVIL_CTRL_GPIO_Port, HVIL_CTRL_Pin, GPIO_PIN_SET);
-// }
+  // INIT BALANCING CAN STRUCT
+  struct CANMessage balancing_msg;
+  CAN_SettingsInit(&balancing_msg, false, 1);
 
-// CAN TEST BEGIN
-struct CANMessage charging_msg;
-CAN_SettingsInit(&charging_msg, true, 8);
-// CAN TEST END
+  // INIT GPIO STATE
+  GPIO_PinState IN_HVIL_SW_STATE;
+  GPIO_PinState RTC_SW_STATE;
 
-HAL_Delay(1000); // Wait for inits to finish
-DISP_KanoaSplash(); //call this in the UI init instead
-HAL_Delay(2000);
+  HAL_Delay(500);
 
-GPIO_PinState IN_HVIL_SW_STATE;
-GPIO_PinState RTC_SW_STATE;
-
-char chargingString[30];
-sprintf(chargingString, "%d volts @ %d amps", charging_limit_volts, charging_limit_amps);
-
-
-// BALANCING
-
-struct CANMessage balancing_msg;
-CAN_SettingsInit(&balancing_msg, false, 1);
-
-SRE_Display_Test();
-
-//   uint16_t adc_buffer[4];  // DMA buffer for ADC readings
-//   uint16_t adc_value_0, adc_value_1, adc_value_2, adc_value_3;  // Variables to store results
-
-// HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adc_buffer, 4);  // Start ADC DMA
+  // TEMP STUFF 1 START
+  DISP_KanoaSplash(); // TODO: call this in the GUI init instead
+  HAL_Delay(1000);
+  char chargingInfoString[30];
+  SRE_Display_Test(); // TODO: better init for GUI
+  // TEMP STUFF 1 END
 
   /* USER CODE END 2 */
 
@@ -307,105 +261,42 @@ SRE_Display_Test();
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    // char displayBuffer[50];
-
-    // // Store ADC values from DMA buffer
-    // uint16_t adc_value_0 = adc_buffer[0];
-    // uint16_t adc_value_1 = adc_buffer[1];
-    // uint16_t adc_value_2 = adc_buffer[2];
-    // uint16_t adc_value_3 = adc_buffer[3];
-
-    // // Format ADC values into a string
-    // sprintf(displayBuffer, "ADC0:%d ADC1:%d ADC2:%d ADC3:%d\n",  adc_value_0, adc_value_1, adc_value_2, adc_value_3);
-
-    // // Display it on the OLED or LCD
-    // printf(displayBuffer);
-
-    // HAL_Delay(1000);  // Update display every second
-
 	  ssd1306_Fill(Black);
 	  ssd1306_UpdateScreen();
 
 	  IN_HVIL_SW_STATE = HAL_GPIO_ReadPin(IN_HVIL_F_SW_GPIO_Port, IN_HVIL_F_SW_Pin);
 	  RTC_SW_STATE = HAL_GPIO_ReadPin(RTC_SW_GPIO_Port, RTC_SW_Pin);
 
+    // TEMP STUFF 1 START
+    sprintf(chargingInfoString, "%d volts @ %d amps", LIMIT_VOLTS, LIMIT_AMPS);
+    // TEMP STUFF 1 END
+
 	  if(IN_HVIL_SW_STATE) {
 		  HAL_GPIO_WritePin(HVIL_CTRL_GPIO_Port, HVIL_CTRL_Pin, GPIO_PIN_SET);
 		  HAL_GPIO_WritePin(GPIOA, LED_HV_Pin, GPIO_PIN_SET);
-		  if(!RTC_SW_STATE) {
-        CAN_Charge(&charging_msg, charging_limit_volts, charging_limit_amps, true);
-		  } else {
-        CAN_Charge(&charging_msg, charging_limit_volts, charging_limit_amps, false);
-		  }
 		  ssd1306_SetCursor(5, 5);
-		  ssd1306_WriteString("Charging:", Font_6x8, White);
-		  ssd1306_SetCursor(5, 20);
-		  ssd1306_WriteString(chargingString, Font_6x8, White);
-		  ssd1306_UpdateScreen();
+		  if(!RTC_SW_STATE) {
+        CAN_Charge(&charging_msg, LIMIT_VOLTS, LIMIT_AMPS, true);
+        ssd1306_WriteString("Now Charging", Font_6x8, White);
+		    ssd1306_SetCursor(5, 20);
+		    ssd1306_WriteString(chargingInfoString, Font_6x8, White);
+		  } else if (RTC_SW_STATE) {
+        CAN_Charge(&charging_msg, LIMIT_VOLTS, LIMIT_AMPS, false);
+        ssd1306_WriteString("PLS FLIP RTC", Font_6x8, White);
+		  }
 	  } else if (isBalancingControl) {
+        CAN_Balance(&balancing_msg, isBalancing);
+        HAL_GPIO_WritePin(GPIOA, LED_BAL_Pin, GPIO_PIN_SET);
         ssd1306_SetCursor(5, 5);
         ssd1306_WriteString("Now Balancing", Font_6x8, White);
-        ssd1306_UpdateScreen();
-				HAL_GPIO_WritePin(GPIOA, LED_BAL_Pin, GPIO_PIN_SET);
-        CAN_Balance(&balancing_msg, isBalancing);
     } else {
 		  HAL_GPIO_WritePin(HVIL_CTRL_GPIO_Port, HVIL_CTRL_Pin, GPIO_PIN_RESET);
 		  HAL_GPIO_WritePin(GPIOA, LED_HV_Pin, GPIO_PIN_RESET);
+      HAL_GPIO_WritePin(GPIOA, LED_BAL_Pin, GPIO_PIN_RESET);
 		  ssd1306_SetCursor(5, 5);
-		  ssd1306_WriteString("Not charging", Font_6x8, White);
-		  ssd1306_UpdateScreen();
+		  ssd1306_WriteString("Not Charging", Font_6x8, White);
 	  }
-
-//	  // LED control
-//	  {
-//		  // Balance LED control
-//		  {
-//			  if (!isBalancing)
-//				  HAL_GPIO_WritePin(GPIOA, LED_BAL_Pin, GPIO_PIN_RESET);
-//			  else
-//				  HAL_GPIO_WritePin(GPIOA, LED_BAL_Pin, GPIO_PIN_SET);
-//		  }
-//
-//		  // Elcon fault LED control
-//		  {
-//			  if(!isElconFault)
-//				  HAL_GPIO_WritePin(LED_TC_FLT_GPIO_Port, LED_TC_FLT_Pin, GPIO_PIN_RESET);
-//			  else
-//				  HAL_GPIO_WritePin(LED_TC_FLT_GPIO_Port, LED_TC_FLT_Pin, GPIO_PIN_SET);
-//
-//		  }
-//
-//		  // HV LED control
-//		  {
-//			  if (!isBalancing)
-//				  HAL_GPIO_WritePin(GPIOA, LED_HV_Pin, GPIO_PIN_RESET);
-//			  else
-//				  HAL_GPIO_WritePin(GPIOA, LED_HV_Pin, GPIO_PIN_SET);
-//		  }
-//
-//	  }
-
-//	  // Atiny comm
-//	  if (atinyCommEnable) {
-//		  uint8_t message[] = {"0x3E"};
-//		  /*
-//		   * First 3 bits are faults (bms, imd, etc)
-//		   * Next 3 bits are soc
-//		   * Last 2 are reserved
-//		  */
-//		  uint8_t deviceAddress = 0x3A << 1;  // Atiny address
-//		  HAL_StatusTypeDef status = HAL_I2C_Master_Transmit(&hi2c2, deviceAddress, message, 5, 500);
-//	  	  if (status == HAL_OK) {
-//	  		  // good
-//	  	  } else {
-//	  		  // fault
-//	  	  }
-//	  }
-
-//	  HAL_GPIO_TogglePin(HVIL_CTRL_GPIO_Port, HVIL_CTRL_Pin);
-//	  HAL_Delay(1000);
-
-
+		ssd1306_UpdateScreen();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

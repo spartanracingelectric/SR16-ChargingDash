@@ -7,8 +7,10 @@ extern int backPressed;
 bool isBalancing = false;
 bool isBalancingControl = false;
 
-extern uint16_t charging_limit_volts;
-extern uint16_t charging_limit_amps;
+extern uint16_t LIMIT_VOLTS;
+extern uint16_t LIMIT_AMPS;
+extern char codeBranch[10];
+extern char codeVersion[5];
 
 void DISP_KanoaSplash() {
 	ssd1306_Fill(Black);
@@ -18,11 +20,9 @@ void DISP_KanoaSplash() {
 	ssd1306_SetCursor(70, 15);
 	ssd1306_WriteString("KANOA OS", Font_6x8, White);
 	ssd1306_SetCursor(70, 25);
-	ssd1306_WriteString("v0.3.1", Font_6x8, White);
+	ssd1306_WriteString(codeVersion, Font_6x8, White);
 	ssd1306_SetCursor(70, 35);
-	ssd1306_WriteString("charging", Font_6x8, White);
-	ssd1306_SetCursor(70, 45);
-	ssd1306_WriteString("solutions", Font_6x8, White);
+	ssd1306_WriteString(codeBranch, Font_6x8, White);
 	ssd1306_UpdateScreen();
 }
 
@@ -402,8 +402,8 @@ void SRE_Display_Start_Charging() {
 	    if (selectedButton >= 0 && selectedButton < numOfProfiles) {
 	        struct Profile selectedProfile = profiles[selectedButton];
 	        // Set charging limits based on the selected profile
-					charging_limit_volts = selectedProfile.voltage;
-					charging_limit_amps = selectedProfile.current;
+					LIMIT_VOLTS = selectedProfile.voltage;
+					LIMIT_AMPS = selectedProfile.current;
 					return;  // Exit after setting the limits
 	    }
 	    else if (selectedButton == numOfProfiles) {
