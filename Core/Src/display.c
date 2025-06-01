@@ -4,22 +4,27 @@
 extern int selectedButton;
 extern bool selectPressed;
 extern int backPressed;
+bool isBalancing = false;
+bool isBalancingControl = false;
 
-//void DISP_KanoaSplash() {
-//	ssd1306_Fill(Black);
-//	ssd1306_UpdateScreen();
-//	ssd1306_SetCursor(0, 0);
-//	ssd1306_DrawBitmap(0, 0, kanoaBootImage, 128, 64, White);
-//	ssd1306_SetCursor(70, 15);
-//	ssd1306_WriteString("KANOA OS", Font_6x8, White);
-//	ssd1306_SetCursor(70, 25);
-//	ssd1306_WriteString("v0.1.0", Font_6x8, White);
-//	ssd1306_SetCursor(70, 35);
-//	ssd1306_WriteString("charging", Font_6x8, White);
-//	ssd1306_SetCursor(70, 45);
-//	ssd1306_WriteString("solutions", Font_6x8, White);
-//	ssd1306_UpdateScreen();
-//}
+extern uint16_t charging_limit_volts;
+extern uint16_t charging_limit_amps;
+
+void DISP_KanoaSplash() {
+	ssd1306_Fill(Black);
+	ssd1306_UpdateScreen();
+	ssd1306_SetCursor(0, 0);
+	ssd1306_DrawBitmap(0, 0, kanoaBootImage, 128, 64, White);
+	ssd1306_SetCursor(70, 15);
+	ssd1306_WriteString("KANOA OS", Font_6x8, White);
+	ssd1306_SetCursor(70, 25);
+	ssd1306_WriteString("v0.3.1", Font_6x8, White);
+	ssd1306_SetCursor(70, 35);
+	ssd1306_WriteString("charging", Font_6x8, White);
+	ssd1306_SetCursor(70, 45);
+	ssd1306_WriteString("solutions", Font_6x8, White);
+	ssd1306_UpdateScreen();
+}
 
 // Initialization function
 void SRE_Display_Init(bool test_mode) {
@@ -39,8 +44,9 @@ void SRE_Display_Nav() {
 	selectedButton = 0;
 	selectPressed = false;
 
-	char* buttons[] = {"Home", "Start Charging", "Start Balancing", "Battery", "Charger", "Errors"};
-	int numOfButtons = 6;
+	char* buttons[] = {"Charging", "Balancing"};
+	// char* buttons[] = {"Home", "Start Charging", "Start Balancing", "Battery", "Charger", "Errors"};
+	int numOfButtons = 2;
 
 	while(!selectPressed) {
 		ssd1306_FillRectangle(0, 0, 127, 63, Black);
@@ -95,23 +101,19 @@ void SRE_Display_Nav() {
 
 		// Populate with the function name that corresponds to each button number respectively later.
 		if (selectedButton == 0) {
-			SRE_Display_Home();
+			SRE_Display_Start_Charging();
 		}
 		else if (selectedButton == 1) {
-			SRE_Display_Start_Charging();
-
-		}
-		else if (selectedButton == 2) {
 			SRE_Display_Start_Balancing();
 
 		}
-		else if (selectedButton == 3) {
+		else if (selectedButton == 2) {
 			SRE_Display_Battery1();
 		}
-		else if (selectedButton == 4) {
+		else if (selectedButton == 3) {
 			SRE_Display_Charger_Stats();
 		}
-		else if (selectedButton ==5) {
+		else if (selectedButton ==4) {
 			SRE_Display_Err();
 		}
 	}
@@ -150,8 +152,8 @@ void SRE_Display_Home() {
 		ssd1306_SetCursor(1, 33);
 		ssd1306_WriteString(balancing, Font_6x8, White);
 
-		char *navBarButtons[] = {"Batt", "Nav"};
-		SRE_Display_Nav_Bar(navBarButtons, 2, 0);
+		char *navBarButtons[] = {"Nav"};
+		SRE_Display_Nav_Bar(navBarButtons, 1, 0);
 
 		ssd1306_UpdateScreen();
 	}
@@ -304,21 +306,17 @@ void SRE_Display_Start_Charging() {
 	//sets up sample profiles to use for testing
 	struct Profile {
 		char name[5];
-		int current;
-		int voltage;
-		bool isBalancing;
+		uint16_t current;
+		uint16_t voltage;
 	};
 
-	struct Profile p1 = {"P1", 10, 20, true};
-	struct Profile p2 = {"P2", 10, 400, true};
-	struct Profile p3 = {"P3", 10, 15, false};
-	struct Profile p4 = {"P4", 10, 20, true};
-	struct Profile p5 = {"P5", 10, 400, true};
-	struct Profile p6 = {"P6", 10, 15, false};
-	struct Profile p7 = {"P7", 10, 400, true};
-	struct Profile p8 = {"P8", 10, 15, false};
+	struct Profile p1 = {"P1", 20, 385};
+	struct Profile p2 = {"P2", 15, 385};
+	struct Profile p3 = {"P3", 3, 385};
+	struct Profile p4 = {"P4", 10, 400};
+	struct Profile p5 = {"P5", 20, 400};
 
-	int numOfProfiles = 8;
+	int numOfProfiles = 5;
 	struct Profile profiles[numOfProfiles];
 
 	profiles[0] = p1;
@@ -326,19 +324,16 @@ void SRE_Display_Start_Charging() {
 	profiles[2] = p3;
 	profiles[3] = p4;
 	profiles[4] = p5;
-	profiles[5] = p6;
-    profiles[6] = p7;
-    profiles[7] = p8;
 
-    int navStartIndex = numOfProfiles;
-    int navLastIndex = numOfProfiles +2;
+  int navStartIndex = numOfProfiles;
+  int navLastIndex = numOfProfiles;
 
 	while (!selectPressed) {
 
 		//resets screen
 		ssd1306_FillRectangle(0,0,127,63, Black);
 
-		SRE_Display_Title_Bar("Start Charging");
+		SRE_Display_Title_Bar("Charging");
 
 		int currentScreen = selectedButton/3;
 
@@ -371,7 +366,7 @@ void SRE_Display_Start_Charging() {
 		//displays up to three profiles per screen
 		for (int i = startIndex; i < startIndex + 3 && i < numOfProfiles; i++) {
 			char profileString[50];
-			sprintf(profileString, "%s: %dA %dV BAL %s", profiles[i].name, profiles[i].current, profiles[i].voltage, profiles[i].isBalancing ? "ON" : "OFF");
+			sprintf(profileString, "%s: %dA %dV", profiles[i].name, profiles[i].current, profiles[i].voltage);
 			ssd1306_SetCursor(3, y1);
 
 			if (selectedButton == i) {
@@ -393,8 +388,8 @@ void SRE_Display_Start_Charging() {
 
 		SRE_Display_Short_Scroll_Bar(currentScreen, numOfScreens);
 
-		char *navBarButtons[] = {"Batt", "Nav", "Start"};
-		SRE_Display_Nav_Bar(navBarButtons,3, navStartIndex);
+		char *navBarButtons[] = {"Nav"};
+		SRE_Display_Nav_Bar(navBarButtons,1, navStartIndex);
 
 
 
@@ -403,12 +398,17 @@ void SRE_Display_Start_Charging() {
 	}
 
 	if (selectPressed) {
-		if (selectedButton == navStartIndex) {
-			SRE_Display_Battery1();
-		}
-		else if (selectedButton == navStartIndex + 1) {
+	    // Make sure the selectedButton is within the valid range of profiles
+	    if (selectedButton >= 0 && selectedButton < numOfProfiles) {
+	        struct Profile selectedProfile = profiles[selectedButton];
+	        // Set charging limits based on the selected profile
+					charging_limit_volts = selectedProfile.voltage;
+					charging_limit_amps = selectedProfile.current;
+					return;  // Exit after setting the limits
+	    }
+	    else if (selectedButton == numOfProfiles) {
 			SRE_Display_Nav();
-		}
+	    }
 	}
 }
 
@@ -652,7 +652,7 @@ void SRE_Display_Start_Balancing(){
 	//Writes "Charging 1"
 		//Change to (1,2) probably
 
-	int numOfButtons = 3;
+	int numOfButtons = 2;
 
 	while(!selectPressed){
 
@@ -671,7 +671,7 @@ void SRE_Display_Start_Balancing(){
 		ssd1306_SetCursor(1, 13);
 		ssd1306_WriteString(balancingOnOff, Font_6x8, White);
 
-		char *navButtons[] = {"Batt", "Nav", "Start Bal"};
+		char *navButtons[] = {"Nav", "Start Bal"};
 		SRE_Display_Nav_Bar(navButtons, numOfButtons, 0);
 
 
@@ -685,14 +685,13 @@ void SRE_Display_Start_Balancing(){
 			selectedButton = numOfButtons-1;
 		}
 
-		if (selectedButton ==0 ) {
-			SRE_Display_Battery1();
-		}
-		else if (selectedButton == 1) {
+		if (selectedButton == 0) {
 			SRE_Display_Nav();
 		}
-		else if (selectedButton == 2) {
-			//start or stop bal
+		else if (selectedButton == 1) {
+			isBalancing = true;
+			isBalancingControl = true;
+			return;
 		}
 
 

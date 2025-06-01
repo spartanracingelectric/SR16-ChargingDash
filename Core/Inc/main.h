@@ -49,6 +49,8 @@ extern "C" {
 
 /* USER CODE END EM */
 
+void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
+
 /* Exported functions prototypes ---------------------------------------------*/
 void Error_Handler(void);
 
@@ -71,32 +73,36 @@ void Error_Handler(void);
 #define IN_HVIL_F_SW_GPIO_Port GPIOA
 #define IN_HVIL_ESTOP_Pin GPIO_PIN_7
 #define IN_HVIL_ESTOP_GPIO_Port GPIOA
+#define THERM_OUT_SIG_Pin GPIO_PIN_4
+#define THERM_OUT_SIG_GPIO_Port GPIOC
+#define THERM_IN_SIG_Pin GPIO_PIN_5
+#define THERM_IN_SIG_GPIO_Port GPIOC
+#define SHUNT_SIG_Pin GPIO_PIN_0
+#define SHUNT_SIG_GPIO_Port GPIOB
 #define IN_BMS_FLT_LED_Pin GPIO_PIN_1
 #define IN_BMS_FLT_LED_GPIO_Port GPIOB
 #define IN_IMD_FLT_LED_Pin GPIO_PIN_12
 #define IN_IMD_FLT_LED_GPIO_Port GPIOB
-#define THERM_2_SIG_Pin GPIO_PIN_13
-#define THERM_2_SIG_GPIO_Port GPIOB
-#define THERM_1_SIG_Pin GPIO_PIN_14
-#define THERM_1_SIG_GPIO_Port GPIOB
 #define LED_ELCON_FLT_Pin GPIO_PIN_15
 #define LED_ELCON_FLT_GPIO_Port GPIOB
-#define SHUNT_SIG_Pin GPIO_PIN_6
-#define SHUNT_SIG_GPIO_Port GPIOC
 #define LED_TSAL_FLT_Pin GPIO_PIN_7
 #define LED_TSAL_FLT_GPIO_Port GPIOC
 #define HVIL_CTRL_Pin GPIO_PIN_9
 #define HVIL_CTRL_GPIO_Port GPIOC
-#define BTN_1_Pin GPIO_PIN_10
-#define BTN_1_GPIO_Port GPIOC
-#define BTN_2_Pin GPIO_PIN_11
-#define BTN_2_GPIO_Port GPIOC
-#define BTN_3_Pin GPIO_PIN_12
-#define BTN_3_GPIO_Port GPIOC
-#define BTN_4_Pin GPIO_PIN_2
-#define BTN_4_GPIO_Port GPIOD
-#define FAN_CRTL_Pin GPIO_PIN_4
-#define FAN_CRTL_GPIO_Port GPIOB
+#define BTN_UP_Pin GPIO_PIN_10
+#define BTN_UP_GPIO_Port GPIOC
+#define BTN_UP_EXTI_IRQn EXTI15_10_IRQn
+#define BTN_DWN_Pin GPIO_PIN_11
+#define BTN_DWN_GPIO_Port GPIOC
+#define BTN_DWN_EXTI_IRQn EXTI15_10_IRQn
+#define BTN_SEL_Pin GPIO_PIN_12
+#define BTN_SEL_GPIO_Port GPIOC
+#define BTN_SEL_EXTI_IRQn EXTI15_10_IRQn
+#define BTN_BCK_Pin GPIO_PIN_2
+#define BTN_BCK_GPIO_Port GPIOD
+#define BTN_BCK_EXTI_IRQn EXTI2_IRQn
+#define FAN_CTRL_Pin GPIO_PIN_4
+#define FAN_CTRL_GPIO_Port GPIOB
 #define RTC_SW_Pin GPIO_PIN_5
 #define RTC_SW_GPIO_Port GPIOB
 

@@ -6,3 +6,8 @@
 
 ## Programming
  Use VS code with the STM32 extension
+
+## Changelog
+Kanoa OS 0.1.0 -> First rev
+Kanao OS 0.2.0 -> Added charging via profiles
+Kanao OS 0.3.0 -> Added charging via profiles

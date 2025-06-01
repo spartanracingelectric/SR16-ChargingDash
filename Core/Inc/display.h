@@ -4,12 +4,12 @@
 
 #include "ssd1306.h"
 #include "ssd1306_fonts.h"
-//#include "graphics.h"
+#include "graphics.h"
 
 #ifndef DISPLAY_H
 #define DISPLAY_H
 
-//void DISP_KanoaSplash();
+void DISP_KanoaSplash();
 
 void SRE_Display_Init(bool test_mode);
 void SRE_Display_Test();
@@ -30,4 +30,5 @@ void SRE_Display_Title_Bar(char title[]);
 void SRE_Display_Charger_Symbol(int x, int y);
 void SRE_Display_Error_Symbol(int x, int y);
 void SRE_Display_Long_Scroll_Bar(int currentScreen, int numOfScreens);
+
 #endif

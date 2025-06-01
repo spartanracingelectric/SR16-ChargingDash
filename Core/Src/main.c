@@ -19,10 +19,12 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include <stdbool.h>
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <stdio.h>
+#include <stdbool.h>
+#include <display.h>
 
 /* USER CODE END Includes */
 
@@ -42,9 +44,15 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+ADC_HandleTypeDef hadc1;
+DMA_HandleTypeDef hdma_adc1;
+
 CAN_HandleTypeDef hcan1;
 
 I2C_HandleTypeDef hi2c2;
+
+TIM_HandleTypeDef htim2;
+TIM_HandleTypeDef htim3;
 
 UART_HandleTypeDef huart1;
 
@@ -54,15 +62,26 @@ bool backPressed = false;
 bool selectPressed = false;
 bool atinyCommEnable = false;
 bool isElconFault = false;
-bool isBalancing = false;
+extern bool isBalancing;
+extern bool isBalancingControl;
+
+uint32_t CURRENT_TIME;
+uint32_t PREVIOUS_TIME;
+
+uint16_t charging_limit_volts = 0;
+uint16_t charging_limit_amps = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
+static void MX_DMA_Init(void);
 static void MX_CAN1_Init(void);
 static void MX_I2C2_Init(void);
 static void MX_USART1_UART_Init(void);
+static void MX_TIM3_Init(void);
+static void MX_ADC1_Init(void);
+static void MX_TIM2_Init(void);
 /* USER CODE BEGIN PFP */
 
 // PRINTF SUPPORT VIA UART - BEGIN
@@ -100,76 +119,87 @@ HAL_StatusTypeDef CAN_Activate() {
 	return HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING);
 }
 
-void CAN_SettingsInit(struct CANMessage *ptr) {
+void CAN_SettingsInit(struct CANMessage *ptr, bool isExtended, uint16_t dlc_length) {
 	CAN_Start();
 	CAN_Activate();
-	ptr->TxHeader.IDE = CAN_ID_EXT;
-	ptr->TxHeader.ExtId = 0x00000000;
+	ptr->TxHeader.IDE = (isExtended) ? CAN_ID_EXT : CAN_ID_STD;
+  ptr->TxHeader.ExtId = (isExtended) ? 0x00000000 : 0x000;
 	ptr->TxHeader.RTR = CAN_RTR_DATA;
-	ptr->TxHeader.DLC = 8;
+	ptr->TxHeader.DLC = dlc_length;
 }
 
-void Set_CAN_Id(struct CANMessage *ptr, uint32_t id) {
-	ptr->TxHeader.ExtId = id;
+void Set_CAN_Id(struct CANMessage *ptr, uint32_t id, bool isExtended) {
+  if (isExtended) {
+	  ptr->TxHeader.ExtId = id;
+  } else {
+    ptr->TxHeader.StdId = id;
+  }
 }
 
 HAL_StatusTypeDef CAN_Send(struct CANMessage *ptr) {
 	return HAL_CAN_AddTxMessage(&hcan1, &ptr->TxHeader, (uint8_t*) ptr->data, &ptr->TxMailbox);
 }
 
-int charging_limit_volts = 400;
-int charging_limit_amps = 20;
+void CAN_Balance(struct CANMessage *ptr, bool balancing_enabled) {
+  uint32_t CAN_ID = 0x604;
+  Set_CAN_Id(ptr, CAN_ID, false);
+  ptr->data[0] = (balancing_enabled) ? 0x1 : 0x0;
+  HAL_Delay(10);
+  CAN_Send(ptr);
+}
 
-void CAN_Charge(struct CANMessage *ptr, bool charge_enable) {
-    uint32_t CAN_ID = 0x1806E5F4;
-    Set_CAN_Id(ptr, CAN_ID);
+void CAN_Charge(struct CANMessage *ptr, uint16_t chargingLimitsVolts, uint16_t chargingLimitsAmps, bool charge_enable) {
 
-    // convert dec to hex
+  uint32_t CAN_ID = 0x1806E5F4;
+  Set_CAN_Id(ptr, CAN_ID, true);
 
-//    {
-//    	int convertedVolts = charging_limit_volts * 10;
-//    	int convertedAmps = charging_limit_amps * 10;
-//    	while (voltsQuotient != 0) {
-//    		voltsRemainder = convertedVolts % 16;
-//    		if (voltsRemainder > 9) {
-//
-//    		}
-//    		convertedVolts = convertedVolts / 16;
-//    	}
-//    }
+  chargingLimitsVolts *= 10;
 
-    ptr->data[0] = 0x0F;
-    ptr->data[1] = 0xA0;
-    ptr->data[2] = 0x00;
-    ptr->data[3] = 0xC8;
-    ptr->data[4] = (charge_enable) ? 0x00 : 0x01;
-    ptr->data[5] = 0x00;
-    ptr->data[6] = 0x00;
-    ptr->data[7] = 0x00;
-    HAL_Delay(10);
-    CAN_Send(ptr);
+  ptr->data[0] = (chargingLimitsVolts >> 8) & 0xFF;
+  ptr->data[1] = chargingLimitsVolts & 0xFF;
+  ptr->data[2] = (chargingLimitsAmps >> 8) & 0xFF;
+  ptr->data[3] = chargingLimitsAmps & 0xFF;
+  ptr->data[4] = (charge_enable) ? 0x00 : 0x01;
+  ptr->data[5] = 0x00;
+  ptr->data[6] = 0x00;
+  ptr->data[7] = 0x00;
+
+  HAL_Delay(10);
+  CAN_Send(ptr);
 }
 
 // CAN test end
 
-//void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
-//	if (GPIO_Pin == BTN_BTM_Pin && !selectPressed) {
-//		selectedButton++;
-//		HAL_Delay(100);
-//	}
-//	else if (GPIO_Pin == GPIO_PIN_12) {
-//		selectPressed = true;
-//		HAL_Delay(100);
-//	}
-//	else if (GPIO_Pin == GPIO_PIN_11 && !selectPressed) {
-//		backPressed = true;
-//		HAL_Delay(100);
-//	}
-//	else if (GPIO_Pin == BTN_TOP_Pin && !selectPressed) {
-//		selectedButton--;
-//		HAL_Delay(100);
-//	}
-//}
+// // 1 for inlet, 2 for outlet
+// double pull_therm(int therm_number) {
+//   if (therm_number == 1) {
+
+//   } else if (therm_number == 2) {
+    
+//   }
+// }
+
+// double pull_stm_therm() {
+// }
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
+	// TODO: fix debouncing
+	CURRENT_TIME = HAL_GetTick();
+	int DEB_TIME_THRES = 200;
+	int TIME_DIFF = CURRENT_TIME - PREVIOUS_TIME;
+	if (TIME_DIFF > DEB_TIME_THRES) {
+		if (GPIO_Pin == BTN_UP_Pin && !selectPressed) {
+			selectedButton--;
+		} else if (GPIO_Pin == BTN_DWN_Pin && !selectPressed) {
+			selectedButton++;
+		} else if (GPIO_Pin == BTN_SEL_Pin) {
+			selectPressed = true;
+		} else if (GPIO_Pin == BTN_BCK_Pin && !selectPressed) {
+			backPressed = true;
+		}
+		PREVIOUS_TIME = CURRENT_TIME;
+	}
+}
 /* USER CODE END 0 */
 
 /**
@@ -201,28 +231,75 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_CAN1_Init();
   MX_I2C2_Init();
   MX_USART1_UART_Init();
+  MX_TIM3_Init();
+  MX_ADC1_Init();
+  MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
-//  ssd1306_Init();
 
-  // CAN TEST BEGIN
-  struct CANMessage msg;
-  CAN_SettingsInit(&msg);
-  // CAN TEST END
+  ssd1306_Init();
 
-  HAL_Delay(1000); // Wait for inits to finish
-//  DISP_KanoaSplash(); //call this in the UI init instead
-//  HAL_Delay(2000);
+// Fan test
+// HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
+// HAL_Delay(500);
+// TIM3->CCR1 = 0;
+// HAL_Delay(1000);
+// TIM3->CCR1 = 1;
+// HAL_Delay(1000);
+// TIM3->CCR1 = 2;
+// HAL_Delay(1000);
+// TIM3->CCR1 = 3;
+// HAL_Delay(1000);
+// TIM3->CCR1 = 4;
+// HAL_Delay(1000);
+// TIM3->CCR1 = 5;
+// HAL_Delay(1000);
+// TIM3->CCR1 = 6;
+// HAL_Delay(1000);
+// TIM3->CCR1 = 7;
+// HAL_Delay(1000);
+// TIM3->CCR1 = 8;
+// HAL_Delay(1000);
+// TIM3->CCR1 = 9;
+// HAL_Delay(1000);
 
-  GPIO_PinState IN_HVIL_SW_STATE;
-  GPIO_PinState RTC_SW_STATE;
+// Pump test
+// {
+//   HAL_GPIO_WritePin(HVIL_CTRL_GPIO_Port, HVIL_CTRL_Pin, GPIO_PIN_SET);
+//   HAL_Delay(3000);
+//   HAL_GPIO_WritePin(HVIL_CTRL_GPIO_Port, HVIL_CTRL_Pin, GPIO_PIN_SET);
+// }
 
-//  char chargingString[30];
-//  sprintf(chargingString, "%d volts @ %d amps", charging_limit_volts, charging_limit_amps);
+// CAN TEST BEGIN
+struct CANMessage charging_msg;
+CAN_SettingsInit(&charging_msg, true, 8);
+// CAN TEST END
 
-//  SRE_Display_Test();
+HAL_Delay(1000); // Wait for inits to finish
+DISP_KanoaSplash(); //call this in the UI init instead
+HAL_Delay(2000);
+
+GPIO_PinState IN_HVIL_SW_STATE;
+GPIO_PinState RTC_SW_STATE;
+
+char chargingString[30];
+sprintf(chargingString, "%d volts @ %d amps", charging_limit_volts, charging_limit_amps);
+
+
+// BALANCING
+
+struct CANMessage balancing_msg;
+CAN_SettingsInit(&balancing_msg, false, 1);
+
+SRE_Display_Test();
+
+//   uint16_t adc_buffer[4];  // DMA buffer for ADC readings
+//   uint16_t adc_value_0, adc_value_1, adc_value_2, adc_value_3;  // Variables to store results
+
+// HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adc_buffer, 4);  // Start ADC DMA
 
   /* USER CODE END 2 */
 
@@ -230,8 +307,24 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-//	  ssd1306_Fill(Black);
-//	  ssd1306_UpdateScreen();
+    // char displayBuffer[50];
+
+    // // Store ADC values from DMA buffer
+    // uint16_t adc_value_0 = adc_buffer[0];
+    // uint16_t adc_value_1 = adc_buffer[1];
+    // uint16_t adc_value_2 = adc_buffer[2];
+    // uint16_t adc_value_3 = adc_buffer[3];
+
+    // // Format ADC values into a string
+    // sprintf(displayBuffer, "ADC0:%d ADC1:%d ADC2:%d ADC3:%d\n",  adc_value_0, adc_value_1, adc_value_2, adc_value_3);
+
+    // // Display it on the OLED or LCD
+    // printf(displayBuffer);
+
+    // HAL_Delay(1000);  // Update display every second
+
+	  ssd1306_Fill(Black);
+	  ssd1306_UpdateScreen();
 
 	  IN_HVIL_SW_STATE = HAL_GPIO_ReadPin(IN_HVIL_F_SW_GPIO_Port, IN_HVIL_F_SW_Pin);
 	  RTC_SW_STATE = HAL_GPIO_ReadPin(RTC_SW_GPIO_Port, RTC_SW_Pin);
@@ -240,21 +333,27 @@ int main(void)
 		  HAL_GPIO_WritePin(HVIL_CTRL_GPIO_Port, HVIL_CTRL_Pin, GPIO_PIN_SET);
 		  HAL_GPIO_WritePin(GPIOA, LED_HV_Pin, GPIO_PIN_SET);
 		  if(!RTC_SW_STATE) {
-			  CAN_Charge(&msg, true);
+        CAN_Charge(&charging_msg, charging_limit_volts, charging_limit_amps, true);
 		  } else {
-			  CAN_Charge(&msg, false);
+        CAN_Charge(&charging_msg, charging_limit_volts, charging_limit_amps, false);
 		  }
-//		  ssd1306_SetCursor(5, 5);
-//		  ssd1306_WriteString("Charging:", Font_6x8, White);
-//		  ssd1306_SetCursor(10, 5);
-//		  ssd1306_WriteString(chargingString, Font_6x8, White);
-//		  ssd1306_UpdateScreen();
-	  } else {
+		  ssd1306_SetCursor(5, 5);
+		  ssd1306_WriteString("Charging:", Font_6x8, White);
+		  ssd1306_SetCursor(5, 20);
+		  ssd1306_WriteString(chargingString, Font_6x8, White);
+		  ssd1306_UpdateScreen();
+	  } else if (isBalancingControl) {
+        ssd1306_SetCursor(5, 5);
+        ssd1306_WriteString("Now Balancing", Font_6x8, White);
+        ssd1306_UpdateScreen();
+				HAL_GPIO_WritePin(GPIOA, LED_BAL_Pin, GPIO_PIN_SET);
+        CAN_Balance(&balancing_msg, isBalancing);
+    } else {
 		  HAL_GPIO_WritePin(HVIL_CTRL_GPIO_Port, HVIL_CTRL_Pin, GPIO_PIN_RESET);
 		  HAL_GPIO_WritePin(GPIOA, LED_HV_Pin, GPIO_PIN_RESET);
-//		  ssd1306_SetCursor(5, 5);
-//		  ssd1306_WriteString("Not charging", Font_6x8, White);
-//		  ssd1306_UpdateScreen();
+		  ssd1306_SetCursor(5, 5);
+		  ssd1306_WriteString("Not charging", Font_6x8, White);
+		  ssd1306_UpdateScreen();
 	  }
 
 //	  // LED control
@@ -322,6 +421,7 @@ void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+  RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
 
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
@@ -355,10 +455,88 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
+  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_ADC;
+  PeriphClkInit.AdcClockSelection = RCC_ADCPCLK2_DIV6;
+  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
+  {
+    Error_Handler();
+  }
 
   /** Configure the Systick interrupt time
   */
   __HAL_RCC_PLLI2S_ENABLE();
+}
+
+/**
+  * @brief ADC1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_ADC1_Init(void)
+{
+
+  /* USER CODE BEGIN ADC1_Init 0 */
+
+  /* USER CODE END ADC1_Init 0 */
+
+  ADC_ChannelConfTypeDef sConfig = {0};
+
+  /* USER CODE BEGIN ADC1_Init 1 */
+
+  /* USER CODE END ADC1_Init 1 */
+
+  /** Common config
+  */
+  hadc1.Instance = ADC1;
+  hadc1.Init.ScanConvMode = ADC_SCAN_ENABLE;
+  hadc1.Init.ContinuousConvMode = DISABLE;
+  hadc1.Init.DiscontinuousConvMode = DISABLE;
+  hadc1.Init.ExternalTrigConv = ADC_EXTERNALTRIGCONV_T3_TRGO;
+  hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
+  hadc1.Init.NbrOfConversion = 4;
+  if (HAL_ADC_Init(&hadc1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Configure Regular Channel
+  */
+  sConfig.Channel = ADC_CHANNEL_14;
+  sConfig.Rank = ADC_REGULAR_RANK_1;
+  sConfig.SamplingTime = ADC_SAMPLETIME_1CYCLE_5;
+  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Configure Regular Channel
+  */
+  sConfig.Channel = ADC_CHANNEL_4;
+  sConfig.Rank = ADC_REGULAR_RANK_2;
+  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Configure Regular Channel
+  */
+  sConfig.Rank = ADC_REGULAR_RANK_3;
+  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Configure Regular Channel
+  */
+  sConfig.Rank = ADC_REGULAR_RANK_4;
+  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN ADC1_Init 2 */
+
+  /* USER CODE END ADC1_Init 2 */
+
 }
 
 /**
@@ -433,6 +611,110 @@ static void MX_I2C2_Init(void)
 }
 
 /**
+  * @brief TIM2 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM2_Init(void)
+{
+
+  /* USER CODE BEGIN TIM2_Init 0 */
+
+  /* USER CODE END TIM2_Init 0 */
+
+  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+  TIM_OC_InitTypeDef sConfigOC = {0};
+
+  /* USER CODE BEGIN TIM2_Init 1 */
+
+  /* USER CODE END TIM2_Init 1 */
+  htim2.Instance = TIM2;
+  htim2.Init.Prescaler = 72-1;
+  htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim2.Init.Period = 100-1;
+  htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
+  if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+  if (HAL_TIM_ConfigClockSource(&htim2, &sClockSourceConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_TIM_PWM_Init(&htim2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim2, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sConfigOC.OCMode = TIM_OCMODE_PWM1;
+  sConfigOC.Pulse = 0;
+  sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+  sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+  if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM2_Init 2 */
+
+  /* USER CODE END TIM2_Init 2 */
+  HAL_TIM_MspPostInit(&htim2);
+
+}
+
+/**
+  * @brief TIM3 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM3_Init(void)
+{
+
+  /* USER CODE BEGIN TIM3_Init 0 */
+
+  /* USER CODE END TIM3_Init 0 */
+
+  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+
+  /* USER CODE BEGIN TIM3_Init 1 */
+
+  /* USER CODE END TIM3_Init 1 */
+  htim3.Instance = TIM3;
+  htim3.Init.Prescaler = 72-1;
+  htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim3.Init.Period = 100-1;
+  htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim3) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+  if (HAL_TIM_ConfigClockSource(&htim3, &sClockSourceConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim3, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM3_Init 2 */
+
+  /* USER CODE END TIM3_Init 2 */
+
+}
+
+/**
   * @brief USART1 Initialization Function
   * @param None
   * @retval None
@@ -453,7 +735,7 @@ static void MX_USART1_UART_Init(void)
   huart1.Init.StopBits = UART_STOPBITS_1;
   huart1.Init.Parity = UART_PARITY_NONE;
   huart1.Init.Mode = UART_MODE_TX_RX;
-  huart1.Init.HwFlowCtl = UART_HWCONTROL_RTS_CTS;
+  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
   huart1.Init.OverSampling = UART_OVERSAMPLING_16;
   if (HAL_UART_Init(&huart1) != HAL_OK)
   {
@@ -462,6 +744,22 @@ static void MX_USART1_UART_Init(void)
   /* USER CODE BEGIN USART1_Init 2 */
 
   /* USER CODE END USART1_Init 2 */
+
+}
+
+/**
+  * Enable DMA controller clock
+  */
+static void MX_DMA_Init(void)
+{
+
+  /* DMA controller clock enable */
+  __HAL_RCC_DMA1_CLK_ENABLE();
+
+  /* DMA interrupt init */
+  /* DMA1_Channel1_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Channel1_IRQn);
 
 }
 
@@ -479,8 +777,8 @@ static void MX_GPIO_Init(void)
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOD_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
-  __HAL_RCC_GPIOB_CLK_ENABLE();
   __HAL_RCC_GPIOC_CLK_ENABLE();
+  __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOA, LED_HV_Pin|LED_BAL_Pin, GPIO_PIN_RESET);
@@ -507,11 +805,6 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : CP_SIG_Pin */
-  GPIO_InitStruct.Pin = CP_SIG_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
-  HAL_GPIO_Init(CP_SIG_GPIO_Port, &GPIO_InitStruct);
-
   /*Configure GPIO pin : IN_HVIL_F_SW_Pin */
   GPIO_InitStruct.Pin = IN_HVIL_F_SW_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
@@ -524,22 +817,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : THERM_2_SIG_Pin THERM_1_SIG_Pin FAN_CRTL_Pin */
-  GPIO_InitStruct.Pin = THERM_2_SIG_Pin|THERM_1_SIG_Pin|FAN_CRTL_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
   /*Configure GPIO pin : LED_ELCON_FLT_Pin */
   GPIO_InitStruct.Pin = LED_ELCON_FLT_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(LED_ELCON_FLT_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : SHUNT_SIG_Pin */
-  GPIO_InitStruct.Pin = SHUNT_SIG_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
-  HAL_GPIO_Init(SHUNT_SIG_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : LED_TSAL_FLT_Pin */
   GPIO_InitStruct.Pin = LED_TSAL_FLT_Pin;
@@ -551,21 +834,28 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin : HVIL_CTRL_Pin */
   GPIO_InitStruct.Pin = HVIL_CTRL_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(HVIL_CTRL_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : BTN_1_Pin BTN_2_Pin BTN_3_Pin */
-  GPIO_InitStruct.Pin = BTN_1_Pin|BTN_2_Pin|BTN_3_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  /*Configure GPIO pins : BTN_UP_Pin BTN_DWN_Pin BTN_SEL_Pin */
+  GPIO_InitStruct.Pin = BTN_UP_Pin|BTN_DWN_Pin|BTN_SEL_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : BTN_4_Pin */
-  GPIO_InitStruct.Pin = BTN_4_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(BTN_4_GPIO_Port, &GPIO_InitStruct);
+  /*Configure GPIO pin : BTN_BCK_Pin */
+  GPIO_InitStruct.Pin = BTN_BCK_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(BTN_BCK_GPIO_Port, &GPIO_InitStruct);
+
+  /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI2_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI2_IRQn);
+
+  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
 
   /* USER CODE BEGIN MX_GPIO_Init_2 */
   /* USER CODE END MX_GPIO_Init_2 */

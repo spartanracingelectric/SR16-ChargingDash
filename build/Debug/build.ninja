@@ -53,7 +53,7 @@ build CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj: C_COMPILER__SR16-Cha
   DEFINES = -DDEBUG -DSTM32F105xC -DUSE_HAL_DRIVER
   DEP_FILE = CMakeFiles\SR16-ChargingDash.dir\Core\Src\main.c.obj.d
   FLAGS = -mcpu=cortex-m3  -Wall -Wextra -Wpedantic -fdata-sections -ffunction-sections -mcpu=cortex-m3  -Wall -Wextra -Wpedantic -fdata-sections -ffunction-sections -O0 -g3 -std=gnu11
-  INCLUDES = -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Core/Inc -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/STM32F1xx_HAL_Driver/Inc -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/CMSIS/Device/ST/STM32F1xx/Include -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/CMSIS/Include
+  INCLUDES = -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Core/Inc -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/Display -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/STM32F1xx_HAL_Driver/Inc -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/CMSIS/Device/ST/STM32F1xx/Include -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/CMSIS/Include
   OBJECT_DIR = CMakeFiles\SR16-ChargingDash.dir
   OBJECT_FILE_DIR = CMakeFiles\SR16-ChargingDash.dir\Core\Src
 
@@ -61,7 +61,7 @@ build CMakeFiles/SR16-ChargingDash.dir/Core/Src/stm32f1xx_it.c.obj: C_COMPILER__
   DEFINES = -DDEBUG -DSTM32F105xC -DUSE_HAL_DRIVER
   DEP_FILE = CMakeFiles\SR16-ChargingDash.dir\Core\Src\stm32f1xx_it.c.obj.d
   FLAGS = -mcpu=cortex-m3  -Wall -Wextra -Wpedantic -fdata-sections -ffunction-sections -mcpu=cortex-m3  -Wall -Wextra -Wpedantic -fdata-sections -ffunction-sections -O0 -g3 -std=gnu11
-  INCLUDES = -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Core/Inc -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/STM32F1xx_HAL_Driver/Inc -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/CMSIS/Device/ST/STM32F1xx/Include -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/CMSIS/Include
+  INCLUDES = -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Core/Inc -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/Display -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/STM32F1xx_HAL_Driver/Inc -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/CMSIS/Device/ST/STM32F1xx/Include -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/CMSIS/Include
   OBJECT_DIR = CMakeFiles\SR16-ChargingDash.dir
   OBJECT_FILE_DIR = CMakeFiles\SR16-ChargingDash.dir\Core\Src
 
@@ -69,7 +69,7 @@ build CMakeFiles/SR16-ChargingDash.dir/Core/Src/stm32f1xx_hal_msp.c.obj: C_COMPI
   DEFINES = -DDEBUG -DSTM32F105xC -DUSE_HAL_DRIVER
   DEP_FILE = CMakeFiles\SR16-ChargingDash.dir\Core\Src\stm32f1xx_hal_msp.c.obj.d
   FLAGS = -mcpu=cortex-m3  -Wall -Wextra -Wpedantic -fdata-sections -ffunction-sections -mcpu=cortex-m3  -Wall -Wextra -Wpedantic -fdata-sections -ffunction-sections -O0 -g3 -std=gnu11
-  INCLUDES = -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Core/Inc -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/STM32F1xx_HAL_Driver/Inc -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/CMSIS/Device/ST/STM32F1xx/Include -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/CMSIS/Include
+  INCLUDES = -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Core/Inc -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/Display -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/STM32F1xx_HAL_Driver/Inc -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/CMSIS/Device/ST/STM32F1xx/Include -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/CMSIS/Include
   OBJECT_DIR = CMakeFiles\SR16-ChargingDash.dir
   OBJECT_FILE_DIR = CMakeFiles\SR16-ChargingDash.dir\Core\Src
 
@@ -77,7 +77,7 @@ build CMakeFiles/SR16-ChargingDash.dir/Core/Src/sysmem.c.obj: C_COMPILER__SR16-C
   DEFINES = -DDEBUG -DSTM32F105xC -DUSE_HAL_DRIVER
   DEP_FILE = CMakeFiles\SR16-ChargingDash.dir\Core\Src\sysmem.c.obj.d
   FLAGS = -mcpu=cortex-m3  -Wall -Wextra -Wpedantic -fdata-sections -ffunction-sections -mcpu=cortex-m3  -Wall -Wextra -Wpedantic -fdata-sections -ffunction-sections -O0 -g3 -std=gnu11
-  INCLUDES = -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Core/Inc -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/STM32F1xx_HAL_Driver/Inc -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/CMSIS/Device/ST/STM32F1xx/Include -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/CMSIS/Include
+  INCLUDES = -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Core/Inc -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/Display -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/STM32F1xx_HAL_Driver/Inc -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/CMSIS/Device/ST/STM32F1xx/Include -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/CMSIS/Include
   OBJECT_DIR = CMakeFiles\SR16-ChargingDash.dir
   OBJECT_FILE_DIR = CMakeFiles\SR16-ChargingDash.dir\Core\Src
 
@@ -85,7 +85,7 @@ build CMakeFiles/SR16-ChargingDash.dir/Core/Src/syscalls.c.obj: C_COMPILER__SR16
   DEFINES = -DDEBUG -DSTM32F105xC -DUSE_HAL_DRIVER
   DEP_FILE = CMakeFiles\SR16-ChargingDash.dir\Core\Src\syscalls.c.obj.d
   FLAGS = -mcpu=cortex-m3  -Wall -Wextra -Wpedantic -fdata-sections -ffunction-sections -mcpu=cortex-m3  -Wall -Wextra -Wpedantic -fdata-sections -ffunction-sections -O0 -g3 -std=gnu11
-  INCLUDES = -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Core/Inc -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/STM32F1xx_HAL_Driver/Inc -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/CMSIS/Device/ST/STM32F1xx/Include -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/CMSIS/Include
+  INCLUDES = -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Core/Inc -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/Display -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/STM32F1xx_HAL_Driver/Inc -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/CMSIS/Device/ST/STM32F1xx/Include -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/CMSIS/Include
   OBJECT_DIR = CMakeFiles\SR16-ChargingDash.dir
   OBJECT_FILE_DIR = CMakeFiles\SR16-ChargingDash.dir\Core\Src
 
@@ -93,9 +93,41 @@ build CMakeFiles/SR16-ChargingDash.dir/startup_stm32f105xc.s.obj: ASM_COMPILER__
   DEFINES = -DDEBUG -DSTM32F105xC -DUSE_HAL_DRIVER
   DEP_FILE = CMakeFiles\SR16-ChargingDash.dir\startup_stm32f105xc.s.obj.d
   FLAGS = -mcpu=cortex-m3  -Wall -Wextra -Wpedantic -fdata-sections -ffunction-sections -mcpu=cortex-m3  -x assembler-with-cpp -MMD -MP -g
-  INCLUDES = -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Core/Inc -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/STM32F1xx_HAL_Driver/Inc -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/CMSIS/Device/ST/STM32F1xx/Include -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/CMSIS/Include
+  INCLUDES = -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Core/Inc -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/Display -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/STM32F1xx_HAL_Driver/Inc -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/CMSIS/Device/ST/STM32F1xx/Include -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/CMSIS/Include
   OBJECT_DIR = CMakeFiles\SR16-ChargingDash.dir
   OBJECT_FILE_DIR = CMakeFiles\SR16-ChargingDash.dir
+
+build CMakeFiles/SR16-ChargingDash.dir/Core/Src/display.c.obj: C_COMPILER__SR16-ChargingDash_unscanned_Debug C$:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Core/Src/display.c || cmake_object_order_depends_target_SR16-ChargingDash
+  DEFINES = -DDEBUG -DSTM32F105xC -DUSE_HAL_DRIVER
+  DEP_FILE = CMakeFiles\SR16-ChargingDash.dir\Core\Src\display.c.obj.d
+  FLAGS = -mcpu=cortex-m3  -Wall -Wextra -Wpedantic -fdata-sections -ffunction-sections -mcpu=cortex-m3  -Wall -Wextra -Wpedantic -fdata-sections -ffunction-sections -O0 -g3 -std=gnu11
+  INCLUDES = -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Core/Inc -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/Display -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/STM32F1xx_HAL_Driver/Inc -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/CMSIS/Device/ST/STM32F1xx/Include -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/CMSIS/Include
+  OBJECT_DIR = CMakeFiles\SR16-ChargingDash.dir
+  OBJECT_FILE_DIR = CMakeFiles\SR16-ChargingDash.dir\Core\Src
+
+build CMakeFiles/SR16-ChargingDash.dir/Core/Src/graphics.c.obj: C_COMPILER__SR16-ChargingDash_unscanned_Debug C$:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Core/Src/graphics.c || cmake_object_order_depends_target_SR16-ChargingDash
+  DEFINES = -DDEBUG -DSTM32F105xC -DUSE_HAL_DRIVER
+  DEP_FILE = CMakeFiles\SR16-ChargingDash.dir\Core\Src\graphics.c.obj.d
+  FLAGS = -mcpu=cortex-m3  -Wall -Wextra -Wpedantic -fdata-sections -ffunction-sections -mcpu=cortex-m3  -Wall -Wextra -Wpedantic -fdata-sections -ffunction-sections -O0 -g3 -std=gnu11
+  INCLUDES = -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Core/Inc -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/Display -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/STM32F1xx_HAL_Driver/Inc -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/CMSIS/Device/ST/STM32F1xx/Include -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/CMSIS/Include
+  OBJECT_DIR = CMakeFiles\SR16-ChargingDash.dir
+  OBJECT_FILE_DIR = CMakeFiles\SR16-ChargingDash.dir\Core\Src
+
+build CMakeFiles/SR16-ChargingDash.dir/Drivers/Display/ssd1306.c.obj: C_COMPILER__SR16-ChargingDash_unscanned_Debug C$:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/Display/ssd1306.c || cmake_object_order_depends_target_SR16-ChargingDash
+  DEFINES = -DDEBUG -DSTM32F105xC -DUSE_HAL_DRIVER
+  DEP_FILE = CMakeFiles\SR16-ChargingDash.dir\Drivers\Display\ssd1306.c.obj.d
+  FLAGS = -mcpu=cortex-m3  -Wall -Wextra -Wpedantic -fdata-sections -ffunction-sections -mcpu=cortex-m3  -Wall -Wextra -Wpedantic -fdata-sections -ffunction-sections -O0 -g3 -std=gnu11
+  INCLUDES = -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Core/Inc -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/Display -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/STM32F1xx_HAL_Driver/Inc -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/CMSIS/Device/ST/STM32F1xx/Include -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/CMSIS/Include
+  OBJECT_DIR = CMakeFiles\SR16-ChargingDash.dir
+  OBJECT_FILE_DIR = CMakeFiles\SR16-ChargingDash.dir\Drivers\Display
+
+build CMakeFiles/SR16-ChargingDash.dir/Drivers/Display/ssd1306_fonts.c.obj: C_COMPILER__SR16-ChargingDash_unscanned_Debug C$:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/Display/ssd1306_fonts.c || cmake_object_order_depends_target_SR16-ChargingDash
+  DEFINES = -DDEBUG -DSTM32F105xC -DUSE_HAL_DRIVER
+  DEP_FILE = CMakeFiles\SR16-ChargingDash.dir\Drivers\Display\ssd1306_fonts.c.obj.d
+  FLAGS = -mcpu=cortex-m3  -Wall -Wextra -Wpedantic -fdata-sections -ffunction-sections -mcpu=cortex-m3  -Wall -Wextra -Wpedantic -fdata-sections -ffunction-sections -O0 -g3 -std=gnu11
+  INCLUDES = -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Core/Inc -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/Display -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/STM32F1xx_HAL_Driver/Inc -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/CMSIS/Device/ST/STM32F1xx/Include -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/CMSIS/Include
+  OBJECT_DIR = CMakeFiles\SR16-ChargingDash.dir
+  OBJECT_FILE_DIR = CMakeFiles\SR16-ChargingDash.dir\Drivers\Display
 
 
 # =============================================================================
@@ -105,7 +137,7 @@ build CMakeFiles/SR16-ChargingDash.dir/startup_stm32f105xc.s.obj: ASM_COMPILER__
 #############################################
 # Link the executable SR16-ChargingDash.elf
 
-build SR16-ChargingDash.elf: C_EXECUTABLE_LINKER__SR16-ChargingDash_Debug cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Core/Src/system_stm32f1xx.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio_ex.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_can.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc_ex.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_dma.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_cortex.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_pwr.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_flash.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_flash_ex.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_exti.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_i2c.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_uart.c.obj CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj CMakeFiles/SR16-ChargingDash.dir/Core/Src/stm32f1xx_it.c.obj CMakeFiles/SR16-ChargingDash.dir/Core/Src/stm32f1xx_hal_msp.c.obj CMakeFiles/SR16-ChargingDash.dir/Core/Src/sysmem.c.obj CMakeFiles/SR16-ChargingDash.dir/Core/Src/syscalls.c.obj CMakeFiles/SR16-ChargingDash.dir/startup_stm32f105xc.s.obj || cmake/stm32cubemx/STM32_Drivers
+build SR16-ChargingDash.elf: C_EXECUTABLE_LINKER__SR16-ChargingDash_Debug cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Core/Src/system_stm32f1xx.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio_ex.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_adc.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_adc_ex.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc_ex.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_dma.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_cortex.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_pwr.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_flash.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_flash_ex.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_exti.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_can.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_i2c.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim_ex.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_uart.c.obj CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj CMakeFiles/SR16-ChargingDash.dir/Core/Src/stm32f1xx_it.c.obj CMakeFiles/SR16-ChargingDash.dir/Core/Src/stm32f1xx_hal_msp.c.obj CMakeFiles/SR16-ChargingDash.dir/Core/Src/sysmem.c.obj CMakeFiles/SR16-ChargingDash.dir/Core/Src/syscalls.c.obj CMakeFiles/SR16-ChargingDash.dir/startup_stm32f105xc.s.obj CMakeFiles/SR16-ChargingDash.dir/Core/Src/display.c.obj CMakeFiles/SR16-ChargingDash.dir/Core/Src/graphics.c.obj CMakeFiles/SR16-ChargingDash.dir/Drivers/Display/ssd1306.c.obj CMakeFiles/SR16-ChargingDash.dir/Drivers/Display/ssd1306_fonts.c.obj || cmake/stm32cubemx/STM32_Drivers
   FLAGS = -mcpu=cortex-m3  -Wall -Wextra -Wpedantic -fdata-sections -ffunction-sections -mcpu=cortex-m3  -Wall -Wextra -Wpedantic -fdata-sections -ffunction-sections -O0 -g3
   OBJECT_DIR = CMakeFiles\SR16-ChargingDash.dir
   POST_BUILD = cd .
@@ -167,9 +199,17 @@ build cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL
   OBJECT_DIR = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir
   OBJECT_FILE_DIR = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir\__\__\Drivers\STM32F1xx_HAL_Driver\Src
 
-build cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_can.c.obj: C_COMPILER__STM32_Drivers_unscanned_Debug C$:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_can.c || cmake_object_order_depends_target_STM32_Drivers
+build cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_adc.c.obj: C_COMPILER__STM32_Drivers_unscanned_Debug C$:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_adc.c || cmake_object_order_depends_target_STM32_Drivers
   DEFINES = -DDEBUG -DSTM32F105xC -DUSE_HAL_DRIVER
-  DEP_FILE = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir\__\__\Drivers\STM32F1xx_HAL_Driver\Src\stm32f1xx_hal_can.c.obj.d
+  DEP_FILE = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir\__\__\Drivers\STM32F1xx_HAL_Driver\Src\stm32f1xx_hal_adc.c.obj.d
+  FLAGS = -mcpu=cortex-m3  -Wall -Wextra -Wpedantic -fdata-sections -ffunction-sections -mcpu=cortex-m3  -Wall -Wextra -Wpedantic -fdata-sections -ffunction-sections -O0 -g3 -std=gnu11
+  INCLUDES = -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Core/Inc -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/STM32F1xx_HAL_Driver/Inc -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/CMSIS/Device/ST/STM32F1xx/Include -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/CMSIS/Include
+  OBJECT_DIR = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir
+  OBJECT_FILE_DIR = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir\__\__\Drivers\STM32F1xx_HAL_Driver\Src
+
+build cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_adc_ex.c.obj: C_COMPILER__STM32_Drivers_unscanned_Debug C$:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_adc_ex.c || cmake_object_order_depends_target_STM32_Drivers
+  DEFINES = -DDEBUG -DSTM32F105xC -DUSE_HAL_DRIVER
+  DEP_FILE = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir\__\__\Drivers\STM32F1xx_HAL_Driver\Src\stm32f1xx_hal_adc_ex.c.obj.d
   FLAGS = -mcpu=cortex-m3  -Wall -Wextra -Wpedantic -fdata-sections -ffunction-sections -mcpu=cortex-m3  -Wall -Wextra -Wpedantic -fdata-sections -ffunction-sections -O0 -g3 -std=gnu11
   INCLUDES = -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Core/Inc -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/STM32F1xx_HAL_Driver/Inc -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/CMSIS/Device/ST/STM32F1xx/Include -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/CMSIS/Include
   OBJECT_DIR = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir
@@ -255,9 +295,33 @@ build cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL
   OBJECT_DIR = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir
   OBJECT_FILE_DIR = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir\__\__\Drivers\STM32F1xx_HAL_Driver\Src
 
+build cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_can.c.obj: C_COMPILER__STM32_Drivers_unscanned_Debug C$:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_can.c || cmake_object_order_depends_target_STM32_Drivers
+  DEFINES = -DDEBUG -DSTM32F105xC -DUSE_HAL_DRIVER
+  DEP_FILE = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir\__\__\Drivers\STM32F1xx_HAL_Driver\Src\stm32f1xx_hal_can.c.obj.d
+  FLAGS = -mcpu=cortex-m3  -Wall -Wextra -Wpedantic -fdata-sections -ffunction-sections -mcpu=cortex-m3  -Wall -Wextra -Wpedantic -fdata-sections -ffunction-sections -O0 -g3 -std=gnu11
+  INCLUDES = -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Core/Inc -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/STM32F1xx_HAL_Driver/Inc -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/CMSIS/Device/ST/STM32F1xx/Include -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/CMSIS/Include
+  OBJECT_DIR = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir
+  OBJECT_FILE_DIR = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir\__\__\Drivers\STM32F1xx_HAL_Driver\Src
+
 build cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_i2c.c.obj: C_COMPILER__STM32_Drivers_unscanned_Debug C$:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_i2c.c || cmake_object_order_depends_target_STM32_Drivers
   DEFINES = -DDEBUG -DSTM32F105xC -DUSE_HAL_DRIVER
   DEP_FILE = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir\__\__\Drivers\STM32F1xx_HAL_Driver\Src\stm32f1xx_hal_i2c.c.obj.d
+  FLAGS = -mcpu=cortex-m3  -Wall -Wextra -Wpedantic -fdata-sections -ffunction-sections -mcpu=cortex-m3  -Wall -Wextra -Wpedantic -fdata-sections -ffunction-sections -O0 -g3 -std=gnu11
+  INCLUDES = -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Core/Inc -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/STM32F1xx_HAL_Driver/Inc -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/CMSIS/Device/ST/STM32F1xx/Include -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/CMSIS/Include
+  OBJECT_DIR = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir
+  OBJECT_FILE_DIR = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir\__\__\Drivers\STM32F1xx_HAL_Driver\Src
+
+build cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim.c.obj: C_COMPILER__STM32_Drivers_unscanned_Debug C$:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim.c || cmake_object_order_depends_target_STM32_Drivers
+  DEFINES = -DDEBUG -DSTM32F105xC -DUSE_HAL_DRIVER
+  DEP_FILE = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir\__\__\Drivers\STM32F1xx_HAL_Driver\Src\stm32f1xx_hal_tim.c.obj.d
+  FLAGS = -mcpu=cortex-m3  -Wall -Wextra -Wpedantic -fdata-sections -ffunction-sections -mcpu=cortex-m3  -Wall -Wextra -Wpedantic -fdata-sections -ffunction-sections -O0 -g3 -std=gnu11
+  INCLUDES = -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Core/Inc -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/STM32F1xx_HAL_Driver/Inc -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/CMSIS/Device/ST/STM32F1xx/Include -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/CMSIS/Include
+  OBJECT_DIR = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir
+  OBJECT_FILE_DIR = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir\__\__\Drivers\STM32F1xx_HAL_Driver\Src
+
+build cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim_ex.c.obj: C_COMPILER__STM32_Drivers_unscanned_Debug C$:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim_ex.c || cmake_object_order_depends_target_STM32_Drivers
+  DEFINES = -DDEBUG -DSTM32F105xC -DUSE_HAL_DRIVER
+  DEP_FILE = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir\__\__\Drivers\STM32F1xx_HAL_Driver\Src\stm32f1xx_hal_tim_ex.c.obj.d
   FLAGS = -mcpu=cortex-m3  -Wall -Wextra -Wpedantic -fdata-sections -ffunction-sections -mcpu=cortex-m3  -Wall -Wextra -Wpedantic -fdata-sections -ffunction-sections -O0 -g3 -std=gnu11
   INCLUDES = -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Core/Inc -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/STM32F1xx_HAL_Driver/Inc -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/CMSIS/Device/ST/STM32F1xx/Include -IC:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/CMSIS/Include
   OBJECT_DIR = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir
@@ -276,7 +340,7 @@ build cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL
 #############################################
 # Object library STM32_Drivers
 
-build cmake/stm32cubemx/STM32_Drivers: phony cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Core/Src/system_stm32f1xx.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio_ex.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_can.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc_ex.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_dma.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_cortex.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_pwr.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_flash.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_flash_ex.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_exti.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_i2c.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_uart.c.obj
+build cmake/stm32cubemx/STM32_Drivers: phony cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Core/Src/system_stm32f1xx.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio_ex.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_adc.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_adc_ex.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc_ex.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_dma.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_cortex.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_pwr.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_flash.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_flash_ex.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_exti.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_can.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_i2c.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim_ex.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_uart.c.obj
 
 
 #############################################
