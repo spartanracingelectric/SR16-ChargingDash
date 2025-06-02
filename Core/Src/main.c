@@ -67,7 +67,7 @@ uint32_t PREVIOUS_TIME = 0;
 uint16_t LIMIT_VOLTS = 0;
 uint16_t LIMIT_AMPS = 0;
 
-char codeBranch[6] = "Release";
+char codeBranch[6] = "Beta";
 char codeVersion[5] = "0.3.3";
 
 extern bool isBalancing;
@@ -272,7 +272,6 @@ int main(void)
     // TEMP STUFF 1 END
 
 	  if(IN_HVIL_SW_STATE) {
-		  HAL_GPIO_WritePin(HVIL_CTRL_GPIO_Port, HVIL_CTRL_Pin, GPIO_PIN_SET);
 		  HAL_GPIO_WritePin(GPIOA, LED_HV_Pin, GPIO_PIN_SET);
 		  ssd1306_SetCursor(5, 5);
 		  if(!RTC_SW_STATE) {
@@ -290,7 +289,6 @@ int main(void)
         ssd1306_SetCursor(5, 5);
         ssd1306_WriteString("Now Balancing", Font_6x8, White);
     } else {
-		  HAL_GPIO_WritePin(HVIL_CTRL_GPIO_Port, HVIL_CTRL_Pin, GPIO_PIN_RESET);
 		  HAL_GPIO_WritePin(GPIOA, LED_HV_Pin, GPIO_PIN_RESET);
       HAL_GPIO_WritePin(GPIOA, LED_BAL_Pin, GPIO_PIN_RESET);
 		  ssd1306_SetCursor(5, 5);
@@ -725,7 +723,7 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin : HVIL_CTRL_Pin */
   GPIO_InitStruct.Pin = HVIL_CTRL_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(HVIL_CTRL_GPIO_Port, &GPIO_InitStruct);
 

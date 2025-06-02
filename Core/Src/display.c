@@ -310,13 +310,16 @@ void SRE_Display_Start_Charging() {
 		uint16_t voltage;
 	};
 
-	struct Profile p1 = {"P1", 20, 385};
-	struct Profile p2 = {"P2", 15, 385};
+	struct Profile p1 = {"P1", 4, 355};
+	struct Profile p2 = {"P2", 20, 355};
 	struct Profile p3 = {"P3", 3, 385};
-	struct Profile p4 = {"P4", 10, 400};
-	struct Profile p5 = {"P5", 20, 400};
+	struct Profile p4 = {"P4", 15, 385};
+	struct Profile p5 = {"P5", 20, 385};
+	struct Profile p6 = {"P6", 10, 400};
+	struct Profile p7 = {"P7", 20, 400};
+	struct Profile p8 = {"P8", 10, 403};
 
-	int numOfProfiles = 5;
+	int numOfProfiles = 8;
 	struct Profile profiles[numOfProfiles];
 
 	profiles[0] = p1;
@@ -324,6 +327,9 @@ void SRE_Display_Start_Charging() {
 	profiles[2] = p3;
 	profiles[3] = p4;
 	profiles[4] = p5;
+	profiles[5] = p6;
+	profiles[6] = p7;
+	profiles[7] = p8;
 
   int navStartIndex = numOfProfiles;
   int navLastIndex = numOfProfiles;
