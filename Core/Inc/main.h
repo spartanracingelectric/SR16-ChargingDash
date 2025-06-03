@@ -59,6 +59,10 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define THERM_IN_SIG_Pin GPIO_PIN_1
+#define THERM_IN_SIG_GPIO_Port GPIOC
+#define THERM_OUT_SIG_Pin GPIO_PIN_2
+#define THERM_OUT_SIG_GPIO_Port GPIOC
 #define IN_HVIL_ACUM_Pin GPIO_PIN_1
 #define IN_HVIL_ACUM_GPIO_Port GPIOA
 #define LED_HV_Pin GPIO_PIN_2
@@ -73,10 +77,6 @@ void Error_Handler(void);
 #define IN_HVIL_F_SW_GPIO_Port GPIOA
 #define IN_HVIL_ESTOP_Pin GPIO_PIN_7
 #define IN_HVIL_ESTOP_GPIO_Port GPIOA
-#define THERM_OUT_SIG_Pin GPIO_PIN_4
-#define THERM_OUT_SIG_GPIO_Port GPIOC
-#define THERM_IN_SIG_Pin GPIO_PIN_5
-#define THERM_IN_SIG_GPIO_Port GPIOC
 #define SHUNT_SIG_Pin GPIO_PIN_0
 #define SHUNT_SIG_GPIO_Port GPIOB
 #define IN_BMS_FLT_LED_Pin GPIO_PIN_1
