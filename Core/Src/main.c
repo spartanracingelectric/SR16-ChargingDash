@@ -24,7 +24,9 @@
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
 #include <stdbool.h>
-#include <display.h>
+#include <math.h>
+
+#include "display.h"
 
 /* USER CODE END Includes */
 
@@ -72,6 +74,7 @@ char codeVersion[5] = "0.3.4";
 
 extern bool isBalancing;
 extern bool isBalancingControl;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -107,22 +110,96 @@ PUTCHAR_PROTOTYPE
 
 // INTERRUPTS FOR KEYS
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
-	// TODO: fix debouncing
-	CURRENT_TIME = HAL_GetTick();
-	int DEB_TIME_THRES = 200;
-	int TIME_DIFF = CURRENT_TIME - PREVIOUS_TIME;
-	if (TIME_DIFF > DEB_TIME_THRES) {
+  if (GPIO_Pin == BTN_UP_Pin || GPIO_Pin == BTN_DWN_Pin || GPIO_Pin == BTN_SEL_Pin || GPIO_Pin == BTN_BCK_Pin) {
+  	// TODO: fix debouncing
+    CURRENT_TIME = HAL_GetTick();
+    int DEB_TIME_THRES = 200;
+    int TIME_DIFF = CURRENT_TIME - PREVIOUS_TIME;
+    if (TIME_DIFF > DEB_TIME_THRES) {
 		if (GPIO_Pin == BTN_UP_Pin && !selectPressed) {
-			selectedButton--;
-		} else if (GPIO_Pin == BTN_DWN_Pin && !selectPressed) {
-			selectedButton++;
-		} else if (GPIO_Pin == BTN_SEL_Pin) {
-			selectPressed = true;
-		} else if (GPIO_Pin == BTN_BCK_Pin && !selectPressed) {
-			backPressed = true;
-		}
-		PREVIOUS_TIME = CURRENT_TIME;
-	}
+        selectedButton--;
+      } else if (GPIO_Pin == BTN_DWN_Pin && !selectPressed) {
+        selectedButton++;
+      } else if (GPIO_Pin == BTN_SEL_Pin) {
+        selectPressed = true;
+      } else if (GPIO_Pin == BTN_BCK_Pin && !selectPressed) {
+        backPressed = true;
+      }
+      PREVIOUS_TIME = CURRENT_TIME;
+    }
+  } else if (GPIO_Pin == IN_HVIL_CHAR_Pin || GPIO_Pin == IN_HVIL_TERM_Pin) {
+    GPIO_PinState IN_HVIL_CHAR_Pin_State = HAL_GPIO_ReadPin(IN_HVIL_CHAR_GPIO_Port, IN_HVIL_CHAR_Pin);
+    GPIO_PinState IN_HVIL_TERM_Pin_State = HAL_GPIO_ReadPin(IN_HVIL_TERM_GPIO_Port, IN_HVIL_TERM_Pin);
+    if (IN_HVIL_CHAR_Pin_State || IN_HVIL_TERM_Pin_State)
+    {
+      HAL_GPIO_WritePin(HVIL_CTRL_GPIO_Port, HVIL_CTRL_Pin, GPIO_PIN_SET);
+    } else if (!IN_HVIL_CHAR_Pin_State || !IN_HVIL_TERM_Pin_State) {
+      HAL_GPIO_WritePin(HVIL_CTRL_GPIO_Port, HVIL_CTRL_Pin, GPIO_PIN_RESET);
+    }
+  } else if (GPIO_Pin == IN_HVIL_ACUM_Pin) {  
+    GPIO_PinState IN_HVIL_ACUM_Pin_State = HAL_GPIO_ReadPin(IN_HVIL_ACUM_GPIO_Port, IN_HVIL_ACUM_Pin);
+    if (IN_HVIL_ACUM_Pin_State)
+    {
+      // HVIL reset intial state
+      HAL_GPIO_WritePin(HVIL_CTRL_GPIO_Port, HVIL_CTRL_Pin, GPIO_PIN_SET);
+    } else if (!IN_HVIL_ACUM_Pin_State) {
+      // HVIL reset button clicked
+      HAL_GPIO_WritePin(HVIL_CTRL_GPIO_Port, HVIL_CTRL_Pin, GPIO_PIN_RESET);
+    }
+  } else if (GPIO_Pin == IN_HVIL_ESTOP_Pin) {
+    GPIO_PinState IN_HVIL_ESTOP_Pin_State = HAL_GPIO_ReadPin(IN_HVIL_ESTOP_GPIO_Port, IN_HVIL_ESTOP_Pin);
+    if (IN_HVIL_ESTOP_Pin_State)
+    {
+      // When estop depressed
+      HAL_GPIO_WritePin(HVIL_CTRL_GPIO_Port, HVIL_CTRL_Pin, GPIO_PIN_SET);
+    } else if (!IN_HVIL_ESTOP_Pin_State) {
+      // When estop pressed
+      HAL_GPIO_WritePin(HVIL_CTRL_GPIO_Port, HVIL_CTRL_Pin, GPIO_PIN_RESET);
+    }
+  } else if (GPIO_Pin == IN_HVIL_FSW_Pin) {
+    GPIO_PinState IN_HVIL_FSW_Pin_State = HAL_GPIO_ReadPin(IN_HVIL_FSW_GPIO_Port, IN_HVIL_FSW_Pin);
+    if (IN_HVIL_FSW_Pin_State)
+    {
+      // When on
+      HAL_GPIO_WritePin(HVIL_CTRL_GPIO_Port, HVIL_CTRL_Pin, GPIO_PIN_SET);
+    } else if (!IN_HVIL_FSW_Pin_State) {
+      // When off
+      HAL_GPIO_WritePin(HVIL_CTRL_GPIO_Port, HVIL_CTRL_Pin, GPIO_PIN_RESET);
+    }
+  }
+  // TODO: Also allow for switch order
+}
+
+// FAN SPEED CONTROL
+void FAN_SPD_CTRL(uint32_t fan_speed) {
+  if (fan_speed <= 100 && fan_speed >= 0) {
+    TIM3->CCR1 = fan_speed;
+  } else {
+    // TODO: Throw error
+  }
+}
+
+// READ THERMISTOR VALUE
+float READ_THERM(uint16_t* adc_thermistor, uint16_t therm_first_resistance) {
+  float calibration_a = 1.462805229e-3;
+  float calibration_b = 2.310582766e-4;
+  float calibration_c = 1.189005910e-7;
+  float thermistor_voltage = (*adc_thermistor / 4095.0) * 3.3;
+  float therm_inlet_resistance = (thermistor_voltage * therm_first_resistance) / (3.3 - thermistor_voltage);
+  float temperature = (1 / (calibration_a + calibration_b * log(therm_inlet_resistance) + calibration_c * pow(log(therm_inlet_resistance), 3))) - 273.15;
+  return temperature;
+}
+
+// READ SHUNT
+void READ_SHUNT() {
+}
+
+// READ CONTROL PILOT
+void READ_CPILOT() {
+}
+
+// SEND i2c to Atiny for SOC
+void NEOPIX_CTRL(int SOC) {
 }
 
 // CAN STUFF BEGIN
@@ -189,6 +266,11 @@ void CAN_Charge(struct CANMessage *ptr, uint16_t chargingLimitsVolts, uint16_t c
   HAL_Delay(10);
   CAN_Send(ptr);
 }
+
+void Read_CAN() {
+  // Use sum of cell
+}
+
 // CAN STUFF END
 
 /* USER CODE END 0 */
@@ -242,15 +324,24 @@ int main(void)
   struct CANMessage balancing_msg;
   CAN_SettingsInit(&balancing_msg, false, 1);
 
-  // INIT GPIO STATE
-  GPIO_PinState IN_HVIL_SW_STATE;
-  GPIO_PinState RTC_SW_STATE;
+  // INIT PWM
+  HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
+
+  // INIT ADC
+  uint16_t adc_buffer[2];
+  HAL_TIM_Base_Start(&htim3);
+  HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adc_buffer, 2);
 
   HAL_Delay(500);
 
   // TEMP STUFF 1 START
   DISP_KanoaSplash(); // TODO: call this in the GUI init instead
   HAL_Delay(1000);
+  FAN_SPD_CTRL(1); // TODO: make this based on temp
+  uint16_t therm_inlet = adc_buffer[0];
+  uint16_t therm_outlet = adc_buffer[1];
+  GPIO_PinState IN_HVIL_SW_STATE;
+  GPIO_PinState RTC_SW_STATE;
   char chargingInfoString[30];
   SRE_Display_Test(); // TODO: better init for GUI
   // TEMP STUFF 1 END
@@ -264,12 +355,12 @@ int main(void)
 	  ssd1306_Fill(Black);
 	  ssd1306_UpdateScreen();
 
-	  IN_HVIL_SW_STATE = HAL_GPIO_ReadPin(IN_HVIL_F_SW_GPIO_Port, IN_HVIL_F_SW_Pin);
-	  RTC_SW_STATE = HAL_GPIO_ReadPin(RTC_SW_GPIO_Port, RTC_SW_Pin);
+    IN_HVIL_SW_STATE = HAL_GPIO_ReadPin(IN_HVIL_FSW_GPIO_Port, IN_HVIL_FSW_Pin);
+	  RTC_SW_STATE = HAL_GPIO_ReadPin(IN_RTC_SW_GPIO_Port, IN_RTC_SW_Pin);
 
-    // TEMP STUFF 1 START
+    // TEMP STUFF 2 START
     sprintf(chargingInfoString, "%d volts @ %d amps", LIMIT_VOLTS, LIMIT_AMPS);
-    // TEMP STUFF 1 END
+    // TEMP STUFF 2 END
 
 	  if(IN_HVIL_SW_STATE) {
 		  HAL_GPIO_WritePin(GPIOA, LED_HV_Pin, GPIO_PIN_SET);
@@ -378,7 +469,7 @@ static void MX_ADC1_Init(void)
   */
   hadc1.Instance = ADC1;
   hadc1.Init.ScanConvMode = ADC_SCAN_ENABLE;
-  hadc1.Init.ContinuousConvMode = DISABLE;
+  hadc1.Init.ContinuousConvMode = ENABLE;
   hadc1.Init.DiscontinuousConvMode = DISABLE;
   hadc1.Init.ExternalTrigConv = ADC_EXTERNALTRIGCONV_T3_TRGO;
   hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
@@ -556,6 +647,7 @@ static void MX_TIM3_Init(void)
 
   TIM_ClockConfigTypeDef sClockSourceConfig = {0};
   TIM_MasterConfigTypeDef sMasterConfig = {0};
+  TIM_OC_InitTypeDef sConfigOC = {0};
 
   /* USER CODE BEGIN TIM3_Init 1 */
 
@@ -565,7 +657,7 @@ static void MX_TIM3_Init(void)
   htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim3.Init.Period = 100-1;
   htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-  htim3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  htim3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
   if (HAL_TIM_Base_Init(&htim3) != HAL_OK)
   {
     Error_Handler();
@@ -575,15 +667,28 @@ static void MX_TIM3_Init(void)
   {
     Error_Handler();
   }
+  if (HAL_TIM_PWM_Init(&htim3) != HAL_OK)
+  {
+    Error_Handler();
+  }
   sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
   sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
   if (HAL_TIMEx_MasterConfigSynchronization(&htim3, &sMasterConfig) != HAL_OK)
   {
     Error_Handler();
   }
+  sConfigOC.OCMode = TIM_OCMODE_PWM1;
+  sConfigOC.Pulse = 0;
+  sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+  sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+  if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
+  {
+    Error_Handler();
+  }
   /* USER CODE BEGIN TIM3_Init 2 */
 
   /* USER CODE END TIM3_Init 2 */
+  HAL_TIM_MspPostInit(&htim3);
 
 }
 
@@ -665,10 +770,10 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(HVIL_CTRL_GPIO_Port, HVIL_CTRL_Pin, GPIO_PIN_SET);
 
-  /*Configure GPIO pins : IN_HVIL_ACUM_Pin IN_HVIL_CHAR_Pin IN_HVIL_ESTOP_Pin */
-  GPIO_InitStruct.Pin = IN_HVIL_ACUM_Pin|IN_HVIL_CHAR_Pin|IN_HVIL_ESTOP_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  /*Configure GPIO pins : IN_HVIL_ACUM_Pin IN_HVIL_CHAR_Pin IN_HVIL_FSW_Pin IN_HVIL_ESTOP_Pin */
+  GPIO_InitStruct.Pin = IN_HVIL_ACUM_Pin|IN_HVIL_CHAR_Pin|IN_HVIL_FSW_Pin|IN_HVIL_ESTOP_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING_FALLING;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   /*Configure GPIO pins : LED_HV_Pin LED_BAL_Pin */
@@ -678,14 +783,8 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : IN_HVIL_F_SW_Pin */
-  GPIO_InitStruct.Pin = IN_HVIL_F_SW_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
-  HAL_GPIO_Init(IN_HVIL_F_SW_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pins : IN_BMS_FLT_LED_Pin IN_IMD_FLT_LED_Pin RTC_SW_Pin */
-  GPIO_InitStruct.Pin = IN_BMS_FLT_LED_Pin|IN_IMD_FLT_LED_Pin|RTC_SW_Pin;
+  /*Configure GPIO pins : IN_BMS_FLT_LED_Pin IN_IMD_FLT_LED_Pin */
+  GPIO_InitStruct.Pin = IN_BMS_FLT_LED_Pin|IN_IMD_FLT_LED_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
@@ -703,6 +802,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(LED_TSAL_FLT_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : IN_HVIL_TERM_Pin */
+  GPIO_InitStruct.Pin = IN_HVIL_TERM_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING_FALLING;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(IN_HVIL_TERM_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : HVIL_CTRL_Pin */
   GPIO_InitStruct.Pin = HVIL_CTRL_Pin;
@@ -723,7 +828,16 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(BTN_BCK_GPIO_Port, &GPIO_InitStruct);
 
+  /*Configure GPIO pin : IN_RTC_SW_Pin */
+  GPIO_InitStruct.Pin = IN_RTC_SW_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+  HAL_GPIO_Init(IN_RTC_SW_GPIO_Port, &GPIO_InitStruct);
+
   /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI1_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI1_IRQn);
+
   HAL_NVIC_SetPriority(EXTI2_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(EXTI2_IRQn);
 

@@ -65,6 +65,7 @@ void Error_Handler(void);
 #define THERM_OUT_SIG_GPIO_Port GPIOC
 #define IN_HVIL_ACUM_Pin GPIO_PIN_1
 #define IN_HVIL_ACUM_GPIO_Port GPIOA
+#define IN_HVIL_ACUM_EXTI_IRQn EXTI1_IRQn
 #define LED_HV_Pin GPIO_PIN_2
 #define LED_HV_GPIO_Port GPIOA
 #define LED_BAL_Pin GPIO_PIN_3
@@ -73,8 +74,8 @@ void Error_Handler(void);
 #define CP_SIG_GPIO_Port GPIOA
 #define IN_HVIL_CHAR_Pin GPIO_PIN_5
 #define IN_HVIL_CHAR_GPIO_Port GPIOA
-#define IN_HVIL_F_SW_Pin GPIO_PIN_6
-#define IN_HVIL_F_SW_GPIO_Port GPIOA
+#define IN_HVIL_FSW_Pin GPIO_PIN_6
+#define IN_HVIL_FSW_GPIO_Port GPIOA
 #define IN_HVIL_ESTOP_Pin GPIO_PIN_7
 #define IN_HVIL_ESTOP_GPIO_Port GPIOA
 #define SHUNT_SIG_Pin GPIO_PIN_0
@@ -87,6 +88,8 @@ void Error_Handler(void);
 #define LED_ELCON_FLT_GPIO_Port GPIOB
 #define LED_TSAL_FLT_Pin GPIO_PIN_7
 #define LED_TSAL_FLT_GPIO_Port GPIOC
+#define IN_HVIL_TERM_Pin GPIO_PIN_8
+#define IN_HVIL_TERM_GPIO_Port GPIOC
 #define HVIL_CTRL_Pin GPIO_PIN_9
 #define HVIL_CTRL_GPIO_Port GPIOC
 #define BTN_UP_Pin GPIO_PIN_10
@@ -103,8 +106,8 @@ void Error_Handler(void);
 #define BTN_BCK_EXTI_IRQn EXTI2_IRQn
 #define FAN_CTRL_Pin GPIO_PIN_4
 #define FAN_CTRL_GPIO_Port GPIOB
-#define RTC_SW_Pin GPIO_PIN_5
-#define RTC_SW_GPIO_Port GPIOB
+#define IN_RTC_SW_Pin GPIO_PIN_5
+#define IN_RTC_SW_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 
