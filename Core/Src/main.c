@@ -190,16 +190,16 @@ float READ_THERM(uint16_t* adc_thermistor, uint16_t therm_first_resistance) {
   return temperature;
 }
 
+// SEND i2c to Atiny for SOC
+void NEOPIX_CTRL(int SOC) {
+}
+
 // READ SHUNT
 void READ_SHUNT() {
 }
 
 // READ CONTROL PILOT
 void READ_CPILOT() {
-}
-
-// SEND i2c to Atiny for SOC
-void NEOPIX_CTRL(int SOC) {
 }
 
 // CAN STUFF BEGIN
@@ -231,6 +231,19 @@ struct bmsAndElconData {
   */
 };
 
+// TODO: maybe move the below
+struct bmsAndElconData currentBmsAndElconData;
+CAN_RxHeaderTypeDef RxHeader;
+uint8_t RxData[8];
+
+uint32_t elconBmsFilterIDs[4] = {
+  0x18FF50E5, // Elcon
+  0x622, // BMS volt/temp
+  0x621, // BMS soc
+  0x600, // BMS imbalance
+};
+// TODO: maybe move the above
+
 HAL_StatusTypeDef CAN_Start() {
 	return HAL_CAN_Start(&hcan1);
 }
@@ -243,26 +256,41 @@ HAL_StatusTypeDef CAN_Send(struct CANMessage *canMsgPtr) {
 	return HAL_CAN_AddTxMessage(&hcan1, &canMsgPtr->TxHeader, (uint8_t*) canMsgPtr->data, &canMsgPtr->TxMailbox);
 }
 
-void CAN_SettingsInit(struct CANMessage *canMsgPtr, bool isExtended, uint16_t dlc_length, CAN_FilterTypeDef *elconBmsCanFilter, uint32_t filterIDs[2]) {
+void CAN_SettingsInit(struct CANMessage *canMsgPtr, bool isExtended, uint16_t dlc_length, uint32_t filterIDs[4]) {
 	CAN_Start();
 	CAN_Activate();
+
 	canMsgPtr->TxHeader.IDE = (isExtended) ? CAN_ID_EXT : CAN_ID_STD;
   canMsgPtr->TxHeader.ExtId = (isExtended) ? 0x00000000 : 0x000;
 	canMsgPtr->TxHeader.RTR = CAN_RTR_DATA;
 	canMsgPtr->TxHeader.DLC = dlc_length;
 
-  elconBmsCanFilter->FilterIdHigh = (ext_id >> 13) & 0xFFFF;
-  elconBmsCanFilter->FilterIdLow  = (ext_id << 3) & 0xFFFF;
-  elconBmsCanFilter->FilterMaskIdHigh = (0x1FFFFFFF >> 13) & 0xFFFF;
-  elconBmsCanFilter->FilterMaskIdLow  = (0x1FFFFFFF << 3) & 0xFFFF;
-  elconBmsCanFilter->FilterActivation = CAN_FILTER_ENABLE;
-  elconBmsCanFilter->FilterBank = 18;
-  elconBmsCanFilter->FilterFIFOAssignment = CAN_FILTER_FIFO0;
-  elconBmsCanFilter->FilterMode = CAN_FILTERMODE_IDMASK;
-  elconBmsCanFilter->FilterScale = CAN_FILTERSCALE_32BIT;
-  elconBmsCanFilter->SlaveStartFilterBank = 20;
+  // Filter 1: First two IDs
+  CAN_FilterTypeDef filterConfig1 = {0};
+  filterConfig1.FilterBank = 18;
+  filterConfig1.FilterMode = CAN_FILTERMODE_IDLIST;
+  filterConfig1.FilterScale = CAN_FILTERSCALE_32BIT;
+  filterConfig1.FilterFIFOAssignment = CAN_FILTER_FIFO0;
+  filterConfig1.FilterActivation = ENABLE;
+  filterConfig1.FilterIdHigh = (filterIDs[0] >> 13) & 0xFFFF;
+  filterConfig1.FilterIdLow  = (filterIDs[0] << 3) & 0xFFFF;
+  filterConfig1.FilterMaskIdHigh = (filterIDs[1] >> 13) & 0xFFFF;
+  filterConfig1.FilterMaskIdLow  = (filterIDs[1] << 3) & 0xFFFF;
+  HAL_CAN_ConfigFilter(&hcan1, &filterConfig1);
 
-  HAL_CAN_ConfigFilter(&hcan1, &elconBmsCanFilter);
+  // Filter 2: Next two IDs
+  CAN_FilterTypeDef filterConfig2 = {0};
+  filterConfig2.FilterBank = 19;
+  filterConfig2.FilterMode = CAN_FILTERMODE_IDLIST;
+  filterConfig2.FilterScale = CAN_FILTERSCALE_32BIT;
+  filterConfig2.FilterFIFOAssignment = CAN_FILTER_FIFO0;
+  filterConfig2.FilterActivation = ENABLE;
+  filterConfig2.FilterIdHigh = (filterIDs[2] >> 13) & 0xFFFF;
+  filterConfig2.FilterIdLow  = (filterIDs[2] << 3) & 0xFFFF;
+  filterConfig2.FilterMaskIdHigh = (filterIDs[3] >> 13) & 0xFFFF;
+  filterConfig2.FilterMaskIdLow  = (filterIDs[3] << 3) & 0xFFFF;
+  HAL_CAN_ConfigFilter(&hcan1, &filterConfig2);
+
   HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING);
 }
 
@@ -302,22 +330,17 @@ void CAN_Charge(struct CANMessage *ptr, uint16_t chargingLimitsVolts, uint16_t c
   CAN_Send(ptr);
 }
 
-void Read_CAN(struct bmsAndElconData* outputData) {
-  if (ID == 0x622) {
-    outputData->BMS_minVolt = data[];
-    outputData->BMS_maxVolt = data[];
-    outputData->BMS_minTemp = data[];
-    outputData->BMS_maxTemp = data[];
-    // TODO: fix these two
-    outputData->BMS_avgVolt = 0;
-    outputData->BMS_avgTemp = 0;
-  } else if (ID == 0x621) {
-    outputData->BMS_stateOfCharge = data[2]; // TODO: figure out
-  } else if (ID == 0x600) {
-    outputData->BMS_packImbalance = data[9]; // TODO: figure out
-  } else if (ID == 0x18FF50E5) {
-    outputData->ELCON_outVolt = data[0] + data[1];
-    outputData->ELCON_outCurrent = data[2] + data[3];
+// struct outputData
+// uint32_t filterIDs[4]
+void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
+{
+  if (HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &RxHeader, RxData) != HAL_OK) {
+    Error_Handler();
+  }
+  // TODO only check every 1 second
+  if (RxHeader.ExtId == elconBmsFilterIDs[0]) {
+    currentBmsAndElconData.ELCON_outVolt = RxData[0] + RxData[1];
+    currentBmsAndElconData.ELCON_outCurrent = RxData[2] + RxData[3];
     /*
       Bit 0: 0 -> no hw fail, 1 -> hw fail
       Bit 1: 0 -> no over temp, 1 -> overtemp
@@ -325,33 +348,25 @@ void Read_CAN(struct bmsAndElconData* outputData) {
       Bit 3: 0 -> batt volt detected, 1 -> batt volt not detected
       Bit 4: 0 -> comms good, 1 -> comms timeout
     */
-    outputData->ELCON_fault[0] = (data[4] && 0xF0000) ? true : false;
-    outputData->ELCON_fault[1] = (data[4] && 0x0F000) ? true : false;
-    outputData->ELCON_fault[2] = (data[4] && 0x00F00) ? true : false;
-    outputData->ELCON_fault[3] = (data[4] && 0x000F0) ? true : false;
-    outputData->ELCON_fault[4] = (data[4] && 0x0000F) ? true : false;
+    currentBmsAndElconData.ELCON_fault[0] = (RxData[4] && 0xF0000) ? true : false; // TODO: figure out
+    currentBmsAndElconData.ELCON_fault[1] = (RxData[4] && 0x0F000) ? true : false; // TODO: figure out
+    currentBmsAndElconData.ELCON_fault[2] = (RxData[4] && 0x00F00) ? true : false; // TODO: figure out
+    currentBmsAndElconData.ELCON_fault[3] = (RxData[4] && 0x000F0) ? true : false; // TODO: figure out
+    currentBmsAndElconData.ELCON_fault[4] = (RxData[4] && 0x0000F) ? true : false; // TODO: figure out
+  } else if (RxHeader.StdId == elconBmsFilterIDs[1]) {
+    currentBmsAndElconData.BMS_minVolt = RxData[0]; // TODO: figure out
+    currentBmsAndElconData.BMS_maxVolt = RxData[1]; // TODO: figure out
+    currentBmsAndElconData.BMS_minTemp = RxData[2]; // TODO: figure out
+    currentBmsAndElconData.BMS_maxTemp = RxData[3]; // TODO: figure out
+    currentBmsAndElconData.BMS_avgVolt = 0; // TODO: figure out
+    currentBmsAndElconData.BMS_avgTemp = 0; // TODO: figure out
+  } else if (RxHeader.StdId == elconBmsFilterIDs[2]) {
+    currentBmsAndElconData.BMS_stateOfCharge = RxData[2]; // TODO: figure out
+  } else if (RxHeader.StdId == elconBmsFilterIDs[3]) {
+    currentBmsAndElconData.BMS_packImbalance = RxData[9]; // TODO: figure out
   }
   // From suguru: Use sum of cell???
 }
-
-  // while (true)
-  // {
-  //   CAN_RxHeaderTypeDef RxHeader;
-  //   uint8_t RxData[8];
-
-  //   if (HAL_CAN_GetRxFifoFillLevel(&hcan1, CAN_RX_FIFO0) > 0)
-  //   {
-  //       if (HAL_CAN_GetRxMessage(&hcan1, CAN_RX_FIFO0, &RxHeader, RxData) == HAL_OK)
-  //       {
-  //           printf("ID: %08lX, Data: ", RxHeader.ExtId);
-  //           for (int i = 0; i < RxHeader.DLC; i++) {
-  //               printf("%02X ", RxData[i]);
-  //           }
-  //           printf("\n");
-  //       }
-  //   }
-  //   HAL_Delay(1000);
-  // }
 
 // CAN STUFF END
 
@@ -398,22 +413,13 @@ int main(void)
   // INIT DISPLAY
   SRE_Display_Init(false);
 
-  // INIT CAN FILTER RULES
-  CAN_FilterTypeDef elconBmsCanFilter = {0};
-  uint32_t filterIDs[2] = {
-      0x18FF50E5, // Elcon
-      0x622, // BMS volt/temp
-      0x621, // BMS soc
-      0x600, // BMS imbalance
-  };
-
   // INIT CHARGING CAN STRUCT
   struct CANMessage charging_msg;
-  CAN_SettingsInit(&charging_msg, true, 8);
+  CAN_SettingsInit(&charging_msg, true, 8, elconBmsFilterIDs);
 
   // INIT BALANCING CAN STRUCT
   struct CANMessage balancing_msg;
-  CAN_SettingsInit(&balancing_msg, false, 1);
+  CAN_SettingsInit(&balancing_msg, false, 1, elconBmsFilterIDs);
 
   // INIT PWM
   HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
