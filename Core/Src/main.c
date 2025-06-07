@@ -289,6 +289,7 @@ int main(void)
         ssd1306_SetCursor(5, 5);
         ssd1306_WriteString("Now Balancing", Font_6x8, White);
     } else {
+      CAN_Charge(&charging_msg, LIMIT_VOLTS, LIMIT_AMPS, false);
 		  HAL_GPIO_WritePin(GPIOA, LED_HV_Pin, GPIO_PIN_RESET);
       HAL_GPIO_WritePin(GPIOA, LED_BAL_Pin, GPIO_PIN_RESET);
 		  ssd1306_SetCursor(5, 5);
