@@ -70,7 +70,7 @@ uint16_t LIMIT_VOLTS = 0;
 uint16_t LIMIT_AMPS = 0;
 
 char codeBranch[6] = "Beta";
-char codeVersion[5] = "0.3.4";
+char codeVersion[5] = "0.3.5";
 
 extern bool isBalancing;
 extern bool isBalancingControl;
@@ -172,7 +172,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 
 // FAN SPEED CONTROL
 void FAN_SPD_CTRL(uint32_t fan_speed) {
-  if (fan_speed <= 100 && fan_speed >= 0) {
+  if (fan_speed <= 100) {
     TIM3->CCR1 = fan_speed;
   } else {
     // TODO: Throw error
@@ -210,6 +210,27 @@ struct CANMessage {
 	uint8_t data[8];
 };
 
+struct bmsAndElconData {
+  float BMS_avgVolt;
+  float BMS_minVolt;
+  float BMS_maxVolt;
+  float BMS_avgTemp;
+  float BMS_minTemp;
+  float BMS_maxTemp;
+  float BMS_stateOfCharge;
+  float BMS_packImbalance;
+  float ELCON_outVolt;
+  float ELCON_outCurrent;
+  bool ELCON_fault[5];
+  /*
+    Bit 0: 0 -> no hw fail, 1 -> hw fail
+    Bit 1: 0 -> no over temp, 1 -> overtemp
+    Bit 2: 0 -> input volt right, 1 -> input volt wrong
+    Bit 3: 0 -> batt volt detected, 1 -> batt volt not detected
+    Bit 4: 0 -> comms good, 1 -> comms timeout
+  */
+};
+
 HAL_StatusTypeDef CAN_Start() {
 	return HAL_CAN_Start(&hcan1);
 }
@@ -218,17 +239,31 @@ HAL_StatusTypeDef CAN_Activate() {
 	return HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING);
 }
 
-HAL_StatusTypeDef CAN_Send(struct CANMessage *ptr) {
-	return HAL_CAN_AddTxMessage(&hcan1, &ptr->TxHeader, (uint8_t*) ptr->data, &ptr->TxMailbox);
+HAL_StatusTypeDef CAN_Send(struct CANMessage *canMsgPtr) {
+	return HAL_CAN_AddTxMessage(&hcan1, &canMsgPtr->TxHeader, (uint8_t*) canMsgPtr->data, &canMsgPtr->TxMailbox);
 }
 
-void CAN_SettingsInit(struct CANMessage *ptr, bool isExtended, uint16_t dlc_length) {
+void CAN_SettingsInit(struct CANMessage *canMsgPtr, bool isExtended, uint16_t dlc_length, CAN_FilterTypeDef *elconBmsCanFilter, uint32_t filterIDs[2]) {
 	CAN_Start();
 	CAN_Activate();
-	ptr->TxHeader.IDE = (isExtended) ? CAN_ID_EXT : CAN_ID_STD;
-  ptr->TxHeader.ExtId = (isExtended) ? 0x00000000 : 0x000;
-	ptr->TxHeader.RTR = CAN_RTR_DATA;
-	ptr->TxHeader.DLC = dlc_length;
+	canMsgPtr->TxHeader.IDE = (isExtended) ? CAN_ID_EXT : CAN_ID_STD;
+  canMsgPtr->TxHeader.ExtId = (isExtended) ? 0x00000000 : 0x000;
+	canMsgPtr->TxHeader.RTR = CAN_RTR_DATA;
+	canMsgPtr->TxHeader.DLC = dlc_length;
+
+  elconBmsCanFilter->FilterIdHigh = (ext_id >> 13) & 0xFFFF;
+  elconBmsCanFilter->FilterIdLow  = (ext_id << 3) & 0xFFFF;
+  elconBmsCanFilter->FilterMaskIdHigh = (0x1FFFFFFF >> 13) & 0xFFFF;
+  elconBmsCanFilter->FilterMaskIdLow  = (0x1FFFFFFF << 3) & 0xFFFF;
+  elconBmsCanFilter->FilterActivation = CAN_FILTER_ENABLE;
+  elconBmsCanFilter->FilterBank = 18;
+  elconBmsCanFilter->FilterFIFOAssignment = CAN_FILTER_FIFO0;
+  elconBmsCanFilter->FilterMode = CAN_FILTERMODE_IDMASK;
+  elconBmsCanFilter->FilterScale = CAN_FILTERSCALE_32BIT;
+  elconBmsCanFilter->SlaveStartFilterBank = 20;
+
+  HAL_CAN_ConfigFilter(&hcan1, &elconBmsCanFilter);
+  HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING);
 }
 
 void Set_CAN_Id(struct CANMessage *ptr, uint32_t id, bool isExtended) {
@@ -267,9 +302,56 @@ void CAN_Charge(struct CANMessage *ptr, uint16_t chargingLimitsVolts, uint16_t c
   CAN_Send(ptr);
 }
 
-void Read_CAN() {
-  // Use sum of cell
+void Read_CAN(struct bmsAndElconData* outputData) {
+  if (ID == 0x622) {
+    outputData->BMS_minVolt = data[];
+    outputData->BMS_maxVolt = data[];
+    outputData->BMS_minTemp = data[];
+    outputData->BMS_maxTemp = data[];
+    // TODO: fix these two
+    outputData->BMS_avgVolt = 0;
+    outputData->BMS_avgTemp = 0;
+  } else if (ID == 0x621) {
+    outputData->BMS_stateOfCharge = data[2]; // TODO: figure out
+  } else if (ID == 0x600) {
+    outputData->BMS_packImbalance = data[9]; // TODO: figure out
+  } else if (ID == 0x18FF50E5) {
+    outputData->ELCON_outVolt = data[0] + data[1];
+    outputData->ELCON_outCurrent = data[2] + data[3];
+    /*
+      Bit 0: 0 -> no hw fail, 1 -> hw fail
+      Bit 1: 0 -> no over temp, 1 -> overtemp
+      Bit 2: 0 -> input volt right, 1 -> input volt wrong
+      Bit 3: 0 -> batt volt detected, 1 -> batt volt not detected
+      Bit 4: 0 -> comms good, 1 -> comms timeout
+    */
+    outputData->ELCON_fault[0] = (data[4] && 0xF0000) ? true : false;
+    outputData->ELCON_fault[1] = (data[4] && 0x0F000) ? true : false;
+    outputData->ELCON_fault[2] = (data[4] && 0x00F00) ? true : false;
+    outputData->ELCON_fault[3] = (data[4] && 0x000F0) ? true : false;
+    outputData->ELCON_fault[4] = (data[4] && 0x0000F) ? true : false;
+  }
+  // From suguru: Use sum of cell???
 }
+
+  // while (true)
+  // {
+  //   CAN_RxHeaderTypeDef RxHeader;
+  //   uint8_t RxData[8];
+
+  //   if (HAL_CAN_GetRxFifoFillLevel(&hcan1, CAN_RX_FIFO0) > 0)
+  //   {
+  //       if (HAL_CAN_GetRxMessage(&hcan1, CAN_RX_FIFO0, &RxHeader, RxData) == HAL_OK)
+  //       {
+  //           printf("ID: %08lX, Data: ", RxHeader.ExtId);
+  //           for (int i = 0; i < RxHeader.DLC; i++) {
+  //               printf("%02X ", RxData[i]);
+  //           }
+  //           printf("\n");
+  //       }
+  //   }
+  //   HAL_Delay(1000);
+  // }
 
 // CAN STUFF END
 
@@ -315,6 +397,15 @@ int main(void)
 
   // INIT DISPLAY
   SRE_Display_Init(false);
+
+  // INIT CAN FILTER RULES
+  CAN_FilterTypeDef elconBmsCanFilter = {0};
+  uint32_t filterIDs[2] = {
+      0x18FF50E5, // Elcon
+      0x622, // BMS volt/temp
+      0x621, // BMS soc
+      0x600, // BMS imbalance
+  };
 
   // INIT CHARGING CAN STRUCT
   struct CANMessage charging_msg;
