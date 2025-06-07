@@ -337,6 +337,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
   if (HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &RxHeader, RxData) != HAL_OK) {
     Error_Handler();
   }
+  printf("Got CAN msg");
   // TODO only check every 1 second
   if (RxHeader.ExtId == elconBmsFilterIDs[0]) {
     currentBmsAndElconData.ELCON_outVolt = RxData[0] + RxData[1];
@@ -353,6 +354,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
     currentBmsAndElconData.ELCON_fault[2] = (RxData[4] && 0x00F00) ? true : false; // TODO: figure out
     currentBmsAndElconData.ELCON_fault[3] = (RxData[4] && 0x000F0) ? true : false; // TODO: figure out
     currentBmsAndElconData.ELCON_fault[4] = (RxData[4] && 0x0000F) ? true : false; // TODO: figure out
+    printf("Received bms temp packet.\n");
   } else if (RxHeader.StdId == elconBmsFilterIDs[1]) {
     currentBmsAndElconData.BMS_minVolt = RxData[0]; // TODO: figure out
     currentBmsAndElconData.BMS_maxVolt = RxData[1]; // TODO: figure out
@@ -360,10 +362,13 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
     currentBmsAndElconData.BMS_maxTemp = RxData[3]; // TODO: figure out
     currentBmsAndElconData.BMS_avgVolt = 0; // TODO: figure out
     currentBmsAndElconData.BMS_avgTemp = 0; // TODO: figure out
+    printf("Received elcon packet.\n");
   } else if (RxHeader.StdId == elconBmsFilterIDs[2]) {
     currentBmsAndElconData.BMS_stateOfCharge = RxData[2]; // TODO: figure out
+    printf("Received bms soc packet.\n");
   } else if (RxHeader.StdId == elconBmsFilterIDs[3]) {
     currentBmsAndElconData.BMS_packImbalance = RxData[9]; // TODO: figure out
+    printf("Received bms imbalance packet.\n");
   }
   // From suguru: Use sum of cell???
 }
