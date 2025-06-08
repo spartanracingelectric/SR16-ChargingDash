@@ -75,6 +75,10 @@ char codeVersion[5] = "0.3.5";
 extern bool isBalancing;
 extern bool isBalancingControl;
 
+extern int currentChargingScreen;
+extern void SRE_Display_Charging1(void);
+extern void SRE_Display_Charging2(void);
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -455,7 +459,7 @@ int main(void)
   while (1)
   {
 	  ssd1306_Fill(Black);
-	  ssd1306_UpdateScreen();
+	  //ssd1306_UpdateScreen();
 
     IN_HVIL_SW_STATE = HAL_GPIO_ReadPin(IN_HVIL_FSW_GPIO_Port, IN_HVIL_FSW_Pin);
 	  RTC_SW_STATE = HAL_GPIO_ReadPin(IN_RTC_SW_GPIO_Port, IN_RTC_SW_Pin);
@@ -469,9 +473,14 @@ int main(void)
 		  ssd1306_SetCursor(5, 5);
 		  if(!RTC_SW_STATE) {
         CAN_Charge(&charging_msg, LIMIT_VOLTS, LIMIT_AMPS, true);
-        ssd1306_WriteString("Now Charging", Font_6x8, White);
-		    ssd1306_SetCursor(5, 20);
-		    ssd1306_WriteString(chargingInfoString, Font_6x8, White);
+        // ssd1306_WriteString("Now Charging", Font_6x8, White);
+		    // ssd1306_SetCursor(5, 20);
+		    // ssd1306_WriteString(chargingInfoString, Font_6x8, White);
+        if (currentChargingScreen == 1) {
+          SRE_Display_Charging1();
+        } else if (currentChargingScreen == 2){
+          SRE_Display_Charging2();
+        }
 		  } else if (RTC_SW_STATE) {
         CAN_Charge(&charging_msg, LIMIT_VOLTS, LIMIT_AMPS, false);
         ssd1306_WriteString("PLS FLIP RTC", Font_6x8, White);

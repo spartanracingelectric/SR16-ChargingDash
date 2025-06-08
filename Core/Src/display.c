@@ -7,6 +7,7 @@ extern bool selectPressed;
 extern int backPressed;
 bool isBalancing = false;
 bool isBalancingControl = false;
+int currentChargingScreen = 1;
 
 struct bmsAndElconData {
     float BMS_avgVolt;
@@ -279,7 +280,9 @@ void SRE_Display_Nav_Bar(char *buttons[], int numOfButtons, int firstButtonIndex
 }
 
 
-void SRE_Display_Charging2(){
+void SRE_Display_Charging2() {
+	int numOfButtons = 1;
+
 	char packVoltStats[] = "Pack Volt: 400.22V";
 	char soc[50];
 	char timeRemaining[] = "Time Remaining: 120m";
@@ -306,9 +309,20 @@ void SRE_Display_Charging2(){
 	char *navBarButtons[] = {"Charging 1"};
 	SRE_Display_Nav_Bar(navBarButtons, 1, 0);
   
-	
+	// ssd1306_UpdateScreen();
 
-	ssd1306_UpdateScreen();
+	if (selectPressed) {
+		selectPressed = false;
+		if (selectedButton < 0) {
+			selectedButton = 0;
+		}
+		else if (selectedButton > numOfButtons-1) {
+			selectedButton = numOfButtons-1;
+		}
+		if (selectedButton == 0) {
+			currentChargingScreen = 1;
+		}
+	}
 
 }
 
@@ -468,7 +482,7 @@ void SRE_Display_Long_Scroll_Bar(int currentScreen, int numOfScreens) {
 void SRE_Display_Charger_Stats() {
 	selectPressed = false;
 	selectedButton = 0;
-	
+
 	int numOfButtons = 2;
 
 	while (!selectPressed) {
@@ -772,6 +786,8 @@ void SRE_Display_Error_Symbol(int x, int y) {
 }
 
 void SRE_Display_Charging1() {
+
+	int numOfButtons = 1;
 	char temperatureStats[50];
 	char voltageStats[50];
 	char averageStats[50];
@@ -817,7 +833,20 @@ void SRE_Display_Charging1() {
 	char *navBarButtons[] = {"Charging 2"};
 	SRE_Display_Nav_Bar(navBarButtons, 1, 0);
 
-	ssd1306_UpdateScreen();
+	// ssd1306_UpdateScreen();
+
+	if (selectPressed) {
+		selectPressed = false;
+		if (selectedButton < 0) {
+			selectedButton = 0;
+		}
+		else if (selectedButton > numOfButtons-1) {
+			selectedButton = numOfButtons-1;
+		}
+		if (selectedButton == 0) {
+			currentChargingScreen = 2;
+		}
+	}
 }
 
 void SRE_Display_Err() {
