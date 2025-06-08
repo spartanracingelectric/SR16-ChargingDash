@@ -400,7 +400,7 @@ int main(void)
   // TEMP STUFF 1 START
   DISP_KanoaSplash(); // TODO: call this in the GUI init instead
   HAL_Delay(1000);
-  FAN_SPD_CTRL(50); // TODO: make this based on temp
+  FAN_SPD_CTRL(100); // TODO: make this based on temp
   uint16_t therm_inlet = adc_buffer[0];
   uint16_t therm_outlet = adc_buffer[1];
   GPIO_PinState IN_HVIL_SW_STATE;
