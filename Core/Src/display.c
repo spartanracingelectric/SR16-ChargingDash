@@ -44,9 +44,9 @@ void SRE_Display_Nav() {
 	selectedButton = 0;
 	selectPressed = false;
 
-	char* buttons[] = {"Charging", "Balancing"};
+	char* buttons[] = {"Charging", "Balancing", "Exit"};
 	// char* buttons[] = {"Home", "Start Charging", "Start Balancing", "Battery", "Charger", "Errors"};
-	int numOfButtons = 2;
+	int numOfButtons = 3;
 
 	while(!selectPressed) {
 		ssd1306_FillRectangle(0, 0, 127, 63, Black);
@@ -105,10 +105,10 @@ void SRE_Display_Nav() {
 		}
 		else if (selectedButton == 1) {
 			SRE_Display_Start_Balancing();
-
 		}
 		else if (selectedButton == 2) {
-			SRE_Display_Battery1();
+			// Restarts the software
+			NVIC_SystemReset();
 		}
 		else if (selectedButton == 3) {
 			SRE_Display_Charger_Stats();
