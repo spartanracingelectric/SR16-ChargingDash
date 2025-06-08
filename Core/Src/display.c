@@ -612,9 +612,15 @@ void SRE_Display_Battery2(){
 	selectPressed = false;
 	selectedButton = 0;
 
-	char socStats[] = "SOC: 95.1%";
-	char balancingOnOff[] = "Balancing On";
+	char soc[50];
+	char balancingOnOff[50];
+	char packImbalance[50];
 
+	sprintf(soc, "SOC:%.2f%%",
+			currentBmsAndElconData.BMS_stateOfCharge);
+			
+	sprintf(packImbalance, "Imbalance:%.2fV",
+			currentBmsAndElconData.BMS_packImbalance);
 	//Below are vertices for the triangle image.
 	//Given text starts at y = 33; and is roughly 8px;
 	//Write string goes from top to bottom pixel.
@@ -623,7 +629,7 @@ void SRE_Display_Battery2(){
 	uint8_t x2 = 5, y2 = 33;  // Vertex 2
 	uint8_t x3 = 10, y3 = 40;  // Vertex 3
 
-	char balancingStats[] = "Balancing: 20.22V";
+	//char balancingStats[] = "Balancing: 20.22V";
 
 	int numOfButtons = 2;
 
@@ -640,18 +646,18 @@ void SRE_Display_Battery2(){
 		SRE_Display_Title_Bar("Battery 2");
 
 		ssd1306_SetCursor(1, 13);
-		ssd1306_WriteString(socStats, Font_6x8, White);
+		ssd1306_WriteString(soc, Font_6x8, White);
 
 		ssd1306_SetCursor(1, 23);
-		ssd1306_WriteString(balancingOnOff, Font_6x8, White);
+		ssd1306_WriteString(packImbalance, Font_6x8, White);
 
 		// Draw the triangle edges
-		ssd1306_Line(x1, y1, x2, y2, White);  // Line from Vertex 1 to Vertex 2
-		ssd1306_Line(x2, y2, x3, y3, White);  // Line from Vertex 2 to Vertex 3
-		ssd1306_Line(x3, y3, x1, y1, White);  // Line from Vertex 3 to Vertex 1
+		// ssd1306_Line(x1, y1, x2, y2, White);  // Line from Vertex 1 to Vertex 2
+		// ssd1306_Line(x2, y2, x3, y3, White);  // Line from Vertex 2 to Vertex 3
+		// ssd1306_Line(x3, y3, x1, y1, White);  // Line from Vertex 3 to Vertex 1
 
-		ssd1306_SetCursor(15, 33);
-		ssd1306_WriteString(balancingStats, Font_6x8, White);
+		// ssd1306_SetCursor(15, 33);
+		// ssd1306_WriteString(balancingStats, Font_6x8, White);
 
 		char *navButtons[] = {"Nav", "Battery 1"};
 		SRE_Display_Nav_Bar(navButtons, 2, 0);
