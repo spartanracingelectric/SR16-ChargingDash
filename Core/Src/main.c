@@ -62,6 +62,7 @@ UART_HandleTypeDef huart1;
 int selectedButton = 0;
 bool backPressed = false;
 bool selectPressed = false;
+bool isChargerUnsafe = false;
 
 uint32_t CURRENT_TIME = 0;
 uint32_t PREVIOUS_TIME = 0;
@@ -127,47 +128,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
       }
       PREVIOUS_TIME = CURRENT_TIME;
     }
-  } else if (GPIO_Pin == IN_HVIL_CHAR_Pin || GPIO_Pin == IN_HVIL_TERM_Pin) {
-    GPIO_PinState IN_HVIL_CHAR_Pin_State = HAL_GPIO_ReadPin(IN_HVIL_CHAR_GPIO_Port, IN_HVIL_CHAR_Pin);
-    GPIO_PinState IN_HVIL_TERM_Pin_State = HAL_GPIO_ReadPin(IN_HVIL_TERM_GPIO_Port, IN_HVIL_TERM_Pin);
-    if (IN_HVIL_CHAR_Pin_State || IN_HVIL_TERM_Pin_State)
-    {
-      HAL_GPIO_WritePin(HVIL_CTRL_GPIO_Port, HVIL_CTRL_Pin, GPIO_PIN_SET);
-    } else if (!IN_HVIL_CHAR_Pin_State || !IN_HVIL_TERM_Pin_State) {
-      HAL_GPIO_WritePin(HVIL_CTRL_GPIO_Port, HVIL_CTRL_Pin, GPIO_PIN_RESET);
-    }
-  } else if (GPIO_Pin == IN_HVIL_ACUM_Pin) {  
-    GPIO_PinState IN_HVIL_ACUM_Pin_State = HAL_GPIO_ReadPin(IN_HVIL_ACUM_GPIO_Port, IN_HVIL_ACUM_Pin);
-    if (IN_HVIL_ACUM_Pin_State)
-    {
-      // HVIL reset intial state
-      HAL_GPIO_WritePin(HVIL_CTRL_GPIO_Port, HVIL_CTRL_Pin, GPIO_PIN_SET);
-    } else if (!IN_HVIL_ACUM_Pin_State) {
-      // HVIL reset button clicked
-      HAL_GPIO_WritePin(HVIL_CTRL_GPIO_Port, HVIL_CTRL_Pin, GPIO_PIN_RESET);
-    }
-  } else if (GPIO_Pin == IN_HVIL_ESTOP_Pin) {
-    GPIO_PinState IN_HVIL_ESTOP_Pin_State = HAL_GPIO_ReadPin(IN_HVIL_ESTOP_GPIO_Port, IN_HVIL_ESTOP_Pin);
-    if (IN_HVIL_ESTOP_Pin_State)
-    {
-      // When estop depressed
-      HAL_GPIO_WritePin(HVIL_CTRL_GPIO_Port, HVIL_CTRL_Pin, GPIO_PIN_SET);
-    } else if (!IN_HVIL_ESTOP_Pin_State) {
-      // When estop pressed
-      HAL_GPIO_WritePin(HVIL_CTRL_GPIO_Port, HVIL_CTRL_Pin, GPIO_PIN_RESET);
-    }
-  } else if (GPIO_Pin == IN_HVIL_FSW_Pin) {
-    GPIO_PinState IN_HVIL_FSW_Pin_State = HAL_GPIO_ReadPin(IN_HVIL_FSW_GPIO_Port, IN_HVIL_FSW_Pin);
-    if (IN_HVIL_FSW_Pin_State)
-    {
-      // When on
-      HAL_GPIO_WritePin(HVIL_CTRL_GPIO_Port, HVIL_CTRL_Pin, GPIO_PIN_SET);
-    } else if (!IN_HVIL_FSW_Pin_State) {
-      // When off
-      HAL_GPIO_WritePin(HVIL_CTRL_GPIO_Port, HVIL_CTRL_Pin, GPIO_PIN_RESET);
-    }
   }
-  // TODO: Also allow for switch order
 }
 
 // FAN SPEED CONTROL
@@ -311,6 +272,7 @@ void CAN_Balance(struct CANMessage *ptr, bool balancing_enabled) {
 }
 
 void CAN_Charge(struct CANMessage *ptr, uint16_t chargingLimitsVolts, uint16_t chargingLimitsAmps, bool charge_enable) {
+  // Check for mailbox instead of delay
   uint32_t CAN_ID = 0x1806E5F4;
   Set_CAN_Id(ptr, CAN_ID, true);
 
@@ -326,7 +288,7 @@ void CAN_Charge(struct CANMessage *ptr, uint16_t chargingLimitsVolts, uint16_t c
   ptr->data[6] = 0x00;
   ptr->data[7] = 0x00;
 
-  HAL_Delay(10);
+  HAL_Delay(3);
   CAN_Send(ptr);
 }
 
@@ -337,7 +299,6 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
   if (HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &RxHeader, RxData) != HAL_OK) {
     Error_Handler();
   }
-  printf("Got CAN msg");
   // TODO only check every 1 second
   if (RxHeader.ExtId == elconBmsFilterIDs[0]) {
     currentBmsAndElconData.ELCON_outVolt = RxData[0] + RxData[1];
@@ -439,11 +400,16 @@ int main(void)
   // TEMP STUFF 1 START
   DISP_KanoaSplash(); // TODO: call this in the GUI init instead
   HAL_Delay(1000);
-  FAN_SPD_CTRL(1); // TODO: make this based on temp
+  FAN_SPD_CTRL(50); // TODO: make this based on temp
   uint16_t therm_inlet = adc_buffer[0];
   uint16_t therm_outlet = adc_buffer[1];
   GPIO_PinState IN_HVIL_SW_STATE;
   GPIO_PinState RTC_SW_STATE;
+  GPIO_PinState IN_HVIL_ESTOP_Pin_State;
+  GPIO_PinState IN_HVIL_CHAR_Pin_State;
+  GPIO_PinState IN_HVIL_TERM_Pin_State;
+  GPIO_PinState IN_HVIL_ACUM_Pin_State;
+  GPIO_PinState IN_HVIL_FSW_Pin_State;
   char chargingInfoString[30];
   SRE_Display_Test(); // TODO: better init for GUI
   // TEMP STUFF 1 END
@@ -454,6 +420,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+    // TODO: CHECK ALL LEDS AND PERIPHERALS WORK
 	  ssd1306_Fill(Black);
 	  ssd1306_UpdateScreen();
 
@@ -464,29 +431,55 @@ int main(void)
     sprintf(chargingInfoString, "%d volts @ %d amps", LIMIT_VOLTS, LIMIT_AMPS);
     // TEMP STUFF 2 END
 
-	  if(IN_HVIL_SW_STATE) {
-		  HAL_GPIO_WritePin(GPIOA, LED_HV_Pin, GPIO_PIN_SET);
-		  ssd1306_SetCursor(5, 5);
-		  if(!RTC_SW_STATE) {
-        CAN_Charge(&charging_msg, LIMIT_VOLTS, LIMIT_AMPS, true);
-        ssd1306_WriteString("Now Charging", Font_6x8, White);
-		    ssd1306_SetCursor(5, 20);
-		    ssd1306_WriteString(chargingInfoString, Font_6x8, White);
-		  } else if (RTC_SW_STATE) {
+    IN_HVIL_ESTOP_Pin_State = HAL_GPIO_ReadPin(IN_HVIL_ESTOP_GPIO_Port, IN_HVIL_ESTOP_Pin);
+    IN_HVIL_TERM_Pin_State = HAL_GPIO_ReadPin(IN_HVIL_TERM_GPIO_Port, IN_HVIL_TERM_Pin);
+    IN_HVIL_ACUM_Pin_State = HAL_GPIO_ReadPin(IN_HVIL_ACUM_GPIO_Port, IN_HVIL_ACUM_Pin);
+    IN_HVIL_FSW_Pin_State = HAL_GPIO_ReadPin(IN_HVIL_FSW_GPIO_Port, IN_HVIL_FSW_Pin);
+
+    if (IN_HVIL_ESTOP_Pin_State == GPIO_PIN_SET ||
+        IN_HVIL_CHAR_Pin_State  == GPIO_PIN_SET ||
+        IN_HVIL_TERM_Pin_State  == GPIO_PIN_SET ||
+        IN_HVIL_ACUM_Pin_State  == GPIO_PIN_SET)
+        isChargerUnsafe = true;
+    else if (IN_HVIL_ESTOP_Pin_State == GPIO_PIN_RESET &&
+        IN_HVIL_CHAR_Pin_State  == GPIO_PIN_RESET &&
+        IN_HVIL_TERM_Pin_State  == GPIO_PIN_RESET &&
+        IN_HVIL_ACUM_Pin_State  == GPIO_PIN_RESET)
+        isChargerUnsafe = false;
+
+    // TODO: add -> IN_HVIL_CHAR_Pin_State  == GPIO_PIN_RESET
+
+    if (!isChargerUnsafe)
+    {
+      CAN_Charge(&charging_msg, LIMIT_VOLTS, LIMIT_AMPS, false);
+      ssd1306_Fill(Black);
+	    ssd1306_UpdateScreen();
+      ssd1306_SetCursor(5, 5);
+      ssd1306_WriteString("HVIL ERROR", Font_6x8, White); // TODO: make it more clear
+      ssd1306_UpdateScreen();
+    } else if (isChargerUnsafe && IN_HVIL_FSW_Pin_State) {
+      if(RTC_SW_STATE) {
+        HAL_GPIO_WritePin(GPIOA, LED_HV_Pin, GPIO_PIN_SET);
+        ssd1306_SetCursor(5, 5);
         CAN_Charge(&charging_msg, LIMIT_VOLTS, LIMIT_AMPS, false);
         ssd1306_WriteString("PLS FLIP RTC", Font_6x8, White);
-		  }
-	  } else if (isBalancingControl) {
-        CAN_Balance(&balancing_msg, isBalancing);
-        HAL_GPIO_WritePin(GPIOA, LED_BAL_Pin, GPIO_PIN_SET);
+      } else if (!RTC_SW_STATE) {
+        CAN_Charge(&charging_msg, LIMIT_VOLTS, LIMIT_AMPS, true);
+        ssd1306_WriteString("Now Charging", Font_6x8, White);
+        ssd1306_SetCursor(5, 20);
+        ssd1306_WriteString(chargingInfoString, Font_6x8, White);
+      } else if (isBalancingControl) {
+          CAN_Balance(&balancing_msg, isBalancing);
+          HAL_GPIO_WritePin(GPIOA, LED_BAL_Pin, GPIO_PIN_SET);
+          ssd1306_SetCursor(5, 5);
+          ssd1306_WriteString("Now Balancing", Font_6x8, White);
+      } else {
+        HAL_GPIO_WritePin(GPIOA, LED_HV_Pin, GPIO_PIN_RESET);
+        HAL_GPIO_WritePin(GPIOA, LED_BAL_Pin, GPIO_PIN_RESET);
         ssd1306_SetCursor(5, 5);
-        ssd1306_WriteString("Now Balancing", Font_6x8, White);
-    } else {
-		  HAL_GPIO_WritePin(GPIOA, LED_HV_Pin, GPIO_PIN_RESET);
-      HAL_GPIO_WritePin(GPIOA, LED_BAL_Pin, GPIO_PIN_RESET);
-		  ssd1306_SetCursor(5, 5);
-		  ssd1306_WriteString("Not Charging", Font_6x8, White);
-	  }
+        ssd1306_WriteString("Not Charging", Font_6x8, White);
+      }
+    }
 		ssd1306_UpdateScreen();
     /* USER CODE END WHILE */
 
@@ -867,26 +860,23 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(LED_ELCON_FLT_GPIO_Port, LED_ELCON_FLT_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(LED_TSAL_FLT_GPIO_Port, LED_TSAL_FLT_Pin, GPIO_PIN_RESET);
-
-  /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(HVIL_CTRL_GPIO_Port, HVIL_CTRL_Pin, GPIO_PIN_SET);
 
-  /*Configure GPIO pins : IN_HVIL_ACUM_Pin IN_HVIL_CHAR_Pin IN_HVIL_FSW_Pin IN_HVIL_ESTOP_Pin */
-  GPIO_InitStruct.Pin = IN_HVIL_ACUM_Pin|IN_HVIL_CHAR_Pin|IN_HVIL_FSW_Pin|IN_HVIL_ESTOP_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING_FALLING;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  /*Configure GPIO pins : IN_HVIL_ACUM_Pin IN_HVIL_FSW_Pin IN_HVIL_ESTOP_Pin */
+  GPIO_InitStruct.Pin = IN_HVIL_ACUM_Pin|IN_HVIL_FSW_Pin|IN_HVIL_ESTOP_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   /*Configure GPIO pins : LED_HV_Pin LED_BAL_Pin */
   GPIO_InitStruct.Pin = LED_HV_Pin|LED_BAL_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : IN_BMS_FLT_LED_Pin IN_IMD_FLT_LED_Pin */
-  GPIO_InitStruct.Pin = IN_BMS_FLT_LED_Pin|IN_IMD_FLT_LED_Pin;
+  /*Configure GPIO pins : IN_BMS_FLT_LED_Pin IN_IMD_FLT_LED_Pin IN_RTC_SW_Pin */
+  GPIO_InitStruct.Pin = IN_BMS_FLT_LED_Pin|IN_IMD_FLT_LED_Pin|IN_RTC_SW_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
@@ -894,21 +884,20 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin : LED_ELCON_FLT_Pin */
   GPIO_InitStruct.Pin = LED_ELCON_FLT_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(LED_ELCON_FLT_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : LED_TSAL_FLT_Pin */
   GPIO_InitStruct.Pin = LED_TSAL_FLT_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(LED_TSAL_FLT_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : IN_HVIL_TERM_Pin */
   GPIO_InitStruct.Pin = IN_HVIL_TERM_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING_FALLING;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   HAL_GPIO_Init(IN_HVIL_TERM_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : HVIL_CTRL_Pin */
@@ -930,16 +919,7 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(BTN_BCK_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : IN_RTC_SW_Pin */
-  GPIO_InitStruct.Pin = IN_RTC_SW_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
-  HAL_GPIO_Init(IN_RTC_SW_GPIO_Port, &GPIO_InitStruct);
-
   /* EXTI interrupt init*/
-  HAL_NVIC_SetPriority(EXTI1_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(EXTI1_IRQn);
-
   HAL_NVIC_SetPriority(EXTI2_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(EXTI2_IRQn);
 

@@ -65,15 +65,12 @@ void Error_Handler(void);
 #define THERM_OUT_SIG_GPIO_Port GPIOC
 #define IN_HVIL_ACUM_Pin GPIO_PIN_1
 #define IN_HVIL_ACUM_GPIO_Port GPIOA
-#define IN_HVIL_ACUM_EXTI_IRQn EXTI1_IRQn
 #define LED_HV_Pin GPIO_PIN_2
 #define LED_HV_GPIO_Port GPIOA
 #define LED_BAL_Pin GPIO_PIN_3
 #define LED_BAL_GPIO_Port GPIOA
 #define CP_SIG_Pin GPIO_PIN_4
 #define CP_SIG_GPIO_Port GPIOA
-#define IN_HVIL_CHAR_Pin GPIO_PIN_5
-#define IN_HVIL_CHAR_GPIO_Port GPIOA
 #define IN_HVIL_FSW_Pin GPIO_PIN_6
 #define IN_HVIL_FSW_GPIO_Port GPIOA
 #define IN_HVIL_ESTOP_Pin GPIO_PIN_7
