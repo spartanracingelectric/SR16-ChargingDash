@@ -633,7 +633,7 @@ void SRE_Display_Battery2(){
 
 	int numOfButtons = 2;
 
-	while(!selectPressed){
+	while(!selectPressed) {
 
 		ssd1306_FillRectangle(0, 0, 127, 63, Black);
 
@@ -745,7 +745,6 @@ void SRE_Display_Start_Balancing(){
 }
 
 void SRE_Display_Title_Bar(char title[]) {
-
 	ssd1306_SetCursor(1,1);
 	ssd1306_WriteString(title, Font_6x8, White);
 	ssd1306_Line(0, 10, 127, 10, White);
@@ -780,28 +779,32 @@ void SRE_Display_Error_Symbol(int x, int y) {
 }
 
 void SRE_Display_Charging1() {
-	char charging1Title[] = "Charging 1";
-	char temperatureStats[] = "Tmp H/L:100.22/50.11C";
-	char voltageStats[] = "Vlt H/L:115.97/98.77V";
-	char averageStats[] = "Avg T/V:120.11C/5.1V";
-	char power[] = "P1: 10A 400V BAL ON";
-	char nextButtonText[] = "Next";
+	char temperatureStats[50];
+	char voltageStats[50];
+	char averageStats[50];
+	char chargingInfo[30];
+	
+	sprintf(temperatureStats, "Tmp H/L:%.2f/%.2fC",
+			currentBmsAndElconData.BMS_maxTemp,
+			currentBmsAndElconData.BMS_minTemp);
+	
+	sprintf(voltageStats, "Vlt H/L:%.2f/%.2fV",
+			currentBmsAndElconData.BMS_maxVolt,
+			currentBmsAndElconData.BMS_minVolt);
 
-	//NOTE: Parameters of drawLine and rectangle may be off. Might need to set Cursor
-		//for them also before calling them.
-		//Can't really test without working OLED.
+	sprintf(averageStats, "Avg T/V:%.2fC/%.2fV",
+			currentBmsAndElconData.BMS_avgTemp,
+			currentBmsAndElconData.BMS_avgVolt);
+
+	sprintf(chargingInfo, "%d volts @ %d amps", 
+			LIMIT_VOLTS, LIMIT_AMPS);
+
+	//Resets screen
+	ssd1306_FillRectangle(0, 0, 127, 63, Black);
 
 	//Writes "Charging 1"
-	ssd1306_SetCursor(1, 1);
-	ssd1306_WriteString(charging1Title, Font_6x8, White);
+	SRE_Display_Title_Bar("Charging 1");
 
-	//x1, y1, x2, y2
-		//Not sure if this makes a straight white line as no Cursor isn't selected.
-
-	//call setcursor function?
-	ssd1306_Line(0, 10, 127, 10, White);
-
-	//Everything appears to be incremented by Y = 10, so font is roughly 8 squares.
 	//Writes temp
 	ssd1306_SetCursor(1, 13);
 	ssd1306_WriteString(temperatureStats, Font_6x8, White);
@@ -814,24 +817,14 @@ void SRE_Display_Charging1() {
 	ssd1306_SetCursor(1, 33);
 	ssd1306_WriteString(averageStats, Font_6x8, White);
 
-	//Writes power
+	//Writes charging info
 	ssd1306_SetCursor(1, 43);
-	ssd1306_WriteString(power, Font_6x8, White);
+	ssd1306_WriteString(chargingInfo, Font_6x8, White);
 
-
-	//Writes next button
-		//Increase in 2 x and 1 y because box takes extra space.
-	ssd1306_SetCursor(3, 54);
-	ssd1306_WriteString(nextButtonText, Font_6x8, White);
-		//draws rectangle surrounding next text
-		//x1, y1, x2, y2: from x-1 and y-52, to x-27. Definitely wrong.
-
-	//Called SetCursor for draw rectangle around.
-	ssd1306_DrawRectangle(1, 52, 27, 63, White);
+	char *navBarButtons[] = {"Charging 2"};
+	SRE_Display_Nav_Bar(navBarButtons, 1, 0);
 
 	ssd1306_UpdateScreen();
-
-
 }
 
 void SRE_Display_Err() {
