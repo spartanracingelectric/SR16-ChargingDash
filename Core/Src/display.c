@@ -1,11 +1,29 @@
 // Written by Ayman Alamayri in Dec 2024
 #include "display.h"
+#include <stdio.h>
 
 extern int selectedButton;
 extern bool selectPressed;
 extern int backPressed;
 bool isBalancing = false;
 bool isBalancingControl = false;
+int currentChargingScreen = 1;
+
+struct bmsAndElconData {
+    float BMS_avgVolt;
+    float BMS_minVolt;
+    float BMS_maxVolt;
+    float BMS_avgTemp;
+    float BMS_minTemp;
+    float BMS_maxTemp;
+    float BMS_stateOfCharge;
+    float BMS_packImbalance;
+    float ELCON_outVolt;
+    float ELCON_outCurrent;
+    bool ELCON_fault[5];
+};
+
+extern struct bmsAndElconData currentBmsAndElconData;
 
 extern uint16_t LIMIT_VOLTS;
 extern uint16_t LIMIT_AMPS;
@@ -44,9 +62,10 @@ void SRE_Display_Nav() {
 	selectedButton = 0;
 	selectPressed = false;
 
-	char* buttons[] = {"Charging", "Balancing", "Exit"};
+
+	char* buttons[] = {"Charging", "Balancing", "Battery", "Exit"};
 	// char* buttons[] = {"Home", "Start Charging", "Start Balancing", "Battery", "Charger", "Errors"};
-	int numOfButtons = 3;
+	int numOfButtons = 4;
 
 	while(!selectPressed) {
 		ssd1306_FillRectangle(0, 0, 127, 63, Black);
@@ -107,6 +126,10 @@ void SRE_Display_Nav() {
 			SRE_Display_Start_Balancing();
 		}
 		else if (selectedButton == 2) {
+			// Restarts the software
+			SRE_Display_Battery1();
+		}
+		else if (selectedButton == 3) {
 			// Restarts the software
 			NVIC_SystemReset();
 		}
@@ -186,7 +209,6 @@ void SRE_Display_Charging_Instructions() {
 	char step2[] = "Placeholder";
 	char step3[] = "Placeholder 2";
 
-	char retval;
 
 	// [todo] Make detection to check if step instruction is completed -> Go to new screen
 	// [todo] Cancel -> goes to some page
@@ -194,25 +216,23 @@ void SRE_Display_Charging_Instructions() {
 
 	while (!selectPressed) {
 		ssd1306_FillRectangle(0, 0, 127, 63, Black);
+
 		if (selectedButton >= 1 || selectedButton < 0) {
 			selectedButton = 0;
 		}
 
-		ssd1306_SetCursor(1, 1);
-		retval = ssd1306_WriteString(instruct, Font_16x15, White);
-		ssd1306_Line(0, 10, 127, 10, White);
+		SRE_Display_Title_Bar("How to Charge");
 
 		ssd1306_SetCursor(1, 13);
-		retval = ssd1306_WriteString(step1, Font_16x15, White);
+		ssd1306_WriteString(step1, Font_16x15, White);
 
 		ssd1306_SetCursor(1, 22);
-		retval = ssd1306_WriteString(step2, Font_16x15, White);
+		ssd1306_WriteString(step2, Font_16x15, White);
 
 		ssd1306_SetCursor(1, 31);
-		retval = ssd1306_WriteString(step3, Font_16x15, White);
+		ssd1306_WriteString(step3, Font_16x15, White);
 
 		char *navBarButtons[] = {"Cancel"};
-
 		SRE_Display_Nav_Bar(navBarButtons, 1, 0);
 
 		ssd1306_UpdateScreen();
@@ -262,40 +282,49 @@ void SRE_Display_Nav_Bar(char *buttons[], int numOfButtons, int firstButtonIndex
 }
 
 
-void SRE_Display_Charging2(){
-	char charging2Title[] = "Charging 2";
+void SRE_Display_Charging2() {
+	int numOfButtons = 1;
+
 	char packVoltStats[] = "Pack Volt: 400.22V";
-	char socStats[] = "SOC: 92.7%";
+	char soc[50];
 	char timeRemaining[] = "Time Remaining: 120m";
-	char charging1Button[] = "Charging 1";
 
-	//Writes "Charging 1"
-	ssd1306_SetCursor(1, 1);
-	ssd1306_WriteString(charging2Title, Font_6x8, White);
-	ssd1306_Line(0, 10, 127, 10, White);
+	ssd1306_FillRectangle(0, 0, 127, 63, Black);
 
-	//Everything appears to be incremented by Y = 10, so font is roughly 8 squares.
-	//Writes Pack Volt Stats
+	SRE_Display_Title_Bar("Charging 2");
+
+	sprintf(soc, "SOC:%.2f%%",
+			currentBmsAndElconData.BMS_stateOfCharge);
+
+
 	ssd1306_SetCursor(1, 13);
 	ssd1306_WriteString(packVoltStats, Font_6x8, White);
 
 	//Writes SOC Stats
 	ssd1306_SetCursor(1, 23);
-	ssd1306_WriteString(socStats, Font_6x8, White);
+	ssd1306_WriteString(soc, Font_6x8, White);
 
 	//Writes timeRemaining
 	ssd1306_SetCursor(1, 33);
 	ssd1306_WriteString(timeRemaining, Font_6x8, White);
-  
-	//Writes charging1 button
-		//Increase in 2 x and 1 y because box takes extra space.
-	ssd1306_SetCursor(3, 54);
-	ssd1306_WriteString(charging1Button, Font_6x8, Black);
-		//draws rectangle surrounding next text
-		//x1, y1, x2, y2:
-	ssd1306_DrawRectangle(1, 52, 64, 63, White);
 
-	ssd1306_UpdateScreen();
+	char *navBarButtons[] = {"Charging 1"};
+	SRE_Display_Nav_Bar(navBarButtons, 1, 0);
+  
+	// ssd1306_UpdateScreen();
+
+	if (selectPressed) {
+		selectPressed = false;
+		if (selectedButton < 0) {
+			selectedButton = 0;
+		}
+		else if (selectedButton > numOfButtons-1) {
+			selectedButton = numOfButtons-1;
+		}
+		if (selectedButton == 0) {
+			currentChargingScreen = 1;
+		}
+	}
 
 }
 
@@ -516,14 +545,27 @@ void SRE_Display_Charger_Stats() {
 void SRE_Display_Battery1(){
 	selectPressed = false;
 	selectedButton = 0;
-
-	char temperatureStats[] = "Tmp H/L:100.22/50.11C";
-	char voltageStats[] = "Vlt H/L:50.11/20.11V";
-	char averageStats[] = "Avg T/V:50.22C/20.11V";
+	
+	
 
 	int numOfButtons = 2;
 
 	while(!selectPressed){
+		char temperatureStats[50];
+		char voltageStats[50];
+		char averageStats[50];
+	
+		sprintf(temperatureStats, "Tmp H/L:%.2f/%.2fC",
+			currentBmsAndElconData.BMS_maxTemp,
+			currentBmsAndElconData.BMS_minTemp);
+		
+		sprintf(voltageStats, "Vlt H/L:%.2f/%.2fV",
+			currentBmsAndElconData.BMS_maxVolt,
+			currentBmsAndElconData.BMS_minVolt);
+
+		sprintf(averageStats, "Avg T/V:%.2fC/%.2fV",
+			currentBmsAndElconData.BMS_avgTemp,
+			currentBmsAndElconData.BMS_avgVolt);
 
 		ssd1306_FillRectangle(0, 0, 127, 63, Black);
 
@@ -579,9 +621,15 @@ void SRE_Display_Battery2(){
 	selectPressed = false;
 	selectedButton = 0;
 
-	char socStats[] = "SOC: 95.1%";
-	char balancingOnOff[] = "Balancing On";
+	char soc[50];
+	char balancingOnOff[50];
+	char packImbalance[50];
 
+	sprintf(soc, "SOC:%.2f%%",
+			currentBmsAndElconData.BMS_stateOfCharge);
+			
+	sprintf(packImbalance, "Imbalance:%.2fV",
+			currentBmsAndElconData.BMS_packImbalance);
 	//Below are vertices for the triangle image.
 	//Given text starts at y = 33; and is roughly 8px;
 	//Write string goes from top to bottom pixel.
@@ -590,11 +638,11 @@ void SRE_Display_Battery2(){
 	uint8_t x2 = 5, y2 = 33;  // Vertex 2
 	uint8_t x3 = 10, y3 = 40;  // Vertex 3
 
-	char balancingStats[] = "Balancing: 20.22V";
+	//char balancingStats[] = "Balancing: 20.22V";
 
 	int numOfButtons = 2;
 
-	while(!selectPressed){
+	while(!selectPressed) {
 
 		ssd1306_FillRectangle(0, 0, 127, 63, Black);
 
@@ -607,18 +655,18 @@ void SRE_Display_Battery2(){
 		SRE_Display_Title_Bar("Battery 2");
 
 		ssd1306_SetCursor(1, 13);
-		ssd1306_WriteString(socStats, Font_6x8, White);
+		ssd1306_WriteString(soc, Font_6x8, White);
 
 		ssd1306_SetCursor(1, 23);
-		ssd1306_WriteString(balancingOnOff, Font_6x8, White);
+		ssd1306_WriteString(packImbalance, Font_6x8, White);
 
 		// Draw the triangle edges
-		ssd1306_Line(x1, y1, x2, y2, White);  // Line from Vertex 1 to Vertex 2
-		ssd1306_Line(x2, y2, x3, y3, White);  // Line from Vertex 2 to Vertex 3
-		ssd1306_Line(x3, y3, x1, y1, White);  // Line from Vertex 3 to Vertex 1
+		// ssd1306_Line(x1, y1, x2, y2, White);  // Line from Vertex 1 to Vertex 2
+		// ssd1306_Line(x2, y2, x3, y3, White);  // Line from Vertex 2 to Vertex 3
+		// ssd1306_Line(x3, y3, x1, y1, White);  // Line from Vertex 3 to Vertex 1
 
-		ssd1306_SetCursor(15, 33);
-		ssd1306_WriteString(balancingStats, Font_6x8, White);
+		// ssd1306_SetCursor(15, 33);
+		// ssd1306_WriteString(balancingStats, Font_6x8, White);
 
 		char *navButtons[] = {"Nav", "Battery 1"};
 		SRE_Display_Nav_Bar(navButtons, 2, 0);
@@ -706,7 +754,6 @@ void SRE_Display_Start_Balancing(){
 }
 
 void SRE_Display_Title_Bar(char title[]) {
-
 	ssd1306_SetCursor(1,1);
 	ssd1306_WriteString(title, Font_6x8, White);
 	ssd1306_Line(0, 10, 127, 10, White);
@@ -741,28 +788,34 @@ void SRE_Display_Error_Symbol(int x, int y) {
 }
 
 void SRE_Display_Charging1() {
-	char charging1Title[] = "Charging 1";
-	char temperatureStats[] = "Tmp H/L:100.22/50.11C";
-	char voltageStats[] = "Vlt H/L:115.97/98.77V";
-	char averageStats[] = "Avg T/V:120.11C/5.1V";
-	char power[] = "P1: 10A 400V BAL ON";
-	char nextButtonText[] = "Next";
 
-	//NOTE: Parameters of drawLine and rectangle may be off. Might need to set Cursor
-		//for them also before calling them.
-		//Can't really test without working OLED.
+	int numOfButtons = 1;
+	char temperatureStats[50];
+	char voltageStats[50];
+	char averageStats[50];
+	char chargingInfo[30];
+	
+	sprintf(temperatureStats, "Tmp H/L:%.2f/%.2fC",
+			currentBmsAndElconData.BMS_maxTemp,
+			currentBmsAndElconData.BMS_minTemp);
+	
+	sprintf(voltageStats, "Vlt H/L:%.2f/%.2fV",
+			currentBmsAndElconData.BMS_maxVolt,
+			currentBmsAndElconData.BMS_minVolt);
+
+	sprintf(averageStats, "Avg T/V:%.2fC/%.2fV",
+			currentBmsAndElconData.BMS_avgTemp,
+			currentBmsAndElconData.BMS_avgVolt);
+
+	sprintf(chargingInfo, "%d volts @ %d amps", 
+			LIMIT_VOLTS, LIMIT_AMPS);
+
+	//Resets screen
+	ssd1306_FillRectangle(0, 0, 127, 63, Black);
 
 	//Writes "Charging 1"
-	ssd1306_SetCursor(1, 1);
-	ssd1306_WriteString(charging1Title, Font_6x8, White);
+	SRE_Display_Title_Bar("Charging 1");
 
-	//x1, y1, x2, y2
-		//Not sure if this makes a straight white line as no Cursor isn't selected.
-
-	//call setcursor function?
-	ssd1306_Line(0, 10, 127, 10, White);
-
-	//Everything appears to be incremented by Y = 10, so font is roughly 8 squares.
 	//Writes temp
 	ssd1306_SetCursor(1, 13);
 	ssd1306_WriteString(temperatureStats, Font_6x8, White);
@@ -775,24 +828,27 @@ void SRE_Display_Charging1() {
 	ssd1306_SetCursor(1, 33);
 	ssd1306_WriteString(averageStats, Font_6x8, White);
 
-	//Writes power
+	//Writes charging info
 	ssd1306_SetCursor(1, 43);
-	ssd1306_WriteString(power, Font_6x8, White);
+	ssd1306_WriteString(chargingInfo, Font_6x8, White);
 
+	char *navBarButtons[] = {"Charging 2"};
+	SRE_Display_Nav_Bar(navBarButtons, 1, 0);
 
-	//Writes next button
-		//Increase in 2 x and 1 y because box takes extra space.
-	ssd1306_SetCursor(3, 54);
-	ssd1306_WriteString(nextButtonText, Font_6x8, White);
-		//draws rectangle surrounding next text
-		//x1, y1, x2, y2: from x-1 and y-52, to x-27. Definitely wrong.
+	// ssd1306_UpdateScreen();
 
-	//Called SetCursor for draw rectangle around.
-	ssd1306_DrawRectangle(1, 52, 27, 63, White);
-
-	ssd1306_UpdateScreen();
-
-
+	if (selectPressed) {
+		selectPressed = false;
+		if (selectedButton < 0) {
+			selectedButton = 0;
+		}
+		else if (selectedButton > numOfButtons-1) {
+			selectedButton = numOfButtons-1;
+		}
+		if (selectedButton == 0) {
+			currentChargingScreen = 2;
+		}
+	}
 }
 
 void SRE_Display_Err() {
