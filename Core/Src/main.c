@@ -232,7 +232,7 @@ struct bmsAndElconData {
 };
 
 // TODO: maybe move the below
-struct bmsAndElconData currentBmsAndElconData;
+struct bmsAndElconData currentBmsAndElconData = {0};
 CAN_RxHeaderTypeDef RxHeader;
 uint8_t RxData[8];
 
