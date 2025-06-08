@@ -1,11 +1,28 @@
 // Written by Ayman Alamayri in Dec 2024
 #include "display.h"
+#include <stdio.h>
 
 extern int selectedButton;
 extern bool selectPressed;
 extern int backPressed;
 bool isBalancing = false;
 bool isBalancingControl = false;
+
+struct bmsAndElconData {
+    float BMS_avgVolt;
+    float BMS_minVolt;
+    float BMS_maxVolt;
+    float BMS_avgTemp;
+    float BMS_minTemp;
+    float BMS_maxTemp;
+    float BMS_stateOfCharge;
+    float BMS_packImbalance;
+    float ELCON_outVolt;
+    float ELCON_outCurrent;
+    bool ELCON_fault[5];
+};
+
+extern struct bmsAndElconData currentBmsAndElconData;
 
 extern uint16_t LIMIT_VOLTS;
 extern uint16_t LIMIT_AMPS;
@@ -44,7 +61,7 @@ void SRE_Display_Nav() {
 	selectedButton = 0;
 	selectPressed = false;
 
-	char* buttons[] = {"Charging", "Balancing", "Exit"};
+	char* buttons[] = {"Charging", "Balancing", "Battery", "Exit"};
 	// char* buttons[] = {"Home", "Start Charging", "Start Balancing", "Battery", "Charger", "Errors"};
 	int numOfButtons = 3;
 
@@ -107,6 +124,9 @@ void SRE_Display_Nav() {
 			SRE_Display_Start_Balancing();
 		}
 		else if (selectedButton == 2) {
+			SRE_Display_Battery1();
+		}
+		else if (selectedButton == 3) {
 			// Restarts the software
 			NVIC_SystemReset();
 		}
@@ -516,14 +536,27 @@ void SRE_Display_Charger_Stats() {
 void SRE_Display_Battery1(){
 	selectPressed = false;
 	selectedButton = 0;
-
-	char temperatureStats[] = "Tmp H/L:100.22/50.11C";
-	char voltageStats[] = "Vlt H/L:50.11/20.11V";
-	char averageStats[] = "Avg T/V:50.22C/20.11V";
+	
+	
 
 	int numOfButtons = 2;
 
 	while(!selectPressed){
+		char temperatureStats[50];
+		char voltageStats[50];
+		char averageStats[50];
+	
+		sprintf(temperatureStats, "Tmp H/L:%.2f/%.2fC",
+			currentBmsAndElconData.BMS_maxTemp,
+			currentBmsAndElconData.BMS_minTemp);
+		
+		sprintf(voltageStats, "Vlt H/L:%.2f/%.2fV",
+			currentBmsAndElconData.BMS_maxVolt,
+			currentBmsAndElconData.BMS_minVolt);
+
+		sprintf(averageStats, "Avg T/V:%.2fC/%.2fV",
+			currentBmsAndElconData.BMS_avgTemp,
+			currentBmsAndElconData.BMS_avgVolt);
 
 		ssd1306_FillRectangle(0, 0, 127, 63, Black);
 
