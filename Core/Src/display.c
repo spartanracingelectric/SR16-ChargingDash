@@ -206,7 +206,6 @@ void SRE_Display_Charging_Instructions() {
 	char step2[] = "Placeholder";
 	char step3[] = "Placeholder 2";
 
-	char retval;
 
 	// [todo] Make detection to check if step instruction is completed -> Go to new screen
 	// [todo] Cancel -> goes to some page
@@ -214,25 +213,23 @@ void SRE_Display_Charging_Instructions() {
 
 	while (!selectPressed) {
 		ssd1306_FillRectangle(0, 0, 127, 63, Black);
+
 		if (selectedButton >= 1 || selectedButton < 0) {
 			selectedButton = 0;
 		}
 
-		ssd1306_SetCursor(1, 1);
-		retval = ssd1306_WriteString(instruct, Font_16x15, White);
-		ssd1306_Line(0, 10, 127, 10, White);
+		SRE_Display_Title_Bar("How to Charge");
 
 		ssd1306_SetCursor(1, 13);
-		retval = ssd1306_WriteString(step1, Font_16x15, White);
+		ssd1306_WriteString(step1, Font_16x15, White);
 
 		ssd1306_SetCursor(1, 22);
-		retval = ssd1306_WriteString(step2, Font_16x15, White);
+		ssd1306_WriteString(step2, Font_16x15, White);
 
 		ssd1306_SetCursor(1, 31);
-		retval = ssd1306_WriteString(step3, Font_16x15, White);
+		ssd1306_WriteString(step3, Font_16x15, White);
 
 		char *navBarButtons[] = {"Cancel"};
-
 		SRE_Display_Nav_Bar(navBarButtons, 1, 0);
 
 		ssd1306_UpdateScreen();
@@ -283,37 +280,33 @@ void SRE_Display_Nav_Bar(char *buttons[], int numOfButtons, int firstButtonIndex
 
 
 void SRE_Display_Charging2(){
-	char charging2Title[] = "Charging 2";
 	char packVoltStats[] = "Pack Volt: 400.22V";
-	char socStats[] = "SOC: 92.7%";
+	char soc[50];
 	char timeRemaining[] = "Time Remaining: 120m";
-	char charging1Button[] = "Charging 1";
 
-	//Writes "Charging 1"
-	ssd1306_SetCursor(1, 1);
-	ssd1306_WriteString(charging2Title, Font_6x8, White);
-	ssd1306_Line(0, 10, 127, 10, White);
+	ssd1306_FillRectangle(0, 0, 127, 63, Black);
 
-	//Everything appears to be incremented by Y = 10, so font is roughly 8 squares.
-	//Writes Pack Volt Stats
+	SRE_Display_Title_Bar("Charging 2");
+
+	sprintf(soc, "SOC:%.2f%%",
+			currentBmsAndElconData.BMS_stateOfCharge);
+
+
 	ssd1306_SetCursor(1, 13);
 	ssd1306_WriteString(packVoltStats, Font_6x8, White);
 
 	//Writes SOC Stats
 	ssd1306_SetCursor(1, 23);
-	ssd1306_WriteString(socStats, Font_6x8, White);
+	ssd1306_WriteString(soc, Font_6x8, White);
 
 	//Writes timeRemaining
 	ssd1306_SetCursor(1, 33);
 	ssd1306_WriteString(timeRemaining, Font_6x8, White);
+
+	char *navBarButtons[] = {"Charging 1"};
+	SRE_Display_Nav_Bar(navBarButtons, 1, 0);
   
-	//Writes charging1 button
-		//Increase in 2 x and 1 y because box takes extra space.
-	ssd1306_SetCursor(3, 54);
-	ssd1306_WriteString(charging1Button, Font_6x8, Black);
-		//draws rectangle surrounding next text
-		//x1, y1, x2, y2:
-	ssd1306_DrawRectangle(1, 52, 64, 63, White);
+	
 
 	ssd1306_UpdateScreen();
 
@@ -475,7 +468,7 @@ void SRE_Display_Long_Scroll_Bar(int currentScreen, int numOfScreens) {
 void SRE_Display_Charger_Stats() {
 	selectPressed = false;
 	selectedButton = 0;
-
+	
 	int numOfButtons = 2;
 
 	while (!selectPressed) {
