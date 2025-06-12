@@ -72,7 +72,7 @@ UART_HandleTypeDef huart1;
 int selectedButton = 0;
 bool backPressed = false;
 bool selectPressed = false;
-bool isChargerUnsafe = false;
+bool isChargerSafe = false;
 bool isCharging = false;
 extern bool isChargingSequence;
 
@@ -204,7 +204,7 @@ struct bmsAndElconData {
   float BMS_avgTemp;
   float BMS_minTemp;
   float BMS_maxTemp;
-  float BMS_stateOfCharge;
+  float BMS_stateOfCharge; // TODO: not float
   float BMS_packImbalance;
   float ELCON_outVolt;
   float ELCON_outCurrent;
@@ -319,6 +319,7 @@ void Set_CAN_Id(struct CANMessage *ptr, uint32_t id, bool isExtended) {
 
 void printBmsAndElconData(const volatile struct bmsAndElconData *d) {
     printf("BMS_avgVolt       = %f V\n", d->BMS_avgVolt);
+    printf("BMS_sumOfCells    = %fV\n", d->BMS_sumOfCells);
     printf("BMS_minVolt       = %f V\n", d->BMS_minVolt);
     printf("BMS_maxVolt       = %f V\n", d->BMS_maxVolt);
     printf("BMS_minTemp       = %f °C\n", d->BMS_minTemp);
@@ -359,9 +360,9 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
   if (RxHeader.IDE == CAN_ID_STD && TIME_DIFF > BMS_CAN_DEBOUNCE_MS) {
     if (RxHeader.StdId == elconBmsFilterIDs[0]) {
       bmsFlags |= FLAG_600;
-      currentBmsAndElconData.BMS_avgVolt = ((RxData[7] * 100.0 + RxData[6]) / 10000.0) / 96.0;
-      currentBmsAndElconData.BMS_sumOfCells = ((RxData[7] * 100.0 + RxData[6]) / 10000.0);
-      currentBmsAndElconData.BMS_packImbalance = (RxData[3] * 100.0 + RxData[2]) / 100.0;
+      currentBmsAndElconData.BMS_sumOfCells = ((RxData[7] << 8) | RxData[6]) * 0.01;
+      currentBmsAndElconData.BMS_avgVolt = currentBmsAndElconData.BMS_sumOfCells / 96;
+      currentBmsAndElconData.BMS_packImbalance = ((RxData[3] << 8) | RxData[2]) * 0.0001;
     } else if (RxHeader.StdId == elconBmsFilterIDs[1]) {
       bmsFlags |= FLAG_621;
       currentBmsAndElconData.BMS_stateOfCharge = RxData[2];
@@ -369,8 +370,8 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
       bmsFlags |= FLAG_622;
       currentBmsAndElconData.BMS_minTemp = RxData[5];
       currentBmsAndElconData.BMS_maxTemp = RxData[4];
-      currentBmsAndElconData.BMS_minVolt = (RxData[3] * 100.0 + RxData[2]) / 10000.0;
-      currentBmsAndElconData.BMS_maxVolt = (RxData[1] * 100.0 + RxData[0]) / 10000.0;
+      currentBmsAndElconData.BMS_minVolt = ((RxData[3] << 8) | RxData[2]) * 0.0001;
+      currentBmsAndElconData.BMS_maxVolt = ((RxData[1] << 8) | RxData[0]) * 0.0001;
     }
 
     if (bmsFlags == (FLAG_600 | FLAG_621 | FLAG_622)) {
@@ -475,6 +476,14 @@ int main(void)
   // TEMP STUFF 1 START
   DISP_KanoaSplash(); // TODO: call this in the GUI init instead
   HAL_Delay(1000);
+  // while(true) {
+  //   printf("INLET TEMP: %.2f\n", READ_THERM(therm_inlet, THERM_RESIST));
+  //   HAL_Delay(1000);
+  //   printf("OUTLET TEMP:%.2f\n", READ_THERM(therm_outlet, THERM_RESIST));
+  //   HAL_Delay(1000);
+  //   printBmsAndElconData(&currentBmsAndElconData);
+  //   HAL_Delay(1000);
+  // }
   FAN_SPD_CTRL(100); // TODO: make this based on temp
   uint16_t therm_inlet_value = adc_buffer[0];
   uint16_t therm_outlet_value = adc_buffer[1];
@@ -488,12 +497,6 @@ int main(void)
   GPIO_PinState IN_HVIL_ACUM_Pin_State;
   GPIO_PinState IN_HVIL_FSW_Pin_State;
   char chargingInfoString[30];
-  // while(1) {
-  //   printf("INLET TEMP: %.2f\n", READ_THERM(therm_inlet, THERM_RESIST));
-  //   HAL_Delay(1000);
-  //   printf("OUTLET TEMP:%.2f\n", READ_THERM(therm_outlet, THERM_RESIST));
-  //   HAL_Delay(1000);
-  // }
    // TODO: better init for GUI
   // TEMP STUFF 1 END
 
@@ -530,16 +533,16 @@ int main(void)
         IN_HVIL_CHAR_Pin_State  == GPIO_PIN_SET ||
         IN_HVIL_TERM_Pin_State  == GPIO_PIN_SET ||
         IN_HVIL_ACUM_Pin_State  == GPIO_PIN_SET)
-        isChargerUnsafe = true;
+        isChargerSafe = true;
     else if (IN_HVIL_ESTOP_Pin_State == GPIO_PIN_RESET &&
         IN_HVIL_CHAR_Pin_State  == GPIO_PIN_RESET &&
         IN_HVIL_TERM_Pin_State  == GPIO_PIN_RESET &&
         IN_HVIL_ACUM_Pin_State  == GPIO_PIN_RESET)
-        isChargerUnsafe = false;
+        isChargerSafe = false;
 
     // TODO: add -> IN_HVIL_CHAR_Pin_State == GPIO_PIN_RESET
     
-    if (!isChargerUnsafe)
+    if (!isChargerSafe)
     {
       CAN_Charge(&charging_msg, LIMIT_VOLTS, LIMIT_AMPS, false);
       ssd1306_Fill(Black);
@@ -547,7 +550,7 @@ int main(void)
       ssd1306_SetCursor(5, 5);
       ssd1306_WriteString("HVIL ERROR", Font_6x8, White); // TODO: make this more clear
       ssd1306_UpdateScreen();
-    } else if (isChargerUnsafe && IN_HVIL_FSW_Pin_State) {
+    } else if (isChargerSafe && IN_HVIL_FSW_Pin_State) {
       if(RTC_SW_STATE) {
         HAL_GPIO_WritePin(GPIOA, LED_HV_Pin, GPIO_PIN_SET);
         ssd1306_SetCursor(5, 5);
