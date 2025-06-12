@@ -307,7 +307,7 @@ void SRE_Display_Charging2() {
 	int numOfButtons = 1;
   //"Pack Volt: 400.22V"
 
-	char sumOfCells[50] = "Cells Sum: 400.22V";
+	char sumOfCells[50];
 	char soc[50];
 	//char timeRemaining[] = "Time Remaining: 120m";
 
@@ -317,7 +317,7 @@ void SRE_Display_Charging2() {
 
 	sprintf(soc, "SOC:%.2f%%",
 			currentBmsAndElconData.BMS_stateOfCharge);
-	sprintf(sumOfCells, "Pack Volt: %.2f%%",
+	sprintf(sumOfCells, "Pack Volt: %.2fV",
 					currentBmsAndElconData.BMS_sumOfCells);
 
 	ssd1306_SetCursor(1, 13);
@@ -458,6 +458,8 @@ void SRE_Display_Start_Charging() {
 					LIMIT_VOLTS = selectedProfile.voltage;
 					LIMIT_AMPS = selectedProfile.current;
 					isChargingSequence = true;
+					selectPressed = false;
+					selectedButton = 0;
 					return;  // Exit after setting the limits
 	    }
 	    else if (selectedButton == numOfProfiles) {

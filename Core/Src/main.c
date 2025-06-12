@@ -508,13 +508,15 @@ int main(void)
   {
     // TODO: CHECK ALL LEDS AND PERIPHERALS WORK
     //TODO: DOUBLE CHECK
-    if ((!isCharging && !isBalancing && !isChargingSequence)) {
+    if (!isCharging && !isBalancing && !isChargingSequence) {
       CAN_Balance(&balancing_msg, false);
       SRE_Display_Test();
     }
-
-	  ssd1306_Fill(Black);
-	  ssd1306_UpdateScreen();
+    if (isChargingSequence) {
+      ssd1306_Fill(Black);
+	    ssd1306_UpdateScreen();
+    }
+	  
 
     IN_HVIL_SW_STATE = HAL_GPIO_ReadPin(IN_HVIL_FSW_GPIO_Port, IN_HVIL_FSW_Pin);
 	  RTC_SW_STATE = HAL_GPIO_ReadPin(IN_RTC_SW_GPIO_Port, IN_RTC_SW_Pin);
@@ -550,7 +552,14 @@ int main(void)
       ssd1306_SetCursor(5, 5);
       ssd1306_WriteString("HVIL ERROR", Font_6x8, White); // TODO: make this more clear
       ssd1306_UpdateScreen();
-    } else if (isChargerSafe && IN_HVIL_FSW_Pin_State) {
+    } 
+    else if (isChargerSafe && !IN_HVIL_FSW_Pin_State) {
+      ssd1306_SetCursor(5, 5);
+      CAN_Charge(&charging_msg, LIMIT_VOLTS, LIMIT_AMPS, false);
+      isCharging = false;
+      ssd1306_WriteString("PLS FLIP HV", Font_6x8, White);
+    }
+    else if (isChargerSafe && IN_HVIL_FSW_Pin_State) {
       if(RTC_SW_STATE) {
         HAL_GPIO_WritePin(GPIOA, LED_HV_Pin, GPIO_PIN_SET);
         ssd1306_SetCursor(5, 5);
@@ -610,7 +619,7 @@ int main(void)
             CAN_Balance(&balancing_msg, false);
             isBalancing = false;
             CAN_Charge(&charging_msg, LIMIT_VOLTS, LIMIT_AMPS, true);
-            isCharging = false;
+            isCharging = true;
           }
           } else if (LIMIT_AMPS * LIMIT_VOLTS <= MAX_ALLOWED_PWR) {
             // TODO: add proper error state
