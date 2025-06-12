@@ -59,3 +59,10 @@
 491	870	7714621359196695	SR16-ChargingDash.elf	ef794c75fb9e98
 5	500	7714623928012665	CMakeFiles/SR16-ChargingDash.dir/Core/Src/display.c.obj	af774bd8323fdd93
 502	881	7714623931380532	SR16-ChargingDash.elf	ef794c75fb9e98
+11	500	7714660024487436	CMakeFiles/SR16-ChargingDash.dir/Core/Src/display.c.obj	af774bd8323fdd93
+5	504	7714660024508745	CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj	a3af890ad0d171aa
+504	888	7714660028137449	SR16-ChargingDash.elf	ef794c75fb9e98
+5	484	7714663000238100	CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj	a3af890ad0d171aa
+485	909	7714663004365576	SR16-ChargingDash.elf	ef794c75fb9e98
+5	513	7714664355055878	CMakeFiles/SR16-ChargingDash.dir/Core/Src/main.c.obj	a3af890ad0d171aa
+514	842	7714664358267743	SR16-ChargingDash.elf	ef794c75fb9e98
