@@ -794,23 +794,40 @@ void SRE_Display_Title_Bar(char title[]) {
 	ssd1306_SetCursor(1, 1);
 	ssd1306_WriteString(title, Font_6x8, White);
 	ssd1306_Line(0, 10, 127, 10, White);
-	if (isCharging) {
-		SRE_Display_Charger_Symbol(88, 3);
-	}
-  if (!isCharging && isBalancing) {
-		ssd1306_FillRectangle(90, 0, 108, 8, White);
-		ssd1306_SetCursor(91, 1);
-		ssd1306_WriteString("BAL", Font_6x8, Black);
-	}
-	if (isCharging && isBalancing) {
-		ssd1306_FillRectangle(68, 0, 86, 8, White);
-		ssd1306_SetCursor(69, 1);
-		ssd1306_WriteString("BAL", Font_6x8, Black);
-	}
+
+	//Flashing status symbols 
+	ssd1306_FillRectangle(70, 0, 127, 9, Black);
+	ssd1306_UpdateScreen();
+
 	if (isError) {
 		SRE_Display_Error_Symbol(119,1);
-  }
-	
+		if (isCharging) {
+			SRE_Display_Charger_Symbol(92, 3);
+			if (isBalancing) {
+				ssd1306_FillRectangle(71, 0, 89, 8, White);
+				ssd1306_SetCursor(72, 1);
+				ssd1306_WriteString("BAL", Font_6x8, Black);
+			}
+		}
+		else if (isBalancing) {
+			ssd1306_FillRectangle(91, 0, 109, 8, White);
+			ssd1306_SetCursor(92, 1);
+			ssd1306_WriteString("BAL", Font_6x8, Black);
+		}
+	}
+	else if (isCharging) {
+		SRE_Display_Charger_Symbol(109, 3);
+		if (isBalancing) {
+			ssd1306_FillRectangle(88, 0, 106, 8, White);
+			ssd1306_SetCursor(89, 1);
+			ssd1306_WriteString("BAL", Font_6x8, Black);
+		}
+	}
+	else if (isBalancing) {
+		ssd1306_FillRectangle(108, 0, 126, 8, White);
+		ssd1306_SetCursor(109, 1);
+		ssd1306_WriteString("BAL", Font_6x8, Black);
+	}
 }
 
 void SRE_Display_Charger_Symbol(int x, int y) {
