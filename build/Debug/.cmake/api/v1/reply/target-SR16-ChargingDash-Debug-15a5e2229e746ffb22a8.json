@@ -43,7 +43,7 @@
 			{
 				"command" : 2,
 				"file" : 0,
-				"line" : 58,
+				"line" : 59,
 				"parent" : 0
 			},
 			{
@@ -55,7 +55,7 @@
 			{
 				"command" : 3,
 				"file" : 0,
-				"line" : 49,
+				"line" : 50,
 				"parent" : 0
 			}
 		]
@@ -206,7 +206,7 @@
 				"role" : "flags"
 			},
 			{
-				"fragment" : "",
+				"fragment" : "-u _printf_float",
 				"role" : "flags"
 			}
 		],
