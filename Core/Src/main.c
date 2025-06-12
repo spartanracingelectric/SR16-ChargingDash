@@ -45,7 +45,6 @@
 #define UPPER_MAX_CELL_CV_THRESH 4.7 // Competition is 4.25
 #define LOWER_MAX_CELL_CV_THRESH 4.6 // Competition is 4.1
 #define MIN_ALLOWED_IMBAL 0.01
-#define MAX_ALLOWED_PWR 4000
 #define MAINT_AMPS 0.5
 
 /* USER CODE END PD */
@@ -81,6 +80,8 @@ uint32_t PREVIOUS_TIME = 0;
 
 uint16_t LIMIT_VOLTS = 0;
 uint16_t LIMIT_AMPS = 0;
+
+uint16_t MAX_ALLOWED_PWR = 4000; 
 
 uint16_t THERM_RESIST = 12000;
 uint16_t *therm_inlet = NULL;
@@ -514,6 +515,8 @@ int main(void)
     // TODO: CHECK ALL LEDS AND PERIPHERALS WORK
     //TODO: DOUBLE CHECK
     if (!isCharging && !isBalancing && !isChargingSequence) {
+      isBalancing = false;
+      isBalancingControl = false;
       CAN_Balance(&balancing_msg, false);
       SRE_Display_Test();
     }
@@ -562,16 +565,19 @@ int main(void)
       ssd1306_SetCursor(5, 5);
       CAN_Charge(&charging_msg, LIMIT_VOLTS, LIMIT_AMPS, false);
       isCharging = false;
+      CAN_Balance(&balancing_msg, false);
+      isBalancing = false;
       ssd1306_WriteString("PLS FLIP HV", Font_6x8, White);
     }
     else if (isChargerSafe && IN_HVIL_FSW_Pin_State) {
-      if(RTC_SW_STATE) {
+      if(RTC_SW_STATE && !isBalancingControl) {
         HAL_GPIO_WritePin(GPIOA, LED_HV_Pin, GPIO_PIN_SET);
         ssd1306_SetCursor(5, 5);
         CAN_Charge(&charging_msg, LIMIT_VOLTS, LIMIT_AMPS, false);
+        //CAN_BALANCE= FALSE? or isBalancing = false?
         isCharging = false;
         ssd1306_WriteString("PLS FLIP RTC", Font_6x8, White);
-      } else if (!RTC_SW_STATE) {
+      } else if (!RTC_SW_STATE && !isBalancingControl) {
         isChargingSequence = false;
         /*
             TODO: create a combo balance + charge function for safety
@@ -640,10 +646,15 @@ int main(void)
           SRE_Display_Charging2();
         }
       } else if (isBalancingControl) {
+          isChargingSequence = false;
           CAN_Balance(&balancing_msg, isBalancing);
           HAL_GPIO_WritePin(GPIOA, LED_BAL_Pin, GPIO_PIN_SET);
-          ssd1306_SetCursor(5, 5);
-          ssd1306_WriteString("Now Balancing", Font_6x8, White);
+          if (currentChargingScreen == 1) {
+            SRE_Display_Charging1();
+          }
+          else if (currentChargingScreen == 2) {
+            SRE_Display_Charging2();
+          }
       } else {
         HAL_GPIO_WritePin(GPIOA, LED_HV_Pin, GPIO_PIN_RESET);
         HAL_GPIO_WritePin(GPIOA, LED_BAL_Pin, GPIO_PIN_RESET);

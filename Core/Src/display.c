@@ -13,13 +13,14 @@ extern bool isCharging;
 extern uint16_t *therm_inlet;
 extern uint16_t *therm_outlet;
 extern uint16_t THERM_RESIST;
+extern uint16_t MAX_ALLOWED_PWR;
 extern float READ_THERM(uint16_t *adc_thermistor, uint16_t therm_first_resistance);
 bool isChargingSequence = false;
 
 struct bmsAndElconData {
     float BMS_avgVolt;
-		float BMS_sumOfCells;
-		float BMS_minVolt;
+	float BMS_sumOfCells;
+	float BMS_minVolt;
     float BMS_maxVolt;
     float BMS_avgTemp;
     float BMS_minTemp;
@@ -313,7 +314,12 @@ void SRE_Display_Charging2() {
 
 	ssd1306_FillRectangle(0, 0, 127, 63, Black);
 
-	SRE_Display_Title_Bar("Charging 2");
+	if (isBalancing) {
+		SRE_Display_Title_Bar("Balancing 2");
+	}
+	else if (!isBalancing) {
+		SRE_Display_Title_Bar("Charging 2");
+	}
 
 	sprintf(soc, "SOC:%.2f%%",
 			currentBmsAndElconData.BMS_stateOfCharge);
@@ -328,7 +334,12 @@ void SRE_Display_Charging2() {
 	ssd1306_WriteString(soc, Font_6x8, White);
 
 
-	char *navBarButtons[] = {"Charging 1"};
+	char *navBarButtons[1];
+	if (isBalancing) {
+		navBarButtons[0] = "Balancing 1";
+	} else {
+		navBarButtons[0] = "Charging 1";
+	}
 	SRE_Display_Nav_Bar(navBarButtons, 1, 0);
 
 	if (selectPressed) {
@@ -357,29 +368,32 @@ void SRE_Display_Start_Charging() {
 		uint16_t voltage;
 	};
 
-	struct Profile p1 = {"P1", 4, 355};
-	struct Profile p2 = {"P2", 20, 355};
-	struct Profile p3 = {"P3", 3, 385};
-	struct Profile p4 = {"P4", 15, 385};
-	struct Profile p5 = {"P5", 20, 385};
-	struct Profile p6 = {"P6", 10, 400};
-	struct Profile p7 = {"P7", 20, 400};
-	struct Profile p8 = {"P8", 10, 403};
+	struct Profile allProfiles[] = {
+		{"P1", 4, 355},
+		{"P2", 20, 355},
+		{"P3", 3, 385},
+		{"P4", 15, 385},
+		{"P5", 20, 385},
+		{"P6", 10, 400},
+		{"P7", 20, 400},
+		{"P8", 10, 403}
+	};
 
 	int numOfProfiles = 8;
 	struct Profile profiles[numOfProfiles];
+	
+	int profile_index = 0;
+	for (int i = 0; i < numOfProfiles; i++) {
+		if (allProfiles[i].voltage * allProfiles[i].current < (MAX_ALLOWED_PWR * (9/10))) {
+			profiles[profile_index] = allProfiles[i];
+			profile_index++;
+		}
+	}
 
-	profiles[0] = p1;
-	profiles[1] = p2;
-	profiles[2] = p3;
-	profiles[3] = p4;
-	profiles[4] = p5;
-	profiles[5] = p6;
-	profiles[6] = p7;
-	profiles[7] = p8;
+	numOfProfiles = profile_index;
 
-  int navStartIndex = numOfProfiles;
-  int navLastIndex = numOfProfiles;
+  	int navStartIndex = numOfProfiles;
+  	int navLastIndex = numOfProfiles;
 
 	while (!selectPressed) {
 
@@ -583,11 +597,11 @@ void SRE_Display_Battery1(){
 			currentBmsAndElconData.BMS_maxTemp,
 			currentBmsAndElconData.BMS_minTemp);
 		
-		sprintf(voltageStats, "Vlt H/L:%.2f/%.2fV",
+		sprintf(voltageStats, "Vlt H/L:%.3f/%.3fV",
 			currentBmsAndElconData.BMS_maxVolt,
 			currentBmsAndElconData.BMS_minVolt);
 
-		sprintf(averageStats, "Avg V:%.2fV",
+		sprintf(averageStats, "Avg V:%.3fV",
 			currentBmsAndElconData.BMS_avgVolt);
 
 		ssd1306_FillRectangle(0, 0, 127, 63, Black);
@@ -645,7 +659,7 @@ void SRE_Display_Battery2(){
 	selectedButton = 0;
 
 	char soc[50];
-	char balancingOnOff[50];
+	char packVolt[50];
 	char packImbalance[50];
 
 	sprintf(soc, "SOC:%.2f%%",
@@ -653,13 +667,9 @@ void SRE_Display_Battery2(){
 			
 	sprintf(packImbalance, "Imbalance:%.2fV",
 			currentBmsAndElconData.BMS_packImbalance);
-	//Below are vertices for the triangle image.
-	//Given text starts at y = 33; and is roughly 8px;
-	//Write string goes from top to bottom pixel.
-	//Goes from 1-10 x, and is 33-40 high;
-	uint8_t x1 = 1, y1 = 40;  // Vertex 1
-	uint8_t x2 = 5, y2 = 33;  // Vertex 2
-	uint8_t x3 = 10, y3 = 40;  // Vertex 3
+	
+	sprintf(packVolt, "Pack Volt: %.2fV",
+			currentBmsAndElconData.BMS_sumOfCells);
 
 	//char balancingStats[] = "Balancing: 20.22V";
 
@@ -683,14 +693,10 @@ void SRE_Display_Battery2(){
 		ssd1306_SetCursor(1, 23);
 		ssd1306_WriteString(packImbalance, Font_6x8, White);
 
-		// Draw the triangle edges
-		// ssd1306_Line(x1, y1, x2, y2, White);  // Line from Vertex 1 to Vertex 2
-		// ssd1306_Line(x2, y2, x3, y3, White);  // Line from Vertex 2 to Vertex 3
-		// ssd1306_Line(x3, y3, x1, y1, White);  // Line from Vertex 3 to Vertex 1
+		ssd1306_SetCursor(1, 33);
+		ssd1306_WriteString(packVolt, Font_6x8, White);
 
-		// ssd1306_SetCursor(15, 33);
-		// ssd1306_WriteString(balancingStats, Font_6x8, White);
-
+		
 		char *navButtons[] = {"Nav", "Battery 1"};
 		SRE_Display_Nav_Bar(navButtons, 2, 0);
 
@@ -788,23 +794,40 @@ void SRE_Display_Title_Bar(char title[]) {
 	ssd1306_SetCursor(1, 1);
 	ssd1306_WriteString(title, Font_6x8, White);
 	ssd1306_Line(0, 10, 127, 10, White);
-	if (isCharging) {
-		SRE_Display_Charger_Symbol(88, 3);
-	}
-  if (!isCharging && isBalancing) {
-		ssd1306_FillRectangle(90, 0, 108, 8, White);
-		ssd1306_SetCursor(91, 1);
-		ssd1306_WriteString("BAL", Font_6x8, Black);
-	}
-	if (isCharging && isBalancing) {
-		ssd1306_FillRectangle(68, 0, 86, 8, White);
-		ssd1306_SetCursor(69, 1);
-		ssd1306_WriteString("BAL", Font_6x8, Black);
-	}
+
+	//Flashing status symbols 
+	ssd1306_FillRectangle(70, 0, 127, 9, Black);
+	ssd1306_UpdateScreen();
+
 	if (isError) {
 		SRE_Display_Error_Symbol(119,1);
-  }
-	
+		if (isCharging) {
+			SRE_Display_Charger_Symbol(92, 3);
+			if (isBalancing) {
+				ssd1306_FillRectangle(71, 0, 89, 8, White);
+				ssd1306_SetCursor(72, 1);
+				ssd1306_WriteString("BAL", Font_6x8, Black);
+			}
+		}
+		else if (isBalancing) {
+			ssd1306_FillRectangle(91, 0, 109, 8, White);
+			ssd1306_SetCursor(92, 1);
+			ssd1306_WriteString("BAL", Font_6x8, Black);
+		}
+	}
+	else if (isCharging) {
+		SRE_Display_Charger_Symbol(109, 3);
+		if (isBalancing) {
+			ssd1306_FillRectangle(88, 0, 106, 8, White);
+			ssd1306_SetCursor(89, 1);
+			ssd1306_WriteString("BAL", Font_6x8, Black);
+		}
+	}
+	else if (isBalancing) {
+		ssd1306_FillRectangle(108, 0, 126, 8, White);
+		ssd1306_SetCursor(109, 1);
+		ssd1306_WriteString("BAL", Font_6x8, Black);
+	}
 }
 
 void SRE_Display_Charger_Symbol(int x, int y) {
@@ -845,11 +868,11 @@ void SRE_Display_Charging1() {
 			currentBmsAndElconData.BMS_maxTemp,
 			currentBmsAndElconData.BMS_minTemp);
 	
-	sprintf(voltageStats, "Vlt H/L:%.2f/%.2fV",
+	sprintf(voltageStats, "Vlt H/L:%.3f/%.3fV",
 			currentBmsAndElconData.BMS_maxVolt,
 			currentBmsAndElconData.BMS_minVolt);
 
-	sprintf(averageStats, "Avg V:%.2fV",
+	sprintf(averageStats, "Avg V:%.3fV",
 			currentBmsAndElconData.BMS_avgVolt);
 
 	sprintf(chargingInfo, "%d volts @ %d amps", 
@@ -859,7 +882,12 @@ void SRE_Display_Charging1() {
 	ssd1306_FillRectangle(0, 0, 127, 63, Black);
 
 	//Writes "Charging 1"
-	SRE_Display_Title_Bar("Charging 1");
+	if (isBalancing) {
+		SRE_Display_Title_Bar("Balancing 1");
+	}
+	else if (!isBalancing) {
+		SRE_Display_Title_Bar("Charging 1");
+	}
 
 	//Writes temp
 	ssd1306_SetCursor(1, 13);
@@ -874,14 +902,18 @@ void SRE_Display_Charging1() {
 	ssd1306_WriteString(averageStats, Font_6x8, White);
 
 	//Writes charging info
-	ssd1306_SetCursor(1, 43);
-	ssd1306_WriteString(chargingInfo, Font_6x8, White);
-
+	if (!isBalancing) {
+		ssd1306_SetCursor(1, 43);
+		ssd1306_WriteString(chargingInfo, Font_6x8, White);
+	}
 	
-	char *navBarButtons[] = {"Charging 2"};
+	char *navBarButtons[1];
+	if (isBalancing) {
+		navBarButtons[0] = "Balancing 2";
+	} else {
+		navBarButtons[0] = "Charging 2";
+	}
 	SRE_Display_Nav_Bar(navBarButtons, 1, 0);
-	
-	// ssd1306_UpdateScreen();
 
 	if (selectPressed) {
 		selectPressed = false;
