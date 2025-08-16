@@ -34,21 +34,21 @@ struct bmsAndElconData {
 
 extern struct bmsAndElconData currentBmsAndElconData;
 
-extern uint16_t LIMIT_VOLTS;
-extern uint16_t LIMIT_AMPS;
+extern float LIMIT_VOLTS;
+extern float LIMIT_AMPS;
 extern char codeBranch[10];
 extern char codeVersion[5];
 
 void DISP_KanoaSplash() {
 	ssd1306_Fill(Black);
 	ssd1306_UpdateScreen();
-	ssd1306_SetCursor(0, 0);
-	ssd1306_DrawBitmap(0, 0, kanoaBootImage, 128, 64, White);
-	ssd1306_SetCursor(70, 15);
-	ssd1306_WriteString("KANOA OS", Font_6x8, White);
-	ssd1306_SetCursor(70, 25);
+	ssd1306_SetCursor(64, 15);
+	ssd1306_WriteString("Elcon Control", Font_6x8, White);
+	ssd1306_SetCursor(64, 25);
+	ssd1306_WriteString("By Ayman A., et al", Font_6x8, White);
+	ssd1306_SetCursor(64, 35);
 	ssd1306_WriteString(codeVersion, Font_6x8, White);
-	ssd1306_SetCursor(70, 35);
+	ssd1306_SetCursor(64, 45);
 	ssd1306_WriteString(codeBranch, Font_6x8, White);
 	ssd1306_UpdateScreen();
 }
@@ -310,7 +310,16 @@ void SRE_Display_Charging2() {
 
 	char sumOfCells[50];
 	char soc[50];
-	//char timeRemaining[] = "Time Remaining: 120m";
+	char averageStats[50];
+	char chargingInfo[50];
+
+	sprintf(averageStats, "Avg V:%.3fV", currentBmsAndElconData.BMS_avgVolt);
+
+	sprintf(chargingInfo, "%.2f V @ %.2f A", LIMIT_VOLTS, LIMIT_AMPS);
+
+	sprintf(soc, "SOC:%.2f%%", currentBmsAndElconData.BMS_stateOfCharge);
+
+	sprintf(sumOfCells, "Pack Volt: %.2fV", currentBmsAndElconData.BMS_sumOfCells);
 
 	ssd1306_FillRectangle(0, 0, 127, 63, Black);
 
@@ -321,10 +330,9 @@ void SRE_Display_Charging2() {
 		SRE_Display_Title_Bar("Charging 2");
 	}
 
-	sprintf(soc, "SOC:%.2f%%",
-			currentBmsAndElconData.BMS_stateOfCharge);
-	sprintf(sumOfCells, "Pack Volt: %.2fV",
-					currentBmsAndElconData.BMS_sumOfCells);
+	
+
+
 
 	ssd1306_SetCursor(1, 13);
 	ssd1306_WriteString(sumOfCells, Font_6x8, White);
@@ -332,6 +340,12 @@ void SRE_Display_Charging2() {
 	//Writes SOC Stats
 	ssd1306_SetCursor(1, 23);
 	ssd1306_WriteString(soc, Font_6x8, White);
+
+	ssd1306_SetCursor(1, 33);
+	ssd1306_WriteString(averageStats, Font_6x8, White);
+
+	ssd1306_SetCursor(1, 43);
+	ssd1306_WriteString(chargingInfo, Font_6x8, White);
 
 
 	char *navBarButtons[1];
@@ -369,22 +383,23 @@ void SRE_Display_Start_Charging() {
 	};
 
 	struct Profile allProfiles[] = {
-		{"P1", 4, 355},
-		{"P2", 20, 355},
-		{"P3", 3, 385},
-		{"P4", 15, 385},
-		{"P5", 20, 385},
-		{"P6", 10, 400},
-		{"P7", 20, 400},
-		{"P8", 10, 403}
+		{"P1", 3, 355},
+		{"P2", 4, 355},
+		{"P3", 20, 355},
+		{"P4", 3, 385},
+		{"P5", 15, 385},
+		{"P6", 20, 385},
+		{"P7", 10, 401},
+		{"P8", 20, 400},
+		{"P9", 10, 403},	
 	};
 
-	int numOfProfiles = 8;
+	int numOfProfiles = 9;
 	struct Profile profiles[numOfProfiles];
 	
 	int profile_index = 0;
 	for (int i = 0; i < numOfProfiles; i++) {
-		if (allProfiles[i].voltage * allProfiles[i].current < (MAX_ALLOWED_PWR * (9/10))) {
+		if (allProfiles[i].voltage * allProfiles[i].current <= (MAX_ALLOWED_PWR * 97 / 100)) {
 			profiles[profile_index] = allProfiles[i];
 			profile_index++;
 		}
@@ -774,6 +789,9 @@ void SRE_Display_Start_Balancing(){
 		else if (selectedButton == 1) {
 			isBalancing = true;
 			isBalancingControl = true;
+			isChargingSequence = true;
+			selectPressed = false;
+			selectedButton = 0;
 			return;
 		}
 
@@ -796,8 +814,8 @@ void SRE_Display_Title_Bar(char title[]) {
 	ssd1306_Line(0, 10, 127, 10, White);
 
 	//Flashing status symbols 
-	ssd1306_FillRectangle(70, 0, 127, 9, Black);
-	ssd1306_UpdateScreen();
+	// ssd1306_FillRectangle(70, 0, 127, 9, Black);
+	// ssd1306_UpdateScreen();
 
 	if (isError) {
 		SRE_Display_Error_Symbol(119,1);
@@ -861,9 +879,9 @@ void SRE_Display_Charging1() {
 	int numOfButtons = 1;
 	char temperatureStats[50];
 	char voltageStats[50];
-	char averageStats[50];
-	char chargingInfo[30];
-	
+	char imbalance[30];
+	char outputStats[50];
+
 	sprintf(temperatureStats, "Tmp H/L:%.2f/%.2fC",
 			currentBmsAndElconData.BMS_maxTemp,
 			currentBmsAndElconData.BMS_minTemp);
@@ -872,16 +890,18 @@ void SRE_Display_Charging1() {
 			currentBmsAndElconData.BMS_maxVolt,
 			currentBmsAndElconData.BMS_minVolt);
 
-	sprintf(averageStats, "Avg V:%.3fV",
-			currentBmsAndElconData.BMS_avgVolt);
+	
 
-	sprintf(chargingInfo, "%d volts @ %d amps", 
-			LIMIT_VOLTS, LIMIT_AMPS);
+	sprintf(imbalance, "Imbal:%.3fV", currentBmsAndElconData.BMS_packImbalance);
+
+	sprintf(outputStats, "Out V/C:%.2fV/%.2fA", currentBmsAndElconData.ELCON_outVolt, currentBmsAndElconData.ELCON_outCurrent);
+
+
 
 	//Resets screen
 	ssd1306_FillRectangle(0, 0, 127, 63, Black);
 
-	//Writes "Charging 1"
+	//Writes title
 	if (isBalancing) {
 		SRE_Display_Title_Bar("Balancing 1");
 	}
@@ -897,14 +917,14 @@ void SRE_Display_Charging1() {
 	ssd1306_SetCursor(1, 23);
 	ssd1306_WriteString(voltageStats, Font_6x8, White);
 
-	//Writes averageStats
+	//Writes imbalance
 	ssd1306_SetCursor(1, 33);
-	ssd1306_WriteString(averageStats, Font_6x8, White);
+	ssd1306_WriteString(imbalance, Font_6x8, White);
 
-	//Writes charging info
+	//Writes output info
 	if (!isBalancing) {
 		ssd1306_SetCursor(1, 43);
-		ssd1306_WriteString(chargingInfo, Font_6x8, White);
+		ssd1306_WriteString(outputStats, Font_6x8, White);
 	}
 	
 	char *navBarButtons[1];
@@ -938,7 +958,7 @@ void SRE_Display_Err() {
 	while (!selectPressed) {
 		const char *error_messages[5] = {
 					"HW Fail",
-					"Overtemp",
+					"Charger Overtemp",
 					"Wrong Input Volt",
 					"No Batt Volt",
 					"Comms Timeout"

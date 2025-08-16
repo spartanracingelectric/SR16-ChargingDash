@@ -42,8 +42,8 @@
 #define FLAG_622 (1 << 2)
 
 // TODO: move stuff here
-#define UPPER_MAX_CELL_CV_THRESH 4.7 // Competition is 4.25
-#define LOWER_MAX_CELL_CV_THRESH 4.6 // Competition is 4.1
+#define UPPER_MAX_CELL_CV_THRESH 4.31 // Competition is 4.25
+#define LOWER_MAX_CELL_CV_THRESH 4.15 // Competition is 4.1
 #define MIN_ALLOWED_IMBAL 0.01
 #define MAINT_AMPS 0.5
 
@@ -78,10 +78,10 @@ extern bool isChargingSequence;
 uint32_t CURRENT_TIME = 0;
 uint32_t PREVIOUS_TIME = 0;
 
-uint16_t LIMIT_VOLTS = 0;
-uint16_t LIMIT_AMPS = 0;
+float LIMIT_VOLTS = 0;
+float LIMIT_AMPS = 0;
 
-uint16_t MAX_ALLOWED_PWR = 4000; 
+uint16_t MAX_ALLOWED_PWR = 10000; 
 
 uint16_t THERM_RESIST = 12000;
 uint16_t *therm_inlet = NULL;
@@ -190,7 +190,7 @@ void NEOPIX_CTRL(int SOC) {
 // TODO: complete
 // READ CONTROL PILOT FOR CURRENT LIMIT
 float READ_CPILOT_CURRENT() {
-  return 0l
+  return 0.0;
 }
 
 // CAN STUFF BEGIN
@@ -353,8 +353,8 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
   int TIME_DIFF = CURRENT_TIME - PREVIOUS_TIME;
 
   if (RxHeader.IDE == CAN_ID_EXT && RxHeader.ExtId == elconBmsFilterIDs[3]) {
-    currentBmsAndElconData.ELCON_outVolt = ((RxData[0] * 100.0) + RxData[1]) / 10.0;
-    currentBmsAndElconData.ELCON_outCurrent = RxData[3] / 10.0;
+    currentBmsAndElconData.ELCON_outVolt = ((RxData[0] << 8) | RxData[1]) * 0.1;
+    currentBmsAndElconData.ELCON_outCurrent = ((RxData[2] << 8) | RxData[3])* 0.1;
     currentBmsAndElconData.ELCON_fault[4] = RxData[4] & 0x10;
     currentBmsAndElconData.ELCON_fault[3] = RxData[4] & 0x08;
     currentBmsAndElconData.ELCON_fault[2] = RxData[4] & 0x04;
@@ -394,13 +394,16 @@ void CAN_Balance(struct CANMessage *ptr, bool balancing_enabled) {
   CAN_Send(ptr);
 }
 
-void CAN_Charge(struct CANMessage *ptr, uint16_t chargingLimitsVolts, uint16_t chargingLimitsAmps, bool charge_enable) {
+void CAN_Charge(struct CANMessage *ptr, float chargingLimitsVoltsFloat, float chargingLimitsAmpsFloat, bool charge_enable) {
   // Check for mailbox instead of delay
   uint32_t CAN_ID = 0x1806E5F4;
   Set_CAN_Id(ptr, CAN_ID, true);
 
-  chargingLimitsVolts *= 10;
-  chargingLimitsAmps *= 10;
+  chargingLimitsVoltsFloat *= 10;
+  chargingLimitsAmpsFloat *= 10;
+  uint16_t chargingLimitsVolts = (uint16_t)chargingLimitsVoltsFloat;
+  uint16_t chargingLimitsAmps = (uint16_t)chargingLimitsAmpsFloat;
+  printf("CHARGING LIMIT VOLTS: %d, CHARGING LIMIT AMPS: %d", chargingLimitsVolts, chargingLimitsAmps);
 
   ptr->data[0] = (chargingLimitsVolts >> 8) & 0xFF;
   ptr->data[1] = chargingLimitsVolts & 0xFF;
@@ -510,7 +513,10 @@ int main(void)
   {
 
     int fan_speed = READ_THERM(therm_outlet, THERM_RESIST);
-    FAN_SPD_CTRL(fan_speed);
+    FAN_SPD_CTRL(50);
+
+    uint8_t data = currentBmsAndElconData.BMS_sumOfCells;
+    HAL_I2C_Master_Transmit(&hi2c2, 0x04 << 1, &data, 1, 10);
 
     // TODO: CHECK ALL LEDS AND PERIPHERALS WORK
     //TODO: DOUBLE CHECK
@@ -530,7 +536,7 @@ int main(void)
 	  RTC_SW_STATE = HAL_GPIO_ReadPin(IN_RTC_SW_GPIO_Port, IN_RTC_SW_Pin);
 
     // TEMP STUFF 2 START
-    sprintf(chargingInfoString, "%d volts @ %d amps", LIMIT_VOLTS, LIMIT_AMPS);
+    sprintf(chargingInfoString, "%.2f volts @ %.2f amps", LIMIT_VOLTS, LIMIT_AMPS);
     // TEMP STUFF 2 END
 
 
@@ -555,6 +561,9 @@ int main(void)
     if (!isChargerSafe)
     {
       CAN_Charge(&charging_msg, LIMIT_VOLTS, LIMIT_AMPS, false);
+      isCharging = false;
+      CAN_Balance(&balancing_msg, false);
+      isBalancing = false;
       ssd1306_Fill(Black);
 	    ssd1306_UpdateScreen();
       ssd1306_SetCursor(5, 5);
@@ -584,7 +593,7 @@ int main(void)
           - Ensure commanded output does not go above 4kW = I*V
           - When highest cell is >= 4.1v decrease current linearly until 4.25v then balance if imbalance >= 10mV then resume charging
         */
-        if (LIMIT_AMPS * LIMIT_VOLTS <= MAX_ALLOWED_PWR)
+        if (LIMIT_AMPS * LIMIT_VOLTS <= (MAX_ALLOWED_PWR * 97 /100))
         {
           if (currentBmsAndElconData.BMS_maxVolt >= UPPER_MAX_CELL_CV_THRESH)
           {
@@ -615,14 +624,17 @@ int main(void)
               }
             }
           }
-          else if (currentBmsAndElconData.BMS_maxVolt >= 4.1)
+          else if (currentBmsAndElconData.BMS_maxVolt >= LOWER_MAX_CELL_CV_THRESH)
           {
             // Highest cell volt above 4.1v, now command current linearly
             CAN_Balance(&balancing_msg, false);
             isBalancing = false;
-            float slope = (MAINT_AMPS - AMPS_AT_LOWER_MAX_CELL_CV_THRESH) / (UPPER_MAX_CELL_CV_THRESH - LOWER_MAX_CELL_CV_THRESH);
-            CAN_Charge(&charging_msg, LIMIT_VOLTS, slope * LIMIT_VOLTS, true);
+            float current = LIMIT_AMPS + ((MAINT_AMPS - LIMIT_AMPS) / (UPPER_MAX_CELL_CV_THRESH - LOWER_MAX_CELL_CV_THRESH) * (currentBmsAndElconData.BMS_maxVolt - LOWER_MAX_CELL_CV_THRESH));
+            // float slope = (MAINT_AMPS - AMPS_AT_LOWER_MAX_CELL_CV_THRESH) / (UPPER_MAX_CELL_CV_THRESH - LOWER_MAX_CELL_CV_THRESH);
+           // slope * LIMIT_VOLTS
+            CAN_Charge(&charging_msg, LIMIT_VOLTS, current, true);
             isCharging = true;
+            printf("current %.2f\n", current);
           }
           else if (currentBmsAndElconData.BMS_maxVolt <= LOWER_MAX_CELL_CV_THRESH)
           {
@@ -632,7 +644,7 @@ int main(void)
             CAN_Charge(&charging_msg, LIMIT_VOLTS, LIMIT_AMPS, true);
             isCharging = true;
           }
-          } else if (LIMIT_AMPS * LIMIT_VOLTS <= MAX_ALLOWED_PWR) {
+          } else if (LIMIT_AMPS * LIMIT_VOLTS <= (MAX_ALLOWED_PWR * 97 /100)) {
             // TODO: add proper error state
             // Over max power to pull => throw error and stop charging
           }
@@ -647,7 +659,8 @@ int main(void)
         }
       } else if (isBalancingControl) {
           isChargingSequence = false;
-          CAN_Balance(&balancing_msg, isBalancing);
+          CAN_Balance(&balancing_msg, true);
+          isBalancing = true;
           HAL_GPIO_WritePin(GPIOA, LED_BAL_Pin, GPIO_PIN_SET);
           if (currentChargingScreen == 1) {
             SRE_Display_Charging1();
