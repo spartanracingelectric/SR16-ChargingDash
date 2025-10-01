@@ -399,7 +399,7 @@ void SRE_Display_Start_Charging() {
 	
 	int profile_index = 0;
 	for (int i = 0; i < numOfProfiles; i++) {
-		if (allProfiles[i].voltage * allProfiles[i].current <= (MAX_ALLOWED_PWR * 97 / 100)) {
+		if (allProfiles[i].voltage * allProfiles[i].current <= (MAX_ALLOWED_PWR * 97 / 100) && allProfiles[i].voltage > currentBmsAndElconData.BMS_sumOfCells) {
 			profiles[profile_index] = allProfiles[i];
 			profile_index++;
 		}
@@ -801,6 +801,17 @@ void SRE_Display_Start_Balancing(){
 }
 
 void SRE_Display_Title_Bar(char title[]) {
+	static uint32_t previous_time = 0;
+
+	uint32_t current_time = HAL_GetTick();
+	if (current_time - previous_time >= 1000) {
+		ssd1306_DrawPixel(85, 5, White);
+		previous_time = current_time;
+	}
+	else {
+		ssd1306_DrawPixel(85, 5, Black);
+	}
+
 	isError = false;
 	for (int i = 0; i < 5; i++) {
 		if (currentBmsAndElconData.ELCON_fault[i] == 1) {

@@ -42,8 +42,8 @@
 #define FLAG_622 (1 << 2)
 
 // TODO: move stuff here
-#define UPPER_MAX_CELL_CV_THRESH 4.31 // Competition is 4.25
-#define LOWER_MAX_CELL_CV_THRESH 4.15 // Competition is 4.1
+#define UPPER_MAX_CELL_CV_THRESH 4.25 // Competition is 4.25
+#define LOWER_MAX_CELL_CV_THRESH 4.1 // Competition is 4.1
 #define MIN_ALLOWED_IMBAL 0.01
 #define MAINT_AMPS 0.5
 
