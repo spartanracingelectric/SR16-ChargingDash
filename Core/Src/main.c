@@ -46,6 +46,8 @@
 #define LOWER_MAX_CELL_CV_THRESH 4.1 // Competition is 4.1
 #define MIN_ALLOWED_IMBAL 0.01
 #define MAINT_AMPS 0.5
+#define HYSTERESIS_VOLTS 0.01
+
 
 /* USER CODE END PD */
 
@@ -101,6 +103,9 @@ extern void SRE_Display_Charging1(void);
 extern void SRE_Display_Charging2(void);
 
 static uint8_t bmsFlags = 0;
+
+static bool in_trickle_mode = false;
+
 
 /* USER CODE END PV */
 
@@ -595,7 +600,19 @@ int main(void)
         */
         if (LIMIT_AMPS * LIMIT_VOLTS <= (MAX_ALLOWED_PWR * 97 /100))
         {
-          if (currentBmsAndElconData.BMS_maxVolt >= UPPER_MAX_CELL_CV_THRESH)
+
+          if (in_trickle_mode) {
+            if (currentBmsAndElconData.BMS_maxVolt < (UPPER_MAX_CELL_CV_THRESH - HYSTERESIS_VOLTS)) {
+              in_trickle_mode = false;
+            }
+          }
+          else {
+            if (currentBmsAndElconData.BMS_maxVolt >= UPPER_MAX_CELL_CV_THRESH) {
+              in_trickle_mode = true;
+            }
+          }
+
+          if (in_trickle_mode)
           {
             // Stop charging and start balancing
             AMPS_AT_LOWER_MAX_CELL_CV_THRESH = currentBmsAndElconData.ELCON_outCurrent; // TODO: maybe change
