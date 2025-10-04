@@ -550,6 +550,7 @@ int main(void)
     IN_HVIL_ACUM_Pin_State = HAL_GPIO_ReadPin(IN_HVIL_ACUM_GPIO_Port, IN_HVIL_ACUM_Pin);
     IN_HVIL_FSW_Pin_State = HAL_GPIO_ReadPin(IN_HVIL_FSW_GPIO_Port, IN_HVIL_FSW_Pin);
 
+    //VERIFY THIS
     if (IN_HVIL_ESTOP_Pin_State == GPIO_PIN_SET ||
         IN_HVIL_CHAR_Pin_State  == GPIO_PIN_SET ||
         IN_HVIL_TERM_Pin_State  == GPIO_PIN_SET ||
@@ -630,12 +631,12 @@ int main(void)
               CAN_Balance(&balancing_msg, false);
               isBalancing = false;
               // TODO: clean up and make part of main loop
-              if ((currentBmsAndElconData.BMS_avgVolt * 96.0 * MAINT_AMPS) <= MAX_ALLOWED_PWR)
+              if ((currentBmsAndElconData.BMS_sumOfCells* MAINT_AMPS) <= MAX_ALLOWED_PWR)
               {
-                CAN_Charge(&charging_msg, currentBmsAndElconData.BMS_avgVolt * 96.0, MAINT_AMPS, true);
+                CAN_Charge(&charging_msg, currentBmsAndElconData.BMS_sumOfCells, MAINT_AMPS, true);
                 isCharging = true;
               }
-              else if ((currentBmsAndElconData.BMS_avgVolt * 96.0 * MAINT_AMPS) >= MAX_ALLOWED_PWR)
+              else if ((currentBmsAndElconData.BMS_sumOfCells * MAINT_AMPS) >= MAX_ALLOWED_PWR)
               {
                 // TODO: add proper error state
               }

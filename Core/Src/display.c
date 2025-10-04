@@ -2,40 +2,14 @@
 #include "display.h"
 #include <stdio.h>
 
-extern int selectedButton;
-extern bool selectPressed;
-extern int backPressed;
-bool isBalancing = false;
-bool isBalancingControl = false;
-bool isError = false;
-int currentChargingScreen = 1;
-extern bool isCharging;
-extern uint16_t *therm_inlet;
-extern uint16_t *therm_outlet;
-extern uint16_t THERM_RESIST;
-extern uint16_t MAX_ALLOWED_PWR;
-extern float READ_THERM(uint16_t *adc_thermistor, uint16_t therm_first_resistance);
-bool isChargingSequence = false;
+int selected_option = 0;
+bool select_pressed = false;
+bool back_pressed = false;
 
-struct bmsAndElconData {
-    float BMS_avgVolt;
-	float BMS_sumOfCells;
-	float BMS_minVolt;
-    float BMS_maxVolt;
-    float BMS_avgTemp;
-    float BMS_minTemp;
-    float BMS_maxTemp;
-    float BMS_stateOfCharge;
-    float BMS_packImbalance;
-    float ELCON_outVolt;
-    float ELCON_outCurrent;
-    bool ELCON_fault[5];
-};
+display_state current_display_state = DISPLAY_STATE_NAVIGATION;
+display_state next_display_state = DISPLAY_STATE_NAVIGATION;
 
-extern struct bmsAndElconData currentBmsAndElconData;
 
-extern float LIMIT_VOLTS;
-extern float LIMIT_AMPS;
 extern char codeBranch[10];
 extern char codeVersion[5];
 
@@ -54,321 +28,235 @@ void DISP_KanoaSplash() {
 }
 
 // Initialization function
-void SRE_Display_Init(bool test_mode) {
+void display_init() {
 	ssd1306_Init();
-	if (test_mode) {
-		SRE_Display_Test();
+}
+
+display_state display_update_state() {
+	if (current_display_state != next_display_state) {
+		selected_option = 0;
+		select_pressed = false;
+		current_display_state = next_display_state;
+	}
+
+	switch(current_display_state) {
+		case DISPLAY_STATE_NAVIGATION:
+			next_display_state = display_navigation(); 
+			break;
+		case DISPLAY_STATE_HOME:
+			next_display_state = display_home();
+			break;
+		case DISPLAY_STATE_CHARGING_PROFILES:
+			// finish
+			break;
+		case DISPLAY_STATE_START_BALANCING:
+			// finish
+			break;
+		case DISPLAY_STATE_BATTERY_STATS_ONE:
+			next_display_state = display_battery_stats_one();
+			break;
+		case DISPLAY_STATE_BATTERY_STATS_TWO:
+			next_display_state = display_battery_stats_two();
+			break;
+		case DISPLAY_STATE_CHARGER_STATS:
+			next_display_state = display_charger_stats();
+			break;
+		case DISPLAY_STATE_IN_CHARGING_STATS_ONE:
+			next_display_state = display_in_charging_stats_one();
+			break;
+		case DISPLAY_STATE_IN_CHARGING_STATS_TWO:
+			next_display_state = display_in_charging_stats_two();
+			break;
+		case DISPLAY_STATE_ERRORS:
+			next_display_state = display_errors();
+			break;
+	}
+	return next_display_state;
+}
+
+void display_clear() {
+	ssd1306_FillRectangle(0, 0, 127, 63, Black);
+}
+
+void display_wrap_selected_option(int number_of_options) {
+	if (selected_option > number_of_options - 1 ){
+		selected_option = 0;
+	}
+	if (selected_option< 0) {
+		selected_option = number_of_options - 1;
 	}
 }
-// Function to test display
-void SRE_Display_Test() {
-	//ssd1306_Fill(White);
-	SRE_Display_Nav();
+
+void display_check_selected_option_bounds(int number_of_options) {
+	if (selected_option > number_of_options - 1) {
+		selected_option = 0;
+	}
+	if (selected_option < 0) {
+		selected_option = number_of_options;
+	}
+}
+
+display_state display_navigation() {
+	static char* options[] = {"Home", "Charging", "Balancing", "Battery", "Charger Stats", "Errors", "Restart"};
+	int number_of_options = 7;
+	int y1 = 15;
+	int y2 = 13;
+	int y3 = 24;
+	int current_view = selected_option/4;
+	int start_index = current_view*4;
+
+	display_clear();
+	display_wrap_selected_option(number_of_options);
+
+	display_draw_title_bar("Navigation");
+
+	for (int i = start_index; i < start_index + 4 && i < selected_option; i++) {
+		ssd1306_SetCursor(3, y1);
+		if (selected_option == i) {
+			ssd1306_FillRectangle(1,y2, 122, y3, White);
+			ssd1306_WriteString(options[i], Font_6x8, Black);
+		}
+		else {
+			ssd1306_DrawRectangle(1,y2, 122, y3, White);
+			ssd1306_WriteString(options[i], Font_6x8, White);
+		}
+
+		y1 = y1 + 13;
+		y2 = y2 + 13;
+		y3 = y2 + 10;
+	}
+
+	int number_of_views = (number_of_options +3 ) / 4; //3 options per view, rounds up to ensure there is enough views
+	display_draw_long_scroll_bar(current_view, number_of_views);
+
 	ssd1306_UpdateScreen();
-}
-// Example function to display navigation
-void SRE_Display_Nav() {
-	selectedButton = 0;
-	selectPressed = false;
-
-
-	char* buttons[] = {"Home", "Charging", "Balancing", "Battery", "Charger Stats", "Errors", "Restart"};
-	// char* buttons[] = {"Home", "Start Charging", "Start Balancing", "Battery", "Charger", "Errors"};
-	int numOfButtons = 7;
-
-	while(!selectPressed) {
-		ssd1306_FillRectangle(0, 0, 127, 63, Black);
-
-		if (selectedButton > numOfButtons-1){
-			selectedButton = 0;
-		}
-		if (selectedButton < 0) {
-			selectedButton = numOfButtons-1;
-		}
-
-		int y1 = 15;
-		int y2 = 13;
-		int y3 = 24;
-
-		//Navigation title
-		SRE_Display_Title_Bar("Navigation");
-
-		int currentScreen = selectedButton/4;
-		int startIndex = currentScreen*4;
-
-		for (int i = startIndex; i < startIndex + 4 && i < numOfButtons; i++) {
-			ssd1306_SetCursor(3, y1);
-			if (selectedButton == i) {
-				ssd1306_FillRectangle(1,y2, 122, y3, White);
-				ssd1306_WriteString(buttons[i], Font_6x8, Black);
-			}
-			else {
-				ssd1306_DrawRectangle(1,y2, 122, y3, White);
-				ssd1306_WriteString(buttons[i], Font_6x8, White);
-			}
-
-			y1 = y1 + 13;
-			y2 = y2 + 13;
-			y3 = y2 + 10;
-		}
-
-		int numOfScreens = (numOfButtons+3)/4;
-		SRE_Display_Long_Scroll_Bar(currentScreen, numOfScreens);
-
-
-		ssd1306_UpdateScreen();
-	}
-
-	if (selectPressed) {
-		if (selectedButton > numOfButtons-1) {
-			selectedButton = 0;
-		}
-		if (selectedButton < 0) {
-			selectedButton = numOfButtons;
-		}
-
-		// Populate with the function name that corresponds to each button number respectively later.
-		if (selectedButton == 0) {
-			SRE_Display_Home();
-		}
-		else if (selectedButton == 1) {
-			SRE_Display_Start_Charging();
-		}
-		else if (selectedButton == 2) {
-			// Restarts the software
-			SRE_Display_Start_Balancing();
-		}
-		else if (selectedButton == 3) {
-			SRE_Display_Battery1();
-		}
-		else if (selectedButton == 4) {
-			SRE_Display_Charger_Stats();
-		}
-		else if (selectedButton == 5) {
-			SRE_Display_Err();
-		}
-		else if (selectedButton ==6) {
-			NVIC_SystemReset();
-		}
-	}
-}
-
-
-void SRE_Display_Home() {
-	selectedButton = 0;
-	selectPressed = false;
-
 	
-
-	int numOfButtons = 2;
-
-	while (!selectPressed) {
-
-		char soc[50];
-		char chargerTemp[50];
-		char balancing[50];
-
-		sprintf(soc, "SOC:%.2f%%",
-				currentBmsAndElconData.BMS_stateOfCharge);
-
-		//TODO READ CHARGER TEMP
-		char charger_temp[] = "Charger Tmp: 100.1C";
-		
-
-		sprintf(balancing, "Balancing %s", isBalancing ? "On" : "Off");
-
-		ssd1306_FillRectangle(0, 0, 127, 63, Black);
-
-		if (selectedButton > numOfButtons-1) {
-			selectedButton = 0;
-		}
-		if (selectedButton < 0) {
-			selectedButton = numOfButtons-1;
-		}
-
-		SRE_Display_Title_Bar("Home");
-
-		ssd1306_SetCursor(1, 13);
-		ssd1306_WriteString(soc, Font_6x8, White);
-
-		ssd1306_SetCursor(1, 23);
-		ssd1306_WriteString(charger_temp, Font_6x8, White);
-
-		ssd1306_SetCursor(1, 33);
-		ssd1306_WriteString(balancing, Font_6x8, White);
-
-		char *navBarButtons[] = {"Nav", "Batt"};
-		SRE_Display_Nav_Bar(navBarButtons, 1, 0);
-
-		ssd1306_UpdateScreen();
-	}
-
-	if (selectPressed) {
-		selectPressed = false;
-
-		if (selectedButton > numOfButtons-1) {
-			selectedButton = 0;
-		}
-		if (selectedButton < 0) {
-			selectedButton = numOfButtons-1;
-		}
-
-		if (selectedButton == 0) {
-			SRE_Display_Nav();
-		}
-		else if (selectedButton == 1) {
-			SRE_Display_Battery1();
+	if (select_pressed) {
+		check_selected_option_bounds(number_of_options);
+		switch(selected_option) {
+			case 0: return DISPLAY_STATE_HOME;
+			case 1: return DISPLAY_STATE_CHARGING_PROFILES;
+			case 2: return DISPLAY_STATE_START_BALANCING;
+			case 3: return DISPLAY_STATE_BATTERY_STATS_ONE;
+			case 4: return DISPLAY_STATE_BATTERY_STATS_TWO;
+			case 5: return DISPLAY_STATE_CHARGER_STATS;
+			case 6: return DISPLAY_STATE_ERRORS;
+			case 7: NVIC_SystemReset();
 		}
 	}
-
+	return DISPLAY_STATE_NAVIGATION;
 }
 
-void SRE_Display_Charging_Instructions() {
-	selectedButton = 0;
 
-	char instruct[] = "How to Charge";
-	char step1[] = "Press the red button";
-	char step2[] = "Placeholder";
-	char step3[] = "Placeholder 2";
+display_state display_home() {
+	char state_of_charge[50];
+	char balancing_status[50];
+
+	//TODO READ CHARGER TEMP
+	char charger_temp[] = "Charger Tmp: 100.1C";
+	int number_of_options = 1;
+
+	display_clear();
+	display_wrap_selected_option(number_of_options);
 
 
-	// [todo] Make detection to check if step instruction is completed -> Go to new screen
-	// [todo] Cancel -> goes to some page
-	// [todo] Once finished, goes to Charger 1 stats
+	display_draw_title_bar("Home");
 
-	while (!selectPressed) {
-		ssd1306_FillRectangle(0, 0, 127, 63, Black);
+	ssd1306_SetCursor(1, 13);
+	ssd1306_WriteString(state_of_charge, Font_6x8, White);
 
-		if (selectedButton >= 1 || selectedButton < 0) {
-			selectedButton = 0;
+	ssd1306_SetCursor(1, 23);
+	ssd1306_WriteString(charger_temp, Font_6x8, White);
+
+	ssd1306_SetCursor(1, 33);
+	ssd1306_WriteString(balancing_status, Font_6x8, White);
+
+	char *nav_bar_options[] = {"Nav"};
+	int first_option_index = 0;
+	display_draw_nav_bar(nav_bar_options, number_of_options, first_option_index);
+
+	ssd1306_UpdateScreen();
+
+	if (select_pressed) {
+		display_check_selected_option_bounds(number_of_options);
+		switch(selected_option) {
+			case 0: return DISPLAY_STATE_NAVIGATION;
+			case 1: return DISPLAY_STATE_BATTERY_STATS_ONE;
 		}
-
-		SRE_Display_Title_Bar("How to Charge");
-
-		ssd1306_SetCursor(1, 13);
-		ssd1306_WriteString(step1, Font_16x15, White);
-
-		ssd1306_SetCursor(1, 22);
-		ssd1306_WriteString(step2, Font_16x15, White);
-
-		ssd1306_SetCursor(1, 31);
-		ssd1306_WriteString(step3, Font_16x15, White);
-
-		char *navBarButtons[] = {"Cancel"};
-		SRE_Display_Nav_Bar(navBarButtons, 1, 0);
-
-		ssd1306_UpdateScreen();
 	}
-
-	if (selectPressed) {
-		selectPressed = false;
-
-		if (selectedButton >= 1 || selectedButton < 0) {
-			selectedButton = 0;
-		}
-
-		// Goes to some page after abort
-	}
+	return DISPLAY_STATE_HOME;
 }
 
-void SRE_Display_Nav_Bar(char *buttons[], int numOfButtons, int firstButtonIndex) {
+void display_draw_nav_bar(char *options[], int number_of_nav_bar_options, int first_nav_bar_option_index) {
 
-	//the selectedButton values for nav bar will vary based on currenty displayed screen
-	int maxSelectedButtonIndex = firstButtonIndex + numOfButtons-1;
-	int buttonIndex = firstButtonIndex;
+	int nav_bar_option_index = first_nav_bar_option_index;
 
 	int x1 = 1;
 	int x2 = 1;
 
-	for (int i = 0; i < numOfButtons; i++) {
-		x2 = x1 + (strlen(buttons[i]) * 6) + 2;
-		if (selectedButton == buttonIndex ||
-			(buttonIndex == 0 && selectedButton > maxSelectedButtonIndex) ||
-			(buttonIndex == maxSelectedButtonIndex && selectedButton < 0))
-		{
+	for (int i = 0; i < number_of_nav_bar_options; i++) {
+		x2 = x1 + (strlen(options[i]) * 6) + 2;
+		if (selected_option == nav_bar_option_index) {
 			ssd1306_FillRectangle(x1, 52, x2, 62, White);
 			ssd1306_SetCursor(x1 + 2, 54);
-			ssd1306_WriteString(buttons[i], Font_6x8, Black);
+			ssd1306_WriteString(options[i], Font_6x8, Black);
 		}
 		else {
 			ssd1306_DrawRectangle(x1, 52, x2, 62, White);
 			ssd1306_SetCursor(x1 + 2, 54);
-			ssd1306_WriteString(buttons[i], Font_6x8, White);
+			ssd1306_WriteString(options[i], Font_6x8, White);
 		}
 
-		buttonIndex++;
+		nav_bar_option_index++;
 		x1 = x2 + 2;
 	}
-
-	ssd1306_UpdateScreen();
+	// ssd1306_UpdateScreen();
 }
 
 
-void SRE_Display_Charging2() {
-	int numOfButtons = 1;
-  //"Pack Volt: 400.22V"
+display_state display_in_charging_stats_two() {
+	int number_of_options = 1;
 
-	char sumOfCells[50];
-	char soc[50];
-	char averageStats[50];
-	char chargingInfo[50];
+	char sum_of_cells[50];
+	char state_of_charge[50];
+	char average_stats[50];
+	char charging_info[50];
 
-	sprintf(averageStats, "Avg V:%.3fV", currentBmsAndElconData.BMS_avgVolt);
+	sprintf(average_stats, "Avg V:%.3fV", currentBmsAndElconData.BMS_avgVolt);
+	sprintf(charging_info, "%.2f V @ %.2f A", LIMIT_VOLTS, LIMIT_AMPS);
+	sprintf(state_of_charge, "SOC:%.2f%%", currentBmsAndElconData.BMS_stateOfCharge);
+	sprintf(sum_of_cells, "Pack Volt: %.2fV", currentBmsAndElconData.BMS_sumOfCells);
 
-	sprintf(chargingInfo, "%.2f V @ %.2f A", LIMIT_VOLTS, LIMIT_AMPS);
+	display_clear();
+	display_wrap_selected_option(number_of_options)
 
-	sprintf(soc, "SOC:%.2f%%", currentBmsAndElconData.BMS_stateOfCharge);
-
-	sprintf(sumOfCells, "Pack Volt: %.2fV", currentBmsAndElconData.BMS_sumOfCells);
-
-	ssd1306_FillRectangle(0, 0, 127, 63, Black);
-
-	if (isBalancing) {
-		SRE_Display_Title_Bar("Balancing 2");
-	}
-	else if (!isBalancing) {
-		SRE_Display_Title_Bar("Charging 2");
-	}
-
-	
-
-
+	display_draw_title_bar(isBalancing ? "Balancing 2" : "Charging 2");
 
 	ssd1306_SetCursor(1, 13);
-	ssd1306_WriteString(sumOfCells, Font_6x8, White);
+	ssd1306_WriteString(sum_of_cells, Font_6x8, White);
 
 	//Writes SOC Stats
 	ssd1306_SetCursor(1, 23);
-	ssd1306_WriteString(soc, Font_6x8, White);
+	ssd1306_WriteString(state_of_charge, Font_6x8, White);
 
 	ssd1306_SetCursor(1, 33);
-	ssd1306_WriteString(averageStats, Font_6x8, White);
+	ssd1306_WriteString(average_stats, Font_6x8, White);
 
 	ssd1306_SetCursor(1, 43);
-	ssd1306_WriteString(chargingInfo, Font_6x8, White);
+	ssd1306_WriteString(charging_info, Font_6x8, White);
 
 
-	char *navBarButtons[1];
-	if (isBalancing) {
-		navBarButtons[0] = "Balancing 1";
-	} else {
-		navBarButtons[0] = "Charging 1";
-	}
-	SRE_Display_Nav_Bar(navBarButtons, 1, 0);
+	char *nav_bar_options[1] = { isBalancing ? "Balancing 1" : "Charging 1" };
+	int first_nav_bar_option_index = 0;
+	display_draw_nav_bar(nav_bar_options, number_of_options, first_nav_bar_option_index);
 
-	if (selectPressed) {
-		selectPressed = false;
-		if (selectedButton < 0) {
-			selectedButton = 0;
-		}
-		else if (selectedButton > numOfButtons-1) {
-			selectedButton = numOfButtons-1;
-		}
-		if (selectedButton == 0) {
-			currentChargingScreen = 1;
+	if (select_pressed) {
+		display_check_selected_option_bounds(number_of_options);
+		switch(selected_option) {
+			case 0: return DISPLAY_STATE_IN_CHARGING_STATS_TWO;
 		}
 	}
-
+	return DISPLAY_STATE_IN_CHARGING_STATS_ONE;
 }
 
 void SRE_Display_Start_Charging() {
@@ -468,7 +356,7 @@ void SRE_Display_Start_Charging() {
 		//numOfProiles + 2 ensures it will always round up
 		int numOfScreens = (numOfProfiles+2)/3;
 
-		SRE_Display_Short_Scroll_Bar(currentScreen, numOfScreens);
+		display_draw_short_scroll_bar(currentScreen, numOfScreens);
 
 		char *navBarButtons[] = {"Nav"};
 		SRE_Display_Nav_Bar(navBarButtons,1, navStartIndex);
@@ -497,243 +385,171 @@ void SRE_Display_Start_Charging() {
 	}
 }
 
-void SRE_Display_Short_Scroll_Bar(int currentScreen, int numOfScreens) {
-
-	//currentScreen is zero-indexed
-
-	if (numOfScreens > 1) {
-
-		int scrollContainerHeight = 35;
-		int scrollBarLength = scrollContainerHeight/numOfScreens;
-
-		int scrollBarStart = 14+ (currentScreen*scrollBarLength);
+void display_draw_short_scroll_bar(int current_view, int number_of_views) {
+	//current_view is zero-indexed
+	if (number_of_views > 1) {
+		int scroll_container_height = 35;
+		int scroll_bar_length = scroll_container_height/number_of_views;
+		int scroll_bar_start = 14 + (current_view * scroll_bar_length);
 
 		ssd1306_DrawRectangle(124, 13, 126, 47, White);
-		ssd1306_Line(125, scrollBarStart, 125, scrollBarStart+scrollBarLength, White);
+		ssd1306_Line(125, scroll_bar_start, 125, scroll_bar_start + scroll_bar_length, White);
 	}
 
 }
 
-void SRE_Display_Long_Scroll_Bar(int currentScreen, int numOfScreens) {
-
+void display_draw_long_scroll_bar(int current_view, int number_of_views) {
 	//currentScreen is zero-indexed
-
-	if (numOfScreens > 1) {
-
-		int scrollContainerHeight = 49;
-		int scrollBarLength = scrollContainerHeight/numOfScreens;
-
-		int scrollBarStart = 14+ (currentScreen*scrollBarLength);
+	if (number_of_views > 1) {
+		int scroll_container_height = 49;
+		int scroll_bar_length = scroll_container_height/number_of_views;
+		int scroll_bar_start = 14+ (current_view * number_of_views);
 
 		ssd1306_DrawRectangle(124, 13, 126, 62, White);
-		ssd1306_Line(125, scrollBarStart, 125, scrollBarStart+scrollBarLength, White);
-	}
-
-}
-
-void SRE_Display_Charger_Stats() {
-	selectPressed = false;
-	selectedButton = 0;
-
-	int numOfButtons = 2;
-
-	while (!selectPressed) {
-
-		ssd1306_FillRectangle(0, 0, 127, 63, Black);
-
-
-		if (selectedButton > numOfButtons-1) {
-			selectedButton = 0;
-		}
-		if (selectedButton < 0) {
-			selectedButton = numOfButtons-1;
-		}
-
-		char inletTempString[50];
-		char outletTempString[50];
-
-		sprintf(inletTempString, "Inlet Tmp:%.2f", READ_THERM(therm_inlet, THERM_RESIST));
-		sprintf(outletTempString, "Outlet Tmp:%.2f", READ_THERM(therm_outlet, THERM_RESIST));
-
-		SRE_Display_Title_Bar("Charger Stats");
-
-		ssd1306_SetCursor(1, 13);
-		ssd1306_WriteString(inletTempString, Font_6x8, White);
-
-		ssd1306_SetCursor(1, 23);
-		ssd1306_WriteString(outletTempString, Font_6x8, White);
-
-		ssd1306_SetCursor(1, 33);
-		if (isError) {
-			ssd1306_WriteString("Errors detected", Font_6x8, White);
-		}
-		else {
-			ssd1306_WriteString("No errors detected", Font_6x8, White);
-		}
-
-
-		char *navBarButtons[] = {"Nav", "Batt"};
-		SRE_Display_Nav_Bar(navBarButtons, numOfButtons, 0);
-
-		ssd1306_UpdateScreen();
-	}
-
-	if (selectPressed) {
-		if (selectedButton > numOfButtons-1) {
-			selectedButton = 0;
-		}
-		if (selectedButton < 0) {
-			selectedButton = numOfButtons-1;
-		}
-
-		if (selectedButton == 0) {
-			SRE_Display_Nav();
-		}
-		else if (selectedButton == 1) {
-			SRE_Display_Battery1();
-		}
+		ssd1306_Line(125, scroll_bar_start, 125, scroll_bar_start + scroll_bar_length, White);
 	}
 }
 
-void SRE_Display_Battery1(){
-	selectPressed = false;
-	selectedButton = 0;
-	
-	
+display_state display_charger_stats() {
+	char inletTempString[50];
+	char outletTempString[50];
+	int number_of_options = 2;
 
-	int numOfButtons = 2;
+	display_clear();
+	display_wrap_selected_option(number_of_options);
 
-	while(!selectPressed){
-		char temperatureStats[50];
-		char voltageStats[50];
-		char averageStats[50];
-	
-		sprintf(temperatureStats, "Tmp H/L:%.2f/%.2fC",
-			currentBmsAndElconData.BMS_maxTemp,
-			currentBmsAndElconData.BMS_minTemp);
-		
-		sprintf(voltageStats, "Vlt H/L:%.3f/%.3fV",
-			currentBmsAndElconData.BMS_maxVolt,
-			currentBmsAndElconData.BMS_minVolt);
+	sprintf(inletTempString, "Inlet Tmp:%.2f", READ_THERM(therm_inlet, THERM_RESIST));
+	sprintf(outletTempString, "Outlet Tmp:%.2f", READ_THERM(therm_outlet, THERM_RESIST));
 
-		sprintf(averageStats, "Avg V:%.3fV",
-			currentBmsAndElconData.BMS_avgVolt);
+	display_draw_title_bar("Charger Stats");
 
-		ssd1306_FillRectangle(0, 0, 127, 63, Black);
+	ssd1306_SetCursor(1, 13);
+	ssd1306_WriteString(inletTempString, Font_6x8, White);
 
-		if (selectedButton > numOfButtons-1) {
-			selectedButton = 0;
-		}
-		if (selectedButton < 0) {
-			selectedButton = numOfButtons-1;
-		}
+	ssd1306_SetCursor(1, 23);
+	ssd1306_WriteString(outletTempString, Font_6x8, White);
 
-		SRE_Display_Title_Bar("Battery 1");
-
-		//Writes temp
-		ssd1306_SetCursor(1, 13);
-		ssd1306_WriteString(temperatureStats, Font_6x8, White);
-		//Writes voltage
-		ssd1306_SetCursor(1, 23);
-		ssd1306_WriteString(voltageStats, Font_6x8, White);
-		//Writes averageStats
-		ssd1306_SetCursor(1, 33);
-		ssd1306_WriteString(averageStats, Font_6x8, White);
-
-		//Writes button for Nav and selects.
-		char *navButtons[] = {"Nav", "Battery 2"};
-		SRE_Display_Nav_Bar(navButtons, 2, 0);
-
-		ssd1306_UpdateScreen();
+	ssd1306_SetCursor(1, 33);
+	if (isError) {
+		ssd1306_WriteString("Errors detected", Font_6x8, White);
 	}
-
-	if (selectPressed) {
-		if (selectedButton > numOfButtons-1) {
-			selectedButton = 0;
-		}
-		if (selectedButton < 0) {
-			selectedButton = numOfButtons-1;
-		}
-
-		if (selectedButton == 0) {
-			SRE_Display_Nav();
-		}
-		else if (selectedButton ==1) {
-			SRE_Display_Battery2();
-		}
-
+	else {
+		ssd1306_WriteString("No errors detected", Font_6x8, White);
 	}
 
 
+	char *nav_bar_options[] = {"Nav", "Batt"};
+	int number_of_nav_bar_options = 2;
+	int first_nav_bar_option_index = 0;
+	display_draw_nav_bar(nav_bar_options, number_of_nav_bar_options, first_nav_bar_option_index);
 
+	ssd1306_UpdateScreen();
+
+	if (select_pressed) {
+		display_check_selected_option_bounds(number_of_options);
+		switch (selected_option) {
+			case 0: return DISPLAY_STATE_NAVIGATION;
+			case 1: return DISPLAY_STATE_BATTERY_STATS_ONE;
+		}
+	}
+	return DISPLAY_STATE_CHARGER_STATS;
+}
+
+void display_battery_stats_one(){
+	char temperature_stats[50];
+	char voltage_stats[50];
+	char average_stats[50];
+	int number_of_options = 2;
+
+	sprintf(temperature_stats, "Tmp H/L:%.2f/%.2fC",
+		currentBmsAndElconData.BMS_maxTemp,
+		currentBmsAndElconData.BMS_minTemp);
+	sprintf(voltage_stats, "Vlt H/L:%.3f/%.3fV",
+		currentBmsAndElconData.BMS_maxVolt,
+		currentBmsAndElconData.BMS_minVolt);
+	sprintf(average_stats, "Avg V:%.3fV",
+		currentBmsAndElconData.BMS_avgVolt);
+
+	display_clear();
+	display_wrap_selected_option(number_of_options);
+
+	display_draw_title_bar("Battery 1");
+
+	ssd1306_SetCursor(1, 13);
+	ssd1306_WriteString(temperature_stats, Font_6x8, White);
+
+	ssd1306_SetCursor(1, 23);
+	ssd1306_WriteString(voltage_stats, Font_6x8, White);
+
+	ssd1306_SetCursor(1, 33);
+	ssd1306_WriteString(average_stats, Font_6x8, White);
+
+	char *nav_bar_options[] = {"Nav", "Battery 2"};
+	int first_nav_bar_option_index = 0;
+
+	display_draw_nav_bar(nav_bar_options, number_of_options, first_nav_bar_option_index);
+
+	ssd1306_UpdateScreen();
+	
+
+	if (select_pressed) {
+		display_check_selected_option_bounds(number_of_options);
+		switch(selected_option) {
+			case 0: return DISPLAY_STATE_NAVIGATION;
+			case 1: return DISPLAY_STATE_BATTERY_STATS_TWO;
+		}
+	}
+	return DISPLAY_STATE_BATTERY_STATS_ONE;
 }
 
 
-void SRE_Display_Battery2(){
-	selectPressed = false;
-	selectedButton = 0;
+display_state display_battery_stats_two(){
 
-	char soc[50];
-	char packVolt[50];
-	char packImbalance[50];
+	char state_of_charge[50];
+	char pack_volt[50];
+	char pack_imbalance[50];
+	int number_of_options = 2;
 
-	sprintf(soc, "SOC:%.2f%%",
+	sprintf(state_of_charge, "SOC:%.2f%%",
 			currentBmsAndElconData.BMS_stateOfCharge);
 			
-	sprintf(packImbalance, "Imbalance:%.2fV",
+	sprintf(pack_imbalance, "Imbalance:%.2fV",
 			currentBmsAndElconData.BMS_packImbalance);
 	
-	sprintf(packVolt, "Pack Volt: %.2fV",
+	sprintf(pack_volt, "Pack Volt: %.2fV",
 			currentBmsAndElconData.BMS_sumOfCells);
 
-	//char balancingStats[] = "Balancing: 20.22V";
 
-	int numOfButtons = 2;
+	display_clear();
+	display_wrap_selected_option(number_of_options);
 
-	while(!selectPressed) {
+	display_draw_title_bar("Battery 2");
 
-		ssd1306_FillRectangle(0, 0, 127, 63, Black);
+	ssd1306_SetCursor(1, 13);
+	ssd1306_WriteString(state_of_charge, Font_6x8, White);
 
-		if (selectedButton > numOfButtons-1) {
-			selectedButton = 0;
-		}
-		if (selectedButton < 0) {
-			selectedButton = numOfButtons-1;
-		}
-		SRE_Display_Title_Bar("Battery 2");
+	ssd1306_SetCursor(1, 23);
+	ssd1306_WriteString(pack_imbalance, Font_6x8, White);
 
-		ssd1306_SetCursor(1, 13);
-		ssd1306_WriteString(soc, Font_6x8, White);
+	ssd1306_SetCursor(1, 33);
+	ssd1306_WriteString(pack_volt, Font_6x8, White);
 
-		ssd1306_SetCursor(1, 23);
-		ssd1306_WriteString(packImbalance, Font_6x8, White);
+	
+	char *nav_bar_options[] = {"Nav", "Battery 1"};
+	int first_nav_bar_option_index = 0;
+	display_draw_nav_bar(nav_bar_options, number_of_options, first_nav_bar_option_index);
 
-		ssd1306_SetCursor(1, 33);
-		ssd1306_WriteString(packVolt, Font_6x8, White);
+	ssd1306_UpdateScreen();
+	
 
-		
-		char *navButtons[] = {"Nav", "Battery 1"};
-		SRE_Display_Nav_Bar(navButtons, 2, 0);
-
-		ssd1306_UpdateScreen();
-	}
-
-	if (selectPressed) {
-		if (selectedButton > numOfButtons-1) {
-			selectedButton = 0;
-		}
-		if (selectedButton < 0) {
-			selectedButton = numOfButtons-1;
-		}
-
-		if (selectedButton == 0) {
-			SRE_Display_Nav();
-		}
-		else if (selectedButton == 1) {
-			SRE_Display_Battery1();
+	if (select_pressed) {
+		display_wrap_selected_option(number_of_options);
+		switch(selected_option) {
+			case 0: return DISPLAY_STATE_NAVIGATION;
+			case 1: return DISPLAY_STATE_BATTERY_STATS_ONE;
 		}
 	}
-
+	return DISPLAY_STATE_BATTERY_STATS_TWO;
 }
 
 //Display Start Balancing
@@ -800,7 +616,7 @@ void SRE_Display_Start_Balancing(){
 
 }
 
-void SRE_Display_Title_Bar(char title[]) {
+void display_draw_title_bar(char title[]) {
 	static uint32_t previous_time = 0;
 
 	uint32_t current_time = HAL_GetTick();
@@ -829,9 +645,9 @@ void SRE_Display_Title_Bar(char title[]) {
 	// ssd1306_UpdateScreen();
 
 	if (isError) {
-		SRE_Display_Error_Symbol(119,1);
+		display_draw_error_symbol(119,1);
 		if (isCharging) {
-			SRE_Display_Charger_Symbol(92, 3);
+			display_draw_in_charging_symbol(92, 3);
 			if (isBalancing) {
 				ssd1306_FillRectangle(71, 0, 89, 8, White);
 				ssd1306_SetCursor(72, 1);
@@ -845,7 +661,7 @@ void SRE_Display_Title_Bar(char title[]) {
 		}
 	}
 	else if (isCharging) {
-		SRE_Display_Charger_Symbol(109, 3);
+		display_draw_in_charging_symbol(109, 3);
 		if (isBalancing) {
 			ssd1306_FillRectangle(88, 0, 106, 8, White);
 			ssd1306_SetCursor(89, 1);
@@ -859,7 +675,7 @@ void SRE_Display_Title_Bar(char title[]) {
 	}
 }
 
-void SRE_Display_Charger_Symbol(int x, int y) {
+void display_draw_in_charging_symbol(int x, int y) {
 	//point of origin (x,y) is the top left of battery
 	ssd1306_Line(x, y, x+4, y, White);
 	ssd1306_Line(x, y, x, y+4, White);
@@ -875,7 +691,7 @@ void SRE_Display_Charger_Symbol(int x, int y) {
 	ssd1306_Line(x+10, y+2, x+7, y+5, White);
 }
 
-void SRE_Display_Error_Symbol(int x, int y) {
+void display_draw_error_symbol(int x, int y) {
 	//point of origin (x,y) is the top of the triangle
 	ssd1306_Line(x, y, x+7, y+7, White);
 	ssd1306_Line(x, y, x-7, y+7, White);
@@ -885,48 +701,35 @@ void SRE_Display_Error_Symbol(int x, int y) {
 	ssd1306_Line(x, y+6, x, y+6, White);
 }
 
-void SRE_Display_Charging1() {
-
-	int numOfButtons = 1;
-	char temperatureStats[50];
-	char voltageStats[50];
+display_state display_in_charging_stats_one() {
+	int number_of_options = 1;
+	char temperature_stats[50];
+	char voltage_stats[50];
 	char imbalance[30];
-	char outputStats[50];
+	char output_stats[50];
 
-	sprintf(temperatureStats, "Tmp H/L:%.2f/%.2fC",
+	sprintf(temperature_stats, "Tmp H/L:%.2f/%.2fC",
 			currentBmsAndElconData.BMS_maxTemp,
 			currentBmsAndElconData.BMS_minTemp);
-	
-	sprintf(voltageStats, "Vlt H/L:%.3f/%.3fV",
+	sprintf(voltage_stats, "Vlt H/L:%.3f/%.3fV",
 			currentBmsAndElconData.BMS_maxVolt,
 			currentBmsAndElconData.BMS_minVolt);
-
-	
-
 	sprintf(imbalance, "Imbal:%.3fV", currentBmsAndElconData.BMS_packImbalance);
+	sprintf(output_stats, "Out V/C:%.2fV/%.2fA", currentBmsAndElconData.ELCON_outVolt, currentBmsAndElconData.ELCON_outCurrent);
 
-	sprintf(outputStats, "Out V/C:%.2fV/%.2fA", currentBmsAndElconData.ELCON_outVolt, currentBmsAndElconData.ELCON_outCurrent);
-
-
-
-	//Resets screen
-	ssd1306_FillRectangle(0, 0, 127, 63, Black);
+	display_clear();
+	display_wrap_selected_option(number_of_options);
 
 	//Writes title
-	if (isBalancing) {
-		SRE_Display_Title_Bar("Balancing 1");
-	}
-	else if (!isBalancing) {
-		SRE_Display_Title_Bar("Charging 1");
-	}
+	display_draw_title_bar(isBalancing ? "Balancing 1" : "Charging 1");
 
 	//Writes temp
 	ssd1306_SetCursor(1, 13);
-	ssd1306_WriteString(temperatureStats, Font_6x8, White);
+	ssd1306_WriteString(temperature_stats, Font_6x8, White);
 
 	//Writes voltage
 	ssd1306_SetCursor(1, 23);
-	ssd1306_WriteString(voltageStats, Font_6x8, White);
+	ssd1306_WriteString(voltage_stats, Font_6x8, White);
 
 	//Writes imbalance
 	ssd1306_SetCursor(1, 33);
@@ -935,139 +738,117 @@ void SRE_Display_Charging1() {
 	//Writes output info
 	if (!isBalancing) {
 		ssd1306_SetCursor(1, 43);
-		ssd1306_WriteString(outputStats, Font_6x8, White);
+		ssd1306_WriteString(output_stats, Font_6x8, White);
 	}
 	
-	char *navBarButtons[1];
-	if (isBalancing) {
-		navBarButtons[0] = "Balancing 2";
-	} else {
-		navBarButtons[0] = "Charging 2";
-	}
-	SRE_Display_Nav_Bar(navBarButtons, 1, 0);
+	char *nav_bar_options[1] = { isBalancing ? "Balancing 2" : "Charging 2" };
 
-	if (selectPressed) {
-		selectPressed = false;
-		if (selectedButton < 0) {
-			selectedButton = 0;
-		}
-		else if (selectedButton > numOfButtons-1) {
-			selectedButton = numOfButtons-1;
-		}
-		if (selectedButton == 0) {
-			currentChargingScreen = 2;
+	int first_nav_bar_option_index = 0;
+	display_draw_nav_bar(nav_bar_options, number_of_options, first_nav_bar_option_index);
+
+	if (select_pressed) {
+		display_check_selected_option_bounds(number_of_options);
+		switch (selected_option) {
+			case 0: return DISPLAY_STATE_IN_CHARGING_STATS_TWO;
 		}
 	}
+	return DISPLAY_STATE_IN_CHARGING_STATS_ONE;
 }
 
-void SRE_Display_Err() {
-	selectedButton = 0;
-	selectPressed = false;
-	int navStartIndex;
-	int navLastIndex;
+display_state display_errors() {
+	
+	const char *error_messages[5] = {
+		"HW Fail",
+		"Charger Overtemp",
+		"Wrong Input Volt",
+		"No Batt Volt",
+		"Comms Timeout"
+	};
 
-	while (!selectPressed) {
-		const char *error_messages[5] = {
-					"HW Fail",
-					"Charger Overtemp",
-					"Wrong Input Volt",
-					"No Batt Volt",
-					"Comms Timeout"
-		};
+	char current_errors[5][100];
+	int current_error_index = 0;
 
-		char current_errors[5][100];
-		int current_error_index = 0;
-
-		for (int i = 0; i < 5; i++) {
-		
-      
-			if (currentBmsAndElconData.ELCON_fault[i] == 1) {
-				sprintf(current_errors[current_error_index], "%s", error_messages[i]);
-				current_error_index++;
-			}
-		}
-
-		int numOfErrors = current_error_index;
-
-		navStartIndex = numOfErrors;
-		navLastIndex = numOfErrors+1;
-
-		ssd1306_FillRectangle(0, 0, 127, 63, Black);
-
-		SRE_Display_Title_Bar("Errors");
-
-		
-		int currentScreen = selectedButton/3;
-
-
-		//if the nav bar is selected, ensures that the currentScreen is the last screen of profiles
-		if (selectedButton > numOfErrors-1) {
-			currentScreen = (numOfErrors-1)/3;
-		}
-		int startIndex = currentScreen*3;
-		//ensures that the correct number of profiles are showed on the last screen
-		if (selectedButton > numOfErrors-1) {
-			startIndex = (numOfErrors-1)/3*3;
-		}
-		//going up from first profile will go to Start button
-		if (selectedButton < 0) {
-			startIndex = 0;
-			selectedButton = navLastIndex;
-		}
-		//going down from start button will reset back to first profile being selected
-		if (selectedButton > navLastIndex) {
-			startIndex = 0;
-			selectedButton = 0;
-		}
-
-		//initial y-positions used for calculating profile display boxes
-		int y1 = 15;
-		int y2 = 13;
-		int y3 = 24;
-
-		//displays up to three errors per screen
-		for (int i = startIndex; i < startIndex + 3 && i < numOfErrors; i++) {
-			ssd1306_SetCursor(3, y1);
-			if (selectedButton == i) {
-				ssd1306_FillRectangle(1,y2, 122, y3, White);
-				ssd1306_WriteString(current_errors[i], Font_6x8, Black);
-			}
-			else {
-				ssd1306_DrawRectangle(1,y2, 122, y3, White);
-				ssd1306_WriteString(current_errors[i], Font_6x8, White);
-			}
-
-			y1 = y1 + 13;
-			y2 = y2 + 13;
-			y3 = y3 + 13;
-		}
-
-		//numOfErrors + 2 ensures it will always round up
-		int numOfScreens = (numOfErrors+2)/3;
-
-		SRE_Display_Short_Scroll_Bar(currentScreen, numOfScreens);
-
-		char *navBarButtons[] = {"Nav", "Batt"};
-		SRE_Display_Nav_Bar(navBarButtons, 2, navStartIndex);
-
-		ssd1306_UpdateScreen();
-	}
-
-	if (selectPressed) {
-		if (selectedButton < 0) {
-			selectedButton = 0;
-		}
-    if (selectedButton > navLastIndex) {
-			selectedButton = navLastIndex;
-		}
-		if (selectedButton < navStartIndex && selectedButton >= 0 ) {
-			SRE_Display_Err();
-		}
-		if (selectedButton == navStartIndex) {
-			SRE_Display_Nav();
-		}
-		if (selectedButton == navStartIndex + 1) {
-			SRE_Display_Battery1();
+	for (int i = 0; i < 5; i++) {
+		if (currentBmsAndElconData.ELCON_fault[i] == 1) {
+			sprintf(current_errors[current_error_index], "%s", error_messages[i]);
+			current_error_index++;
 		}
 	}
+
+	int number_of_errors = current_error_index;
+
+	int nav_bar_start_index = number_of_errors;
+	int nav_bar_last_index = number_of_errors + 1;
+	int number_of_options = nav_bar_last_index;
+
+	display_clear();
+
+	display_draw_title_bar("Errors");
+
+	
+	int current_view = selected_option/3;
+
+
+	//if the nav bar is selected, ensures that the currentScreen is the last screen of profiles
+	if (selected_option > number_of_errors - 1) {
+		current_view = (number_of_errors -1 ) / 3;
+	}
+	int start_index = current_view * 3;
+	//ensures that the correct number of profiles are showed on the last screen
+	if (selected_option > number_of_errors - 1) {
+		start_index = (number_of_errors-1) / 3 * 3;
+	}
+	//going up from first profile will go to Start button
+	if (selected_option < 0) {
+		start_index = 0;
+		selected_option = nav_bar_last_index;
+	}
+	//going down from start button will reset back to first profile being selected
+	if (selected_option > nav_bar_last_index) {
+		start_index = 0;
+		selected_option = 0;
+	}
+
+	//initial y-positions used for calculating profile display boxes
+	int y1 = 15;
+	int y2 = 13;
+	int y3 = 24;
+
+	//displays up to three errors per screen
+	for (int i = start_index; i < start_index + 3 && i < number_of_errors; i++) {
+		ssd1306_SetCursor(3, y1);
+		if (selected_option == i) {
+			ssd1306_FillRectangle(1,y2, 122, y3, White);
+			ssd1306_WriteString(current_errors[i], Font_6x8, Black);
+		}
+		else {
+			ssd1306_DrawRectangle(1,y2, 122, y3, White);
+			ssd1306_WriteString(current_errors[i], Font_6x8, White);
+		}
+
+		y1 = y1 + 13;
+		y2 = y2 + 13;
+		y3 = y3 + 13;
+	}
+
+	int number_of_views= (number_of_errors + 2) / 3; //+ 2 ensures it will always round up
+
+	display_draw_short_scroll_bar(current_view, number_of_views);
+
+	char *nav_bar_options[] = {"Nav"};
+	int number_of_nav_bar_options = 1;
+	display_draw_nav_bar(nav_bar_options, number_of_nav_bar_options, nav_bar_start_index);
+
+	ssd1306_UpdateScreen();
+
+	if (select_pressed) {
+		display_check_selected_option_bounds(number_of_options);
+		if (selected_option < nav_bar_start_index && selected_option >= 0 ) {
+			return DISPLAY_STATE_ERRORS;
+		}
+		if (selected_option == nav_bar_start_index) {
+			return DISPLAY_STATE_NAVIGATION;
+		}
+	}
+	return DISPLAY_STATE_ERRORS;
 }
