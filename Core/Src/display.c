@@ -1,6 +1,21 @@
 // Written by Ayman Alamayri in Dec 2024
 #include "display.h"
+#include "charger.h"
 #include <stdio.h>
+
+profile all_profiles[] = {
+	{"P1", 3, 355},
+	{"P2", 4, 355},
+	{"P3", 20, 355},
+	{"P4", 3, 385},
+	{"P5", 15, 385},
+	{"P6", 20, 385},
+	{"P7", 10, 401},
+	{"P8", 20, 400},
+	{"P9", 10, 403},	
+};
+
+int number_of_profiles = 9;
 
 int selected_option = 0;
 bool select_pressed = false;
@@ -47,10 +62,16 @@ display_state display_update_state() {
 			next_display_state = display_home();
 			break;
 		case DISPLAY_STATE_CHARGING_PROFILES:
-			// finish
+			next_display_state = display_charging_profiles();
+			break;
+		case DISPLAY_STATE_CHARGING_INITIALIZATION:
+			next_display_state = display_charging_initialization();
 			break;
 		case DISPLAY_STATE_START_BALANCING:
-			// finish
+			next_display_state = display_start_balancing();
+			break;
+		case DISPLAY_STATE_BALANCING_INITIALIZATION:
+			next_display_state = display_balancing_initialization();
 			break;
 		case DISPLAY_STATE_BATTERY_STATS_ONE:
 			next_display_state = display_battery_stats_one();
@@ -215,6 +236,12 @@ void display_draw_nav_bar(char *options[], int number_of_nav_bar_options, int fi
 
 
 display_state display_in_charging_stats_two() {
+	if (current_charger_state != CHARGER_STATE_CHARGING || 
+		current_charger_state != CHARGER_STATE_BALANCING ||
+		current_charger_state != CHARGER_STATE_BALANCING_ONLY) {
+		return DISPLAY_STATE_NAVIGATION;
+	}
+
 	int number_of_options = 1;
 
 	char sum_of_cells[50];
@@ -230,7 +257,9 @@ display_state display_in_charging_stats_two() {
 	display_clear();
 	display_wrap_selected_option(number_of_options)
 
-	display_draw_title_bar(isBalancing ? "Balancing 2" : "Charging 2");
+	bool is_balancing = (current_charging_mode == CHARGING_MODE_BALANCING);
+
+	display_draw_title_bar(is_balancing ? "Balancing 2" : "Charging 2");
 
 	ssd1306_SetCursor(1, 13);
 	ssd1306_WriteString(sum_of_cells, Font_6x8, White);
@@ -246,7 +275,7 @@ display_state display_in_charging_stats_two() {
 	ssd1306_WriteString(charging_info, Font_6x8, White);
 
 
-	char *nav_bar_options[1] = { isBalancing ? "Balancing 1" : "Charging 1" };
+	char *nav_bar_options[1] = { is_balancing ? "Balancing 1" : "Charging 1" };
 	int first_nav_bar_option_index = 0;
 	display_draw_nav_bar(nav_bar_options, number_of_options, first_nav_bar_option_index);
 
@@ -259,130 +288,127 @@ display_state display_in_charging_stats_two() {
 	return DISPLAY_STATE_IN_CHARGING_STATS_ONE;
 }
 
-void SRE_Display_Start_Charging() {
-	selectPressed = false;
-	selectedButton = 0;
-
-	//sets up sample profiles to use for testing
-	struct Profile {
-		char name[5];
-		uint16_t current;
-		uint16_t voltage;
-	};
-
-	struct Profile allProfiles[] = {
-		{"P1", 3, 355},
-		{"P2", 4, 355},
-		{"P3", 20, 355},
-		{"P4", 3, 385},
-		{"P5", 15, 385},
-		{"P6", 20, 385},
-		{"P7", 10, 401},
-		{"P8", 20, 400},
-		{"P9", 10, 403},	
-	};
-
-	int numOfProfiles = 9;
-	struct Profile profiles[numOfProfiles];
+display_state display_charging_profiles() {
+	profile profiles[number_of_profiles];
 	
 	int profile_index = 0;
-	for (int i = 0; i < numOfProfiles; i++) {
-		if (allProfiles[i].voltage * allProfiles[i].current <= (MAX_ALLOWED_PWR * 97 / 100) && allProfiles[i].voltage > currentBmsAndElconData.BMS_sumOfCells) {
-			profiles[profile_index] = allProfiles[i];
+	for (int i = 0; i < number_of_profiles; i++) {
+		if (all_profiles[i].voltage * all_profiles[i].current <= (MAX_ALLOWED_PWR * 97 / 100) && all_profiles[i].voltage > currentBmsAndElconData.BMS_sumOfCells) {
+			profiles[profile_index] = all_profiles[i];
 			profile_index++;
 		}
 	}
 
-	numOfProfiles = profile_index;
+	int current_number_of_profiles = profile_index;
 
-  	int navStartIndex = numOfProfiles;
-  	int navLastIndex = numOfProfiles;
+  	int navStartIndex = current_number_of_profiles;
+  	int navLastIndex = current_number_of_profiles;
 
-	while (!selectPressed) {
+	
 
-		//resets screen
-		ssd1306_FillRectangle(0,0,127,63, Black);
+	//resets screen
+	display_clear();
 
-		SRE_Display_Title_Bar("Charging");
+	display_draw_title_bar("Charging");
 
-		int currentScreen = selectedButton/3;
-
-
-		//if the nav bar is selected, ensures that the currentScreen is the last screen of profiles
-		if (selectedButton > numOfProfiles-1) {
-			currentScreen = (numOfProfiles-1)/3;
-		}
-		int startIndex = currentScreen*3;
-		//ensures that the correct number of profiles are showed on the last screen
-		if (selectedButton > numOfProfiles-1) {
-			startIndex = (numOfProfiles-1)/3*3;
-		}
-		//going up from first profile will go to Start button
-		if (selectedButton < 0) {
-			startIndex = 0;
-			selectedButton = navLastIndex;
-		}
-		//going down from start button will reset back to first profile being selected
-		if (selectedButton > navLastIndex) {
-			startIndex = 0;
-			selectedButton = 0;
-		}
-
-		//initial y-positions used for calculating profile display boxes
-		int y1 = 15;
-		int y2 = 13;
-		int y3 = 24;
-
-		//displays up to three profiles per screen
-		for (int i = startIndex; i < startIndex + 3 && i < numOfProfiles; i++) {
-			char profileString[50];
-			sprintf(profileString, "%s: %dA %dV", profiles[i].name, profiles[i].current, profiles[i].voltage);
-			ssd1306_SetCursor(3, y1);
-
-			if (selectedButton == i) {
-				ssd1306_FillRectangle(1,y2, 122, y3, White);
-				ssd1306_WriteString(profileString, Font_6x8, Black);
-			}
-			else {
-				ssd1306_DrawRectangle(1,y2, 122, y3, White);
-				ssd1306_WriteString(profileString, Font_6x8, White);
-			}
-
-			y1 = y1 + 13;
-			y2 = y2 + 13;
-			y3 = y3 + 13;
-		}
-
-		//numOfProiles + 2 ensures it will always round up
-		int numOfScreens = (numOfProfiles+2)/3;
-
-		display_draw_short_scroll_bar(currentScreen, numOfScreens);
-
-		char *navBarButtons[] = {"Nav"};
-		SRE_Display_Nav_Bar(navBarButtons,1, navStartIndex);
+	int currentScreen = selected_option/3;
 
 
-
-		ssd1306_UpdateScreen();
-
+	//if the nav bar is selected, ensures that the currentScreen is the last screen of profiles
+	if (selected_option > current_number_of_profiles-1) {
+		currentScreen = (current_number_of_profiles-1)/3;
+	}
+	int startIndex = currentScreen*3;
+	//ensures that the correct number of profiles are showed on the last screen
+	if (selected_option > current_number_of_profiles-1) {
+		startIndex = (current_number_of_profiles-1)/3*3;
+	}
+	//going up from first profile will go to Start button
+	if (selected_option < 0) {
+		startIndex = 0;
+		selected_option = navLastIndex;
+	}
+	//going down from start button will reset back to first profile being selected
+	if (selected_option > navLastIndex) {
+		startIndex = 0;
+		selected_option = 0;
 	}
 
-	if (selectPressed) {
-	    // Make sure the selectedButton is within the valid range of profiles
-	    if (selectedButton >= 0 && selectedButton < numOfProfiles) {
-	        struct Profile selectedProfile = profiles[selectedButton];
+	//initial y-positions used for calculating profile display boxes
+	int y1 = 15;
+	int y2 = 13;
+	int y3 = 24;
+
+	//displays up to three profiles per screen
+	for (int i = startIndex; i < startIndex + 3 && i < current_number_of_profiles; i++) {
+		char profileString[50];
+		sprintf(profileString, "%s: %dA %dV", profiles[i].name, profiles[i].current, profiles[i].voltage);
+		ssd1306_SetCursor(3, y1);
+
+		if (selected_option == i) {
+			ssd1306_FillRectangle(1,y2, 122, y3, White);
+			ssd1306_WriteString(profileString, Font_6x8, Black);
+		}
+		else {
+			ssd1306_DrawRectangle(1,y2, 122, y3, White);
+			ssd1306_WriteString(profileString, Font_6x8, White);
+		}
+
+		y1 = y1 + 13;
+		y2 = y2 + 13;
+		y3 = y3 + 13;
+	}
+
+	//numOfProiles + 2 ensures it will always round up
+	int numOfScreens = (number_of_profiles+2)/3;
+
+	display_draw_short_scroll_bar(currentScreen, numOfScreens);
+
+	char *nav_bar_options[] = {"Nav"};
+	int number_of_nav_bar_options = 1;
+	display_draw_nav_bar(nav_bar_options, number_of_nav_bar_options, navStartIndex);
+
+	ssd1306_UpdateScreen();
+
+	if (select_pressed) {
+	    // Make sure the selected option is within the valid range of profiles
+	    if (selected_option >= 0 && selected_option < current_number_of_profiles) {
+	        profile selected_profile = profiles[selected_option];
 	        // Set charging limits based on the selected profile
-					LIMIT_VOLTS = selectedProfile.voltage;
-					LIMIT_AMPS = selectedProfile.current;
-					isChargingSequence = true;
-					selectPressed = false;
-					selectedButton = 0;
-					return;  // Exit after setting the limits
+			LIMIT_VOLTS = selectedProfile.voltage;
+			LIMIT_AMPS = selectedProfile.current;
+			return DISPLAY_STATE_CHARGING_INITIALIZATION;
 	    }
-	    else if (selectedButton == numOfProfiles) {
-			SRE_Display_Nav();
+	    else if (selected_option == current_number_of_profiles) {
+			return DISPLAY_STATE_NAVIGATION;
 	    }
 	}
+	return DISPLAY_STATE_CHARGING_PROFILES;
+}
+
+display_state display_charging_initialization() {
+	display_clear();
+
+	if (!charger_is_charger_safe()) {
+    	ssd1306_SetCursor(5, 5);
+		ssd1306_WriteString("HVIL ERROR", Font_6x8, White);
+		ssd1306_UpdateScreen();
+	}
+	else if (!charger_is_hvil_switch_flipped()) {
+		ssd1306_SetCursor(5, 5);
+		ssd1306_WriteString("PLEASE FLIP HV", Font_6x8, White);
+		ssd1306_UpdateScreen();
+	}
+	else if (!charger_is_ready_to_charge_switch_flipped()) {
+		ssd1306_SetCursor(5, 5);
+		ssd1306_WriteString("PLEASE FLIP RTC", Font_6x8, White);
+		ssd1306_UpdateScreen();
+	}
+	else {
+		current_charger_state = CHARGER_STATE_CHARGING;
+		return DISPLAY_STATE_IN_CHARGING_STATS_ONE;
+	}
+	return DISPLAY_STATE_CHARGING_INITIALIZATION;
 }
 
 void display_draw_short_scroll_bar(int current_view, int number_of_views) {
@@ -553,67 +579,53 @@ display_state display_battery_stats_two(){
 }
 
 //Display Start Balancing
-void SRE_Display_Start_Balancing(){
-	selectPressed = false;
-	selectedButton = 0;
+display_state display_start_balancing() {
+	int number_of_options = 2;
 
-	char balancingOnOff[] = "Balancing is off";
+	display_clear();
+	display_wrap_selected_option(number_of_options)
 
+	display_draw_title_bar("Start Balancing");
 
-	//NOTE: Parameters of drawLine and rectangle may be off. Might need to set Cursor
-		//for them also before calling them.
-		//Can't really test without working OLED.
-	//Writes "Charging 1"
-		//Change to (1,2) probably
+	ssd1306_SetCursor(1, 13);
+	ssd1306_WriteString("Balancing is off", Font_6x8, White);
 
-	int numOfButtons = 2;
-
-	while(!selectPressed){
+	char *nav_bar_options[] = {"Nav", "Start Bal"};
+	int nav_bar_start_index = 0;
+	display_draw_nav_bar(nav_bar_options, number_of_options, nav_bar_start_index);
 
 
-		if (selectedButton > numOfButtons-1) {
-			selectedButton = 0;
+	ssd1306_UpdateScreen();
+	
+	if (select_pressed) {
+		display_check_selected_option_bounds(number_of_options);
+		switch (selected_option) {
+			case 0: return DISPLAY_STATE_NAVIGATION;
+			case 1: {
+				return DISPLAY_STATE_BALANCING_INITIALIZATION;
+			}
 		}
-		if (selectedButton < 0) {
-			selectedButton = numOfButtons-1;
-		}
+	}
+	return DISPLAY_STATE_START_BALANCING;
+}
 
-		ssd1306_FillRectangle(0, 0, 127, 63, Black);
-
-		SRE_Display_Title_Bar("Balancing");
-
-		ssd1306_SetCursor(1, 13);
-		ssd1306_WriteString(balancingOnOff, Font_6x8, White);
-
-		char *navButtons[] = {"Nav", "Start Bal"};
-		SRE_Display_Nav_Bar(navButtons, numOfButtons, 0);
-
-
+display_state display_balancing_initialization() {
+	display_clear();
+	if (!charger_is_charger_safe()) {
+    	ssd1306_SetCursor(5, 5);
+		ssd1306_WriteString("HVIL ERROR", Font_6x8, White);
 		ssd1306_UpdateScreen();
 	}
-	if (selectPressed) {
-		if (selectedButton > numOfButtons-1) {
-			selectedButton = 0;
-		}
-		if (selectedButton < 0) {
-			selectedButton = numOfButtons-1;
-		}
-
-		if (selectedButton == 0) {
-			SRE_Display_Nav();
-		}
-		else if (selectedButton == 1) {
-			isBalancing = true;
-			isBalancingControl = true;
-			isChargingSequence = true;
-			selectPressed = false;
-			selectedButton = 0;
-			return;
-		}
-
-
+	else if (!charger_is_hvil_switch_flipped()) {
+		ssd1306_SetCursor(5, 5);
+		ssd1306_WriteString("PLEASE FLIP HV", Font_6x8, White);
+		ssd1306_UpdateScreen();
 	}
-
+	else {
+		current_charger_state = CHARGER_STATE_BALANCING;
+		return DISPLAY_STATE_IN_CHARGING_STATS_ONE;
+	}
+	return DISPLAY_STATE_BALANCING_INITIALIZATION;
 }
 
 void display_draw_title_bar(char title[]) {
@@ -702,6 +714,11 @@ void display_draw_error_symbol(int x, int y) {
 }
 
 display_state display_in_charging_stats_one() {
+	if (current_charger_state != CHARGER_STATE_CHARGING || 
+		current_charger_state != CHARGER_STATE_BALANCING ||
+		current_charger_state != CHARGER_STATE_BALANCING_ONLY) {
+		return DISPLAY_STATE_NAVIGATION;
+	}
 	int number_of_options = 1;
 	char temperature_stats[50];
 	char voltage_stats[50];
@@ -719,9 +736,10 @@ display_state display_in_charging_stats_one() {
 
 	display_clear();
 	display_wrap_selected_option(number_of_options);
-
+	
+	bool is_balancing = (current_charging_mode == CHARGING_MODE_BALANCING);
 	//Writes title
-	display_draw_title_bar(isBalancing ? "Balancing 1" : "Charging 1");
+	display_draw_title_bar(is_balancing ? "Balancing 1" : "Charging 1");
 
 	//Writes temp
 	ssd1306_SetCursor(1, 13);
@@ -736,12 +754,12 @@ display_state display_in_charging_stats_one() {
 	ssd1306_WriteString(imbalance, Font_6x8, White);
 
 	//Writes output info
-	if (!isBalancing) {
+	if (!is_balancing) {
 		ssd1306_SetCursor(1, 43);
 		ssd1306_WriteString(output_stats, Font_6x8, White);
 	}
 	
-	char *nav_bar_options[1] = { isBalancing ? "Balancing 2" : "Charging 2" };
+	char *nav_bar_options[1] = { is_balancing ? "Balancing 2" : "Charging 2" };
 
 	int first_nav_bar_option_index = 0;
 	display_draw_nav_bar(nav_bar_options, number_of_options, first_nav_bar_option_index);

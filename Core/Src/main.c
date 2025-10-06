@@ -27,6 +27,8 @@
 #include <math.h>
 
 #include "display.h"
+#include "charger.h"
+#include "can_interface.h"
 
 /* USER CODE END Includes */
 
@@ -37,16 +39,10 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define FLAG_600 (1 << 0)
-#define FLAG_621 (1 << 1)
-#define FLAG_622 (1 << 2)
+
 
 // TODO: move stuff here
-#define UPPER_MAX_CELL_CV_THRESH 4.25 // Competition is 4.25
-#define LOWER_MAX_CELL_CV_THRESH 4.1 // Competition is 4.1
-#define MIN_ALLOWED_IMBAL 0.01
-#define MAINT_AMPS 0.5
-#define HYSTERESIS_VOLTS 0.01
+
 
 
 /* USER CODE END PD */
@@ -70,20 +66,9 @@ TIM_HandleTypeDef htim3;
 UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN PV */
-int selectedButton = 0;
-bool backPressed = false;
-bool selectPressed = false;
-bool isChargerSafe = false;
-bool isCharging = false;
-extern bool isChargingSequence;
 
-uint32_t CURRENT_TIME = 0;
-uint32_t PREVIOUS_TIME = 0;
-
-float LIMIT_VOLTS = 0;
-float LIMIT_AMPS = 0;
-
-uint16_t MAX_ALLOWED_PWR = 10000; 
+uint32_t button_interrupt_current_time = 0;
+uint32_t button_interrupt_previous_time = 0;
 
 uint16_t THERM_RESIST = 12000;
 uint16_t *therm_inlet = NULL;
@@ -93,19 +78,6 @@ float AMPS_AT_LOWER_MAX_CELL_CV_THRESH = 0;
 
 char codeBranch[6] = "Beta";
 char codeVersion[5] = "0.3.X";
-
-//TODO: CHECK IF BMS IS ACTUALLY BALANCING
-extern bool isBalancing;
-extern bool isBalancingControl;
-
-extern int currentChargingScreen;
-extern void SRE_Display_Charging1(void);
-extern void SRE_Display_Charging2(void);
-
-static uint8_t bmsFlags = 0;
-
-static bool in_trickle_mode = false;
-
 
 /* USER CODE END PV */
 
@@ -142,24 +114,27 @@ PUTCHAR_PROTOTYPE
 
 // INTERRUPTS FOR KEYS
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
-  if (GPIO_Pin == BTN_UP_Pin || GPIO_Pin == BTN_DWN_Pin || GPIO_Pin == BTN_SEL_Pin || GPIO_Pin == BTN_BCK_Pin) {
-  	// TODO: fix debouncing
-    CURRENT_TIME = HAL_GetTick();
-    int DEB_TIME_THRES = 200;
-    int TIME_DIFF = CURRENT_TIME - PREVIOUS_TIME;
-    if (TIME_DIFF > DEB_TIME_THRES) {
-		if (GPIO_Pin == BTN_UP_Pin && !selectPressed) {
-        selectedButton--;
-      } else if (GPIO_Pin == BTN_DWN_Pin && !selectPressed) {
-        selectedButton++;
-      } else if (GPIO_Pin == BTN_SEL_Pin) {
-        selectPressed = true;
-      } else if (GPIO_Pin == BTN_BCK_Pin && !selectPressed) {
-        backPressed = true;
-      }
-      PREVIOUS_TIME = CURRENT_TIME;
+    if (GPIO_Pin == BTN_UP_Pin || GPIO_Pin == BTN_DWN_Pin || GPIO_Pin == BTN_SEL_Pin || GPIO_Pin == BTN_BCK_Pin) {
+  	    // TODO: fix debouncing
+        button_interrupt_current_time = HAL_GetTick();
+        int debounce_time_threshold = 200;
+        int time_difference = button_interrupt_current_time - button_interrupt_previous_time;
+        if (time_difference > debounce_time_threshold) {
+            if (GPIO_Pin == BTN_UP_Pin) {
+                selected_option--;
+            }   
+            else if (GPIO_Pin == BTN_DWN_Pin) {
+                selected_option++;
+            } 
+            else if (GPIO_Pin == BTN_SEL_Pin) {
+                select_pressed = true;
+            } 
+            else if (GPIO_Pin == BTN_BCK_Pin) {
+                back_pressed = true;
+            }
+            button_interrupt_previous_time = button_interrupt_current_time;
+        }
     }
-  }
 }
 
 // FAN SPEED CONTROL
@@ -198,232 +173,6 @@ float READ_CPILOT_CURRENT() {
   return 0.0;
 }
 
-// CAN STUFF BEGIN
-
-struct CANMessage {
-	CAN_TxHeaderTypeDef TxHeader;
-	uint32_t TxMailbox;
-	uint8_t data[8];
-};
-
-struct bmsAndElconData {
-  float BMS_avgVolt;
-  float BMS_sumOfCells;
-  float BMS_minVolt;
-  float BMS_maxVolt;
-  float BMS_avgTemp;
-  float BMS_minTemp;
-  float BMS_maxTemp;
-  float BMS_stateOfCharge; // TODO: not float
-  float BMS_packImbalance;
-  float ELCON_outVolt;
-  float ELCON_outCurrent;
-  bool ELCON_fault[5];
-  /*
-    Bit 0: 0 -> no hw fail, 1 -> hw fail
-    Bit 1: 0 -> no over temp, 1 -> overtemp
-    Bit 2: 0 -> input volt right, 1 -> input volt wrong
-    Bit 3: 0 -> batt volt detected, 1 -> batt volt not detected
-    Bit 4: 0 -> comms good, 1 -> comms timeout
-  */
-};
-
-// TODO: maybe move the below
-volatile struct bmsAndElconData currentBmsAndElconData = {0};
-CAN_RxHeaderTypeDef RxHeader;
-uint8_t RxData[8];
-
-uint32_t elconBmsFilterIDs[4] = {
-  0x600, // BMS imbalance
-  0x621, // BMS soc
-  0x622, // BMS volt/temp high+low
-  0x18FF50E5, // Elcon
-};
-// TODO: maybe move the above
-
-HAL_StatusTypeDef CAN_Start() {
-	return HAL_CAN_Start(&hcan1);
-}
-
-HAL_StatusTypeDef CAN_Activate() {
-	return HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING);
-}
-
-HAL_StatusTypeDef CAN_Send(struct CANMessage *canMsgPtr) {
-	return HAL_CAN_AddTxMessage(&hcan1, &canMsgPtr->TxHeader, (uint8_t*) canMsgPtr->data, &canMsgPtr->TxMailbox);
-}
-
-void CAN_SettingsInit(struct CANMessage *canMsgPtr, bool isExtended, uint16_t dlc_length) {
-  CAN_Start();
-  CAN_Activate();
-
-  canMsgPtr->TxHeader.IDE = (isExtended) ? CAN_ID_EXT : CAN_ID_STD;
-  canMsgPtr->TxHeader.ExtId = (isExtended) ? 0x00000000 : 0x000;
-  canMsgPtr->TxHeader.RTR = CAN_RTR_DATA;
-  canMsgPtr->TxHeader.DLC = dlc_length;
-
-  // ----- Filter 0: BMS ID 0x600 -----
-  CAN_FilterTypeDef filter0 = {0};
-  filter0.FilterBank = 0;
-  filter0.FilterMode = CAN_FILTERMODE_IDMASK;
-  filter0.FilterScale = CAN_FILTERSCALE_32BIT;
-  filter0.FilterFIFOAssignment = CAN_FILTER_FIFO0;
-  filter0.FilterActivation = ENABLE;
-  filter0.FilterIdHigh     = (elconBmsFilterIDs[0] << 5) & 0xFFFF;
-  filter0.FilterIdLow      = 0;
-  filter0.FilterMaskIdHigh = 0xFFFF;
-  filter0.FilterMaskIdLow  = 0xFFFF;
-
-  // ----- Filter 1: BMS ID 0x621 -----
-  CAN_FilterTypeDef filter1 = {0};
-  filter1.FilterBank = 1;
-  filter1.FilterMode = CAN_FILTERMODE_IDMASK;
-  filter1.FilterScale = CAN_FILTERSCALE_32BIT;
-  filter1.FilterFIFOAssignment = CAN_FILTER_FIFO0;
-  filter1.FilterActivation = ENABLE;
-  filter1.FilterIdHigh     = (elconBmsFilterIDs[1] << 5) & 0xFFFF;
-  filter1.FilterIdLow      = 0;
-  filter1.FilterMaskIdHigh = 0xFFFF;
-  filter1.FilterMaskIdLow  = 0xFFFF;
-
-  // ----- Filter 2: BMS ID 0x622 -----
-  CAN_FilterTypeDef filter2 = {0};
-  filter2.FilterBank = 2;
-  filter2.FilterMode = CAN_FILTERMODE_IDMASK;
-  filter2.FilterScale = CAN_FILTERSCALE_32BIT;
-  filter2.FilterFIFOAssignment = CAN_FILTER_FIFO0;
-  filter2.FilterActivation = ENABLE;
-  filter2.FilterIdHigh     = (elconBmsFilterIDs[2] << 5) & 0xFFFF;
-  filter2.FilterIdLow      = 0;
-  filter2.FilterMaskIdHigh = 0xFFFF;
-  filter2.FilterMaskIdLow  = 0xFFFF;
-
-  // ----- Filter 3: ELCON Extended ID 0x18FF50E5 -----
-  CAN_FilterTypeDef filter3 = {0};
-  filter3.FilterBank = 3;
-  filter3.FilterMode = CAN_FILTERMODE_IDMASK;
-  filter3.FilterScale = CAN_FILTERSCALE_32BIT;
-  filter3.FilterFIFOAssignment = CAN_FILTER_FIFO0;
-  filter3.FilterActivation = ENABLE;
-  filter3.FilterIdHigh     = (elconBmsFilterIDs[3] >> 13) & 0xFFFF;
-  filter3.FilterIdLow      = ((elconBmsFilterIDs[3] << 3) & 0xFFFF) | (1 << 2);
-  filter3.FilterMaskIdHigh = 0xFFFF;
-  filter3.FilterMaskIdLow  = 0xFFFF;
-
-  // Apply filters
-  HAL_CAN_ConfigFilter(&hcan1, &filter0);
-  HAL_CAN_ConfigFilter(&hcan1, &filter1);
-  HAL_CAN_ConfigFilter(&hcan1, &filter2);
-  HAL_CAN_ConfigFilter(&hcan1, &filter3);
-
-  HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING);
-}
-
-void Set_CAN_Id(struct CANMessage *ptr, uint32_t id, bool isExtended) {
-  if (isExtended) {
-	  ptr->TxHeader.ExtId = id;
-  } else {
-    ptr->TxHeader.StdId = id;
-  }
-}
-
-void printBmsAndElconData(const volatile struct bmsAndElconData *d) {
-    printf("BMS_avgVolt       = %f V\n", d->BMS_avgVolt);
-    printf("BMS_sumOfCells    = %fV\n", d->BMS_sumOfCells);
-    printf("BMS_minVolt       = %f V\n", d->BMS_minVolt);
-    printf("BMS_maxVolt       = %f V\n", d->BMS_maxVolt);
-    printf("BMS_minTemp       = %f °C\n", d->BMS_minTemp);
-    printf("BMS_maxTemp       = %f °C\n", d->BMS_maxTemp);
-    printf("BMS_stateOfCharge = %f %%\n", d->BMS_stateOfCharge);
-    printf("BMS_packImbalance = %f V\n", d->BMS_packImbalance);
-    printf("ELCON_outVolt     = %f V\n", d->ELCON_outVolt);
-    printf("ELCON_outCurrent  = %f A\n", d->ELCON_outCurrent);
-
-    // Fault bits: 0=hw fail, 1=overtemp, 2=input volt wrong, 3=batt volt not detected, 4=comms timeout
-    printf("ELCON_faults      = [");
-    for (int i = 0; i < 5; ++i) {
-        printf("%s", d->ELCON_fault[i] ? "1" : "0");
-        if (i < 4) printf(", ");
-    }
-    printf("]\n");
-}
-
-void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
-  if (HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &RxHeader, RxData) != HAL_OK) {
-    Error_Handler();
-  }
-
-  CURRENT_TIME = HAL_GetTick();
-  int BMS_CAN_DEBOUNCE_MS = 1000;
-  int TIME_DIFF = CURRENT_TIME - PREVIOUS_TIME;
-
-  if (RxHeader.IDE == CAN_ID_EXT && RxHeader.ExtId == elconBmsFilterIDs[3]) {
-    currentBmsAndElconData.ELCON_outVolt = ((RxData[0] << 8) | RxData[1]) * 0.1;
-    currentBmsAndElconData.ELCON_outCurrent = ((RxData[2] << 8) | RxData[3])* 0.1;
-    currentBmsAndElconData.ELCON_fault[4] = RxData[4] & 0x10;
-    currentBmsAndElconData.ELCON_fault[3] = RxData[4] & 0x08;
-    currentBmsAndElconData.ELCON_fault[2] = RxData[4] & 0x04;
-    currentBmsAndElconData.ELCON_fault[1] = RxData[4] & 0x02;
-    currentBmsAndElconData.ELCON_fault[0] = RxData[4] & 0x01;
-  }
-
-  if (RxHeader.IDE == CAN_ID_STD && TIME_DIFF > BMS_CAN_DEBOUNCE_MS) {
-    if (RxHeader.StdId == elconBmsFilterIDs[0]) {
-      bmsFlags |= FLAG_600;
-      currentBmsAndElconData.BMS_sumOfCells = ((RxData[7] << 8) | RxData[6]) * 0.01;
-      currentBmsAndElconData.BMS_avgVolt = currentBmsAndElconData.BMS_sumOfCells / 96;
-      currentBmsAndElconData.BMS_packImbalance = ((RxData[3] << 8) | RxData[2]) * 0.0001;
-    } else if (RxHeader.StdId == elconBmsFilterIDs[1]) {
-      bmsFlags |= FLAG_621;
-      currentBmsAndElconData.BMS_stateOfCharge = RxData[2];
-    } else if (RxHeader.StdId == elconBmsFilterIDs[2]) {
-      bmsFlags |= FLAG_622;
-      currentBmsAndElconData.BMS_minTemp = RxData[5];
-      currentBmsAndElconData.BMS_maxTemp = RxData[4];
-      currentBmsAndElconData.BMS_minVolt = ((RxData[3] << 8) | RxData[2]) * 0.0001;
-      currentBmsAndElconData.BMS_maxVolt = ((RxData[1] << 8) | RxData[0]) * 0.0001;
-    }
-
-    if (bmsFlags == (FLAG_600 | FLAG_621 | FLAG_622)) {
-      PREVIOUS_TIME = CURRENT_TIME;
-      bmsFlags = 0;
-    }
-  }
-}
-
-void CAN_Balance(struct CANMessage *ptr, bool balancing_enabled) {
-  uint32_t CAN_ID = 0x604;
-  Set_CAN_Id(ptr, CAN_ID, false);
-  ptr->data[0] = (balancing_enabled) ? 0x1 : 0x0;
-  HAL_Delay(10);
-  CAN_Send(ptr);
-}
-
-void CAN_Charge(struct CANMessage *ptr, float chargingLimitsVoltsFloat, float chargingLimitsAmpsFloat, bool charge_enable) {
-  // Check for mailbox instead of delay
-  uint32_t CAN_ID = 0x1806E5F4;
-  Set_CAN_Id(ptr, CAN_ID, true);
-
-  chargingLimitsVoltsFloat *= 10;
-  chargingLimitsAmpsFloat *= 10;
-  uint16_t chargingLimitsVolts = (uint16_t)chargingLimitsVoltsFloat;
-  uint16_t chargingLimitsAmps = (uint16_t)chargingLimitsAmpsFloat;
-  printf("CHARGING LIMIT VOLTS: %d, CHARGING LIMIT AMPS: %d", chargingLimitsVolts, chargingLimitsAmps);
-
-  ptr->data[0] = (chargingLimitsVolts >> 8) & 0xFF;
-  ptr->data[1] = chargingLimitsVolts & 0xFF;
-  ptr->data[2] = (chargingLimitsAmps >> 8) & 0xFF;
-  ptr->data[3] = chargingLimitsAmps & 0xFF;
-  ptr->data[4] = (charge_enable) ? 0x00 : 0x01;
-  ptr->data[5] = 0x00;
-  ptr->data[6] = 0x00;
-  ptr->data[7] = 0x00;
-
-  HAL_Delay(3);
-  CAN_Send(ptr);
-}
-
-// CAN STUFF END
 
 /* USER CODE END 0 */
 
@@ -466,14 +215,14 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   // INIT DISPLAY
-  SRE_Display_Init(false);
+  display_init();
 
   // INIT CHARGING CAN STRUCT
-  struct CANMessage charging_msg;
+  CANMessage charging_msg;
   CAN_SettingsInit(&charging_msg, true, 8);
 
   // INIT BALANCING CAN STRUCT
-  struct CANMessage balancing_msg;
+  CANMessage balancing_msg;
   CAN_SettingsInit(&balancing_msg, false, 1);
 
   // INIT PWM
@@ -484,29 +233,10 @@ int main(void)
   HAL_TIM_Base_Start(&htim3);
   HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adc_buffer, 2);
 
-  HAL_Delay(500);
-
-  // TEMP STUFF 1 START
-  DISP_KanoaSplash(); // TODO: call this in the GUI init instead
   HAL_Delay(1000);
-  // while(true) {
-  //   printf("INLET TEMP: %.2f\n", READ_THERM(therm_inlet, THERM_RESIST));
-  //   HAL_Delay(1000);
-  //   printf("OUTLET TEMP:%.2f\n", READ_THERM(therm_outlet, THERM_RESIST));
-  //   HAL_Delay(1000);
-  //   printBmsAndElconData(&currentBmsAndElconData);
-  //   HAL_Delay(1000);
-  // }
   therm_inlet = &adc_buffer[0];
   therm_outlet = &adc_buffer[1];
-  GPIO_PinState IN_HVIL_SW_STATE;
-  GPIO_PinState RTC_SW_STATE;
-  GPIO_PinState IN_HVIL_ESTOP_Pin_State;
-  GPIO_PinState IN_HVIL_CHAR_Pin_State;
-  GPIO_PinState IN_HVIL_TERM_Pin_State;
-  GPIO_PinState IN_HVIL_ACUM_Pin_State;
-  GPIO_PinState IN_HVIL_FSW_Pin_State;
-  char chargingInfoString[30];
+  
    // TODO: better init for GUI
   // TEMP STUFF 1 END
 
@@ -524,176 +254,10 @@ int main(void)
     HAL_I2C_Master_Transmit(&hi2c2, 0x04 << 1, &data, 1, 10);
 
     // TODO: CHECK ALL LEDS AND PERIPHERALS WORK
-    //TODO: DOUBLE CHECK
-    if (!isCharging && !isBalancing && !isChargingSequence) {
-      isBalancing = false;
-      isBalancingControl = false;
-      CAN_Balance(&balancing_msg, false);
-      SRE_Display_Test();
-    }
-    if (isChargingSequence) {
-      ssd1306_Fill(Black);
-	    ssd1306_UpdateScreen();
-    }
-	  
-
-    IN_HVIL_SW_STATE = HAL_GPIO_ReadPin(IN_HVIL_FSW_GPIO_Port, IN_HVIL_FSW_Pin);
-	  RTC_SW_STATE = HAL_GPIO_ReadPin(IN_RTC_SW_GPIO_Port, IN_RTC_SW_Pin);
-
-    // TEMP STUFF 2 START
-    sprintf(chargingInfoString, "%.2f volts @ %.2f amps", LIMIT_VOLTS, LIMIT_AMPS);
-    // TEMP STUFF 2 END
-
-
-    IN_HVIL_ESTOP_Pin_State = HAL_GPIO_ReadPin(IN_HVIL_ESTOP_GPIO_Port, IN_HVIL_ESTOP_Pin);
-    IN_HVIL_TERM_Pin_State = HAL_GPIO_ReadPin(IN_HVIL_TERM_GPIO_Port, IN_HVIL_TERM_Pin);
-    IN_HVIL_ACUM_Pin_State = HAL_GPIO_ReadPin(IN_HVIL_ACUM_GPIO_Port, IN_HVIL_ACUM_Pin);
-    IN_HVIL_FSW_Pin_State = HAL_GPIO_ReadPin(IN_HVIL_FSW_GPIO_Port, IN_HVIL_FSW_Pin);
-
-    //VERIFY THIS
-    if (IN_HVIL_ESTOP_Pin_State == GPIO_PIN_SET ||
-        IN_HVIL_CHAR_Pin_State  == GPIO_PIN_SET ||
-        IN_HVIL_TERM_Pin_State  == GPIO_PIN_SET ||
-        IN_HVIL_ACUM_Pin_State  == GPIO_PIN_SET)
-        isChargerSafe = true;
-    else if (IN_HVIL_ESTOP_Pin_State == GPIO_PIN_RESET &&
-        IN_HVIL_CHAR_Pin_State  == GPIO_PIN_RESET &&
-        IN_HVIL_TERM_Pin_State  == GPIO_PIN_RESET &&
-        IN_HVIL_ACUM_Pin_State  == GPIO_PIN_RESET)
-        isChargerSafe = false;
-
-    // TODO: add -> IN_HVIL_CHAR_Pin_State == GPIO_PIN_RESET
     
-    if (!isChargerSafe)
-    {
-      CAN_Charge(&charging_msg, LIMIT_VOLTS, LIMIT_AMPS, false);
-      isCharging = false;
-      CAN_Balance(&balancing_msg, false);
-      isBalancing = false;
-      ssd1306_Fill(Black);
-	    ssd1306_UpdateScreen();
-      ssd1306_SetCursor(5, 5);
-      ssd1306_WriteString("HVIL ERROR", Font_6x8, White); // TODO: make this more clear
-      ssd1306_UpdateScreen();
-    } 
-    else if (isChargerSafe && !IN_HVIL_FSW_Pin_State) {
-      ssd1306_SetCursor(5, 5);
-      CAN_Charge(&charging_msg, LIMIT_VOLTS, LIMIT_AMPS, false);
-      isCharging = false;
-      CAN_Balance(&balancing_msg, false);
-      isBalancing = false;
-      ssd1306_WriteString("PLS FLIP HV", Font_6x8, White);
-    }
-    else if (isChargerSafe && IN_HVIL_FSW_Pin_State) {
-      if(RTC_SW_STATE && !isBalancingControl) {
-        HAL_GPIO_WritePin(GPIOA, LED_HV_Pin, GPIO_PIN_SET);
-        ssd1306_SetCursor(5, 5);
-        CAN_Charge(&charging_msg, LIMIT_VOLTS, LIMIT_AMPS, false);
-        //CAN_BALANCE= FALSE? or isBalancing = false?
-        isCharging = false;
-        ssd1306_WriteString("PLS FLIP RTC", Font_6x8, White);
-      } else if (!RTC_SW_STATE && !isBalancingControl) {
-        isChargingSequence = false;
-        /*
-            TODO: create a combo balance + charge function for safety
-          - Ensure commanded output does not go above 4kW = I*V
-          - When highest cell is >= 4.1v decrease current linearly until 4.25v then balance if imbalance >= 10mV then resume charging
-        */
-        if (LIMIT_AMPS * LIMIT_VOLTS <= (MAX_ALLOWED_PWR * 97 /100))
-        {
-
-          if (in_trickle_mode) {
-            if (currentBmsAndElconData.BMS_maxVolt < (UPPER_MAX_CELL_CV_THRESH - HYSTERESIS_VOLTS)) {
-              in_trickle_mode = false;
-            }
-          }
-          else {
-            if (currentBmsAndElconData.BMS_maxVolt >= UPPER_MAX_CELL_CV_THRESH) {
-              in_trickle_mode = true;
-            }
-          }
-
-          if (in_trickle_mode)
-          {
-            // Stop charging and start balancing
-            AMPS_AT_LOWER_MAX_CELL_CV_THRESH = currentBmsAndElconData.ELCON_outCurrent; // TODO: maybe change
-            if (currentBmsAndElconData.BMS_packImbalance >= MIN_ALLOWED_IMBAL)
-            {
-              // Imbalance greater than 10mV => balance and stop charging
-              CAN_Charge(&charging_msg, LIMIT_VOLTS, LIMIT_AMPS, false);
-              isCharging = false;
-              CAN_Balance(&balancing_msg, true);
-              isBalancing = true;
-            }
-            else if (currentBmsAndElconData.BMS_packImbalance <= MIN_ALLOWED_IMBAL)
-            {
-              // Imbalance less than 10mV => charge at 0.5A and whatever the current pack voltage is
-              CAN_Balance(&balancing_msg, false);
-              isBalancing = false;
-              // TODO: clean up and make part of main loop
-              if ((currentBmsAndElconData.BMS_sumOfCells* MAINT_AMPS) <= MAX_ALLOWED_PWR)
-              {
-                CAN_Charge(&charging_msg, currentBmsAndElconData.BMS_sumOfCells, MAINT_AMPS, true);
-                isCharging = true;
-              }
-              else if ((currentBmsAndElconData.BMS_sumOfCells * MAINT_AMPS) >= MAX_ALLOWED_PWR)
-              {
-                // TODO: add proper error state
-              }
-            }
-          }
-          else if (currentBmsAndElconData.BMS_maxVolt >= LOWER_MAX_CELL_CV_THRESH)
-          {
-            // Highest cell volt above 4.1v, now command current linearly
-            CAN_Balance(&balancing_msg, false);
-            isBalancing = false;
-            float current = LIMIT_AMPS + ((MAINT_AMPS - LIMIT_AMPS) / (UPPER_MAX_CELL_CV_THRESH - LOWER_MAX_CELL_CV_THRESH) * (currentBmsAndElconData.BMS_maxVolt - LOWER_MAX_CELL_CV_THRESH));
-            // float slope = (MAINT_AMPS - AMPS_AT_LOWER_MAX_CELL_CV_THRESH) / (UPPER_MAX_CELL_CV_THRESH - LOWER_MAX_CELL_CV_THRESH);
-           // slope * LIMIT_VOLTS
-            CAN_Charge(&charging_msg, LIMIT_VOLTS, current, true);
-            isCharging = true;
-            printf("current %.2f\n", current);
-          }
-          else if (currentBmsAndElconData.BMS_maxVolt <= LOWER_MAX_CELL_CV_THRESH)
-          {
-            // Highest cell volt under 4.1v, charge normally and stop balancing
-            CAN_Balance(&balancing_msg, false);
-            isBalancing = false;
-            CAN_Charge(&charging_msg, LIMIT_VOLTS, LIMIT_AMPS, true);
-            isCharging = true;
-          }
-          } else if (LIMIT_AMPS * LIMIT_VOLTS <= (MAX_ALLOWED_PWR * 97 /100)) {
-            // TODO: add proper error state
-            // Over max power to pull => throw error and stop charging
-          }
-        // ssd1306_WriteString("Now Charging", Font_6x8, White);
-        // ssd1306_SetCursor(5, 20);
-        // ssd1306_WriteString(chargingInfoString, Font_6x8, White);
-        if (currentChargingScreen == 1) {
-          SRE_Display_Charging1();
-        }
-        else if (currentChargingScreen == 2) {
-          SRE_Display_Charging2();
-        }
-      } else if (isBalancingControl) {
-          isChargingSequence = false;
-          CAN_Balance(&balancing_msg, true);
-          isBalancing = true;
-          HAL_GPIO_WritePin(GPIOA, LED_BAL_Pin, GPIO_PIN_SET);
-          if (currentChargingScreen == 1) {
-            SRE_Display_Charging1();
-          }
-          else if (currentChargingScreen == 2) {
-            SRE_Display_Charging2();
-          }
-      } else {
-        HAL_GPIO_WritePin(GPIOA, LED_HV_Pin, GPIO_PIN_RESET);
-        HAL_GPIO_WritePin(GPIOA, LED_BAL_Pin, GPIO_PIN_RESET);
-        ssd1306_SetCursor(5, 5);
-        ssd1306_WriteString("Not Charging", Font_6x8, White);
-      }
-    }
-		ssd1306_UpdateScreen();
+    display_update_state();
+    charger_handle_charging(&charging_msg, &balancing_msg);
+   
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
