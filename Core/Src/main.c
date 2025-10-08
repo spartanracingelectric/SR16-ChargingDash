@@ -141,23 +141,25 @@ PUTCHAR_PROTOTYPE
 /* USER CODE BEGIN 0 */
 
 // INTERRUPTS FOR KEYS
+volatile int button_interrupt_current_time = 0;
+volatile int button_interrupt_previous_time = 0;
+int button_interrupt_debounce_threshold = 200;
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
   if (GPIO_Pin == BTN_UP_Pin || GPIO_Pin == BTN_DWN_Pin || GPIO_Pin == BTN_SEL_Pin || GPIO_Pin == BTN_BCK_Pin) {
   	// TODO: fix debouncing
-    CURRENT_TIME = HAL_GetTick();
-    int DEB_TIME_THRES = 200;
-    int TIME_DIFF = CURRENT_TIME - PREVIOUS_TIME;
-    if (TIME_DIFF > DEB_TIME_THRES) {
-		if (GPIO_Pin == BTN_UP_Pin && !selectPressed) {
-        selectedButton--;
+    button_interrupt_current_time = HAL_GetTick();
+    int time_difference = button_interrupt_current_time - button_interrupt_previous_time;
+    if (time_difference > button_interrupt_debounce_threshold) {
+      if (GPIO_Pin == BTN_UP_Pin && !selectPressed) {
+          selectedButton--;
       } else if (GPIO_Pin == BTN_DWN_Pin && !selectPressed) {
-        selectedButton++;
+          selectedButton++;
       } else if (GPIO_Pin == BTN_SEL_Pin) {
-        selectPressed = true;
+          selectPressed = true;
       } else if (GPIO_Pin == BTN_BCK_Pin && !selectPressed) {
-        backPressed = true;
+          backPressed = true;
       }
-      PREVIOUS_TIME = CURRENT_TIME;
+      button_interrupt_previous_time = button_interrupt_current_time;
     }
   }
 }
