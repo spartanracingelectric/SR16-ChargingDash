@@ -67,8 +67,8 @@ UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN PV */
 
-uint32_t button_interrupt_current_time = 0;
-uint32_t button_interrupt_previous_time = 0;
+uint32_t buttonInterruptCurrentTime = 0;
+uint32_t buttonInterruptPreviousTime = 0;
 
 uint16_t THERM_RESIST = 12000;
 uint16_t *therm_inlet = NULL;
@@ -116,23 +116,23 @@ PUTCHAR_PROTOTYPE
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
     if (GPIO_Pin == BTN_UP_Pin || GPIO_Pin == BTN_DWN_Pin || GPIO_Pin == BTN_SEL_Pin || GPIO_Pin == BTN_BCK_Pin) {
   	    // TODO: fix debouncing
-        button_interrupt_current_time = HAL_GetTick();
-        int debounce_time_threshold = 200;
-        int time_difference = button_interrupt_current_time - button_interrupt_previous_time;
-        if (time_difference > debounce_time_threshold) {
+        buttonInterruptCurrentTime = HAL_GetTick();
+        int debounceTimeThreshold = 200;
+        int timeDifference = buttonInterruptPreviousTime - buttonInterruptCurrentTime;
+        if (timeDifference > debounceTimeThreshold) {
             if (GPIO_Pin == BTN_UP_Pin) {
-                selected_option--;
+                selectedOption--;
             }   
             else if (GPIO_Pin == BTN_DWN_Pin) {
-                selected_option++;
+                selectedOption++;
             } 
             else if (GPIO_Pin == BTN_SEL_Pin) {
-                select_pressed = true;
+                selectPressed = true;
             } 
             else if (GPIO_Pin == BTN_BCK_Pin) {
-                back_pressed = true;
+                backPressed = true;
             }
-            button_interrupt_previous_time = button_interrupt_current_time;
+            buttonInterruptPreviousTime= buttonInterruptCurrentTime;
         }
     }
 }

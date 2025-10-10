@@ -1,4 +1,6 @@
 #include "can_interface.h"
+#include "charger.h"
+#include <stdio.h> 
 
 static uint8_t bmsFlags = 0;
 
@@ -24,11 +26,11 @@ HAL_StatusTypeDef CAN_Activate() {
 	return HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING);
 }
 
-HAL_StatusTypeDef CAN_Send(struct CANMessage *canMsgPtr) {
+HAL_StatusTypeDef CAN_Send(CANMessage *canMsgPtr) {
 	return HAL_CAN_AddTxMessage(&hcan1, &canMsgPtr->TxHeader, (uint8_t*) canMsgPtr->data, &canMsgPtr->TxMailbox);
 }
 
-void CAN_SettingsInit(struct CANMessage *canMsgPtr, bool isExtended, uint16_t dlc_length) {
+void CAN_SettingsInit(CANMessage *canMsgPtr, bool isExtended, uint16_t dlc_length) {
   CAN_Start();
   CAN_Activate();
 
@@ -94,7 +96,7 @@ void CAN_SettingsInit(struct CANMessage *canMsgPtr, bool isExtended, uint16_t dl
   HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING);
 }
 
-void Set_CAN_Id(struct CANMessage *ptr, uint32_t id, bool isExtended) {
+void Set_CAN_Id(CANMessage *ptr, uint32_t id, bool isExtended) {
   if (isExtended) {
 	  ptr->TxHeader.ExtId = id;
   } else {
@@ -144,7 +146,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
   }
 }
 
-void CAN_Balance(struct CANMessage *ptr, bool balancing_enabled) {
+void CAN_Balance(CANMessage *ptr, bool balancing_enabled) {
   uint32_t CAN_ID = 0x604;
   Set_CAN_Id(ptr, CAN_ID, false);
   ptr->data[0] = (balancing_enabled) ? 0x1 : 0x0;
@@ -152,7 +154,7 @@ void CAN_Balance(struct CANMessage *ptr, bool balancing_enabled) {
   CAN_Send(ptr);
 }
 
-void CAN_Charge(struct CANMessage *ptr, float chargingLimitsVoltsFloat, float chargingLimitsAmpsFloat, bool charge_enable) {
+void CAN_Charge(CANMessage *ptr, float chargingLimitsVoltsFloat, float chargingLimitsAmpsFloat, bool charge_enable) {
   // Check for mailbox instead of delay
   uint32_t CAN_ID = 0x1806E5F4;
   Set_CAN_Id(ptr, CAN_ID, true);

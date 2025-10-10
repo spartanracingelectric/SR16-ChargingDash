@@ -19,7 +19,7 @@ int numberOfProfiles = 9;
 
 int selectedOption = 0;
 bool selectPressed = false;
-bool backPresed= false;
+bool backPressed = false;
 
 displayState currentDisplayState = DISPLAY_STATE_NAVIGATION;
 displayState nextDisplayState = DISPLAY_STATE_NAVIGATION;
@@ -232,9 +232,9 @@ void Display_drawNavBar(char *options[], int numberOfNavBarOptions, int firstNav
 	}
 }
 
-
+//TODO: Title should only display Balancing if charger state is balancing, or it should show BAL symbol if auto balancing in charger state 
 displayState Display_displayInChargingStatsTwo() {
-	if (currentChargerState != CHARGER_STATE_CHARGING || 
+	if (currentChargerState != CHARGER_STATE_CHARGING && 
 		currentChargerState != CHARGER_STATE_BALANCING) {
 		return DISPLAY_STATE_NAVIGATION;
 	}
@@ -596,7 +596,7 @@ displayState Display_displayStartBalancing() {
 
 displayState Display_displayBalancingInitialization() {
 	Display_clear();
-	if (!charger_is_charger_safe()) {
+	if (!Charger_isChargerSafe()) {
     	ssd1306_SetCursor(5, 5);
 		ssd1306_WriteString("HVIL ERROR", Font_6x8, White);
 		ssd1306_UpdateScreen();
@@ -678,8 +678,9 @@ void Display_drawErrorSymbol(int x, int y) {
 	ssd1306_Line(x, y+6, x, y+6, White);
 }
 
+//TODO: Title should only display Balancing if charger state is balancing, or it should show BAL symbol if auto balancing in charger state 
 displayState Display_displayInChargingStatsOne() {
-	if (currentChargerState != CHARGER_STATE_CHARGING || 
+	if (currentChargerState != CHARGER_STATE_CHARGING && 
 		currentChargerState != CHARGER_STATE_BALANCING) {
 		return DISPLAY_STATE_NAVIGATION;
 	}

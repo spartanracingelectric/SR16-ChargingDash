@@ -51,6 +51,8 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user sources here
     Core/Src/display.c
     Core/Src/graphics.c
+    Core/Src/charger.c
+    Core/Src/can_interface.c
     Drivers/Display/ssd1306.c
     Drivers/Display/ssd1306_fonts.c
 )
