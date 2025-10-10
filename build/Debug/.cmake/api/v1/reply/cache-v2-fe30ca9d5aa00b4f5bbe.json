@@ -15,7 +15,7 @@
 				}
 			],
 			"type" : "FILEPATH",
-			"value" : "C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/arm-none-eabi-addr2line.exe"
+			"value" : "/opt/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/arm-none-eabi-addr2line"
 		},
 		{
 			"name" : "CMAKE_AR",
@@ -31,7 +31,7 @@
 				}
 			],
 			"type" : "FILEPATH",
-			"value" : "C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/arm-none-eabi-ar.exe"
+			"value" : "/opt/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/arm-none-eabi-ar"
 		},
 		{
 			"name" : "CMAKE_ASM_COMPILER_AR",
@@ -47,7 +47,7 @@
 				}
 			],
 			"type" : "FILEPATH",
-			"value" : "C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/arm-none-eabi-gcc-ar.exe"
+			"value" : "/opt/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/arm-none-eabi-gcc-ar"
 		},
 		{
 			"name" : "CMAKE_ASM_COMPILER_RANLIB",
@@ -63,7 +63,7 @@
 				}
 			],
 			"type" : "FILEPATH",
-			"value" : "C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/arm-none-eabi-gcc-ranlib.exe"
+			"value" : "/opt/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/arm-none-eabi-gcc-ranlib"
 		},
 		{
 			"name" : "CMAKE_ASM_COMPILER_WORKS",
@@ -179,7 +179,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "c:/Users/Owner/Documents/GitHub/SR16-ChargingDash/build/Debug"
+			"value" : "/Users/bhuvaneshselvaraj/Desktop/fsae_projects/SR16-ChargingDash/build/Debug"
 		},
 		{
 			"name" : "CMAKE_CACHE_MAJOR_VERSION",
@@ -227,7 +227,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "C:/ST/STM32CubeCLT_1.18.0/CMake/bin/cmake.exe"
+			"value" : "/opt/ST/STM32CubeCLT_1.18.0/CMake/bin/cmake"
 		},
 		{
 			"name" : "CMAKE_CPACK_COMMAND",
@@ -239,7 +239,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "C:/ST/STM32CubeCLT_1.18.0/CMake/bin/cpack.exe"
+			"value" : "/opt/ST/STM32CubeCLT_1.18.0/CMake/bin/cpack"
 		},
 		{
 			"name" : "CMAKE_CTEST_COMMAND",
@@ -251,7 +251,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "C:/ST/STM32CubeCLT_1.18.0/CMake/bin/ctest.exe"
+			"value" : "/opt/ST/STM32CubeCLT_1.18.0/CMake/bin/ctest"
 		},
 		{
 			"name" : "CMAKE_CXX_COMPILER_AR",
@@ -267,7 +267,7 @@
 				}
 			],
 			"type" : "FILEPATH",
-			"value" : "C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/arm-none-eabi-gcc-ar.exe"
+			"value" : "/opt/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/arm-none-eabi-gcc-ar"
 		},
 		{
 			"name" : "CMAKE_CXX_COMPILER_RANLIB",
@@ -283,7 +283,7 @@
 				}
 			],
 			"type" : "FILEPATH",
-			"value" : "C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/arm-none-eabi-gcc-ranlib.exe"
+			"value" : "/opt/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/arm-none-eabi-gcc-ranlib"
 		},
 		{
 			"name" : "CMAKE_CXX_FLAGS",
@@ -379,7 +379,7 @@
 				}
 			],
 			"type" : "FILEPATH",
-			"value" : "C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/arm-none-eabi-gcc-ar.exe"
+			"value" : "/opt/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/arm-none-eabi-gcc-ar"
 		},
 		{
 			"name" : "CMAKE_C_COMPILER_RANLIB",
@@ -395,7 +395,7 @@
 				}
 			],
 			"type" : "FILEPATH",
-			"value" : "C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/arm-none-eabi-gcc-ranlib.exe"
+			"value" : "/opt/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/arm-none-eabi-gcc-ranlib"
 		},
 		{
 			"name" : "CMAKE_C_FLAGS",
@@ -503,7 +503,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "C:/ST/STM32CubeCLT_1.18.0/CMake/bin/cmake-gui.exe"
+			"value" : "/opt/ST/STM32CubeCLT_1.18.0/CMake/bin/ccmake"
 		},
 		{
 			"name" : "CMAKE_EXECUTABLE_FORMAT",
@@ -531,7 +531,7 @@
 				}
 			],
 			"type" : "STRING",
-			"value" : ""
+			"value" : "-L/usr/local/opt/openssl/lib"
 		},
 		{
 			"name" : "CMAKE_EXE_LINKER_FLAGS_DEBUG",
@@ -619,7 +619,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "C:/Users/Owner/Documents/GitHub/SR16-ChargingDash/build/Debug/CMakeFiles/pkgRedirects"
+			"value" : "/Users/bhuvaneshselvaraj/Desktop/fsae_projects/SR16-ChargingDash/build/Debug/CMakeFiles/pkgRedirects"
 		},
 		{
 			"name" : "CMAKE_GENERATOR",
@@ -679,7 +679,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "C:/Users/Owner/Documents/Github/SR16-ChargingDash"
+			"value" : "/Users/bhuvaneshselvaraj/Desktop/fsae_projects/SR16-ChargingDash"
 		},
 		{
 			"name" : "CMAKE_INSTALL_PREFIX",
@@ -691,7 +691,7 @@
 				}
 			],
 			"type" : "PATH",
-			"value" : "C:/Program Files (x86)/SR16-ChargingDash"
+			"value" : "/usr/local"
 		},
 		{
 			"name" : "CMAKE_MAKE_PROGRAM",
@@ -707,7 +707,7 @@
 				}
 			],
 			"type" : "FILEPATH",
-			"value" : "C:/ST/STM32CubeCLT_1.18.0/Ninja/bin/ninja.exe"
+			"value" : "/opt/homebrew/bin/ninja"
 		},
 		{
 			"name" : "CMAKE_MODULE_LINKER_FLAGS",
@@ -723,7 +723,7 @@
 				}
 			],
 			"type" : "STRING",
-			"value" : ""
+			"value" : "-L/usr/local/opt/openssl/lib"
 		},
 		{
 			"name" : "CMAKE_MODULE_LINKER_FLAGS_DEBUG",
@@ -803,7 +803,7 @@
 				}
 			],
 			"type" : "FILEPATH",
-			"value" : "C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/arm-none-eabi-nm.exe"
+			"value" : "/opt/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/arm-none-eabi-nm"
 		},
 		{
 			"name" : "CMAKE_NUMBER_OF_MAKEFILES",
@@ -831,7 +831,7 @@
 				}
 			],
 			"type" : "FILEPATH",
-			"value" : "C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/arm-none-eabi-objdump.exe"
+			"value" : "/opt/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/arm-none-eabi-objdump"
 		},
 		{
 			"name" : "CMAKE_PLATFORM_INFO_INITIALIZED",
@@ -895,7 +895,7 @@
 				}
 			],
 			"type" : "FILEPATH",
-			"value" : "C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/arm-none-eabi-ranlib.exe"
+			"value" : "/opt/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/arm-none-eabi-ranlib"
 		},
 		{
 			"name" : "CMAKE_READELF",
@@ -911,7 +911,7 @@
 				}
 			],
 			"type" : "FILEPATH",
-			"value" : "C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/arm-none-eabi-readelf.exe"
+			"value" : "/opt/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/arm-none-eabi-readelf"
 		},
 		{
 			"name" : "CMAKE_ROOT",
@@ -923,7 +923,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "C:/ST/STM32CubeCLT_1.18.0/CMake/share/cmake-3.28"
+			"value" : "/opt/ST/STM32CubeCLT_1.18.0/CMake/share/cmake-3.28"
 		},
 		{
 			"name" : "CMAKE_SHARED_LINKER_FLAGS",
@@ -939,7 +939,7 @@
 				}
 			],
 			"type" : "STRING",
-			"value" : ""
+			"value" : "-L/usr/local/opt/openssl/lib"
 		},
 		{
 			"name" : "CMAKE_SHARED_LINKER_FLAGS_DEBUG",
@@ -1131,7 +1131,7 @@
 				}
 			],
 			"type" : "FILEPATH",
-			"value" : "C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/arm-none-eabi-strip.exe"
+			"value" : "/opt/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/arm-none-eabi-strip"
 		},
 		{
 			"name" : "CMAKE_TAPI",
@@ -1155,11 +1155,23 @@
 			[
 				{
 					"name" : "HELPSTRING",
-					"value" : "No help, variable specified on the command line."
+					"value" : "The CMake toolchain file"
 				}
 			],
-			"type" : "UNINITIALIZED",
-			"value" : "C:/Users/Owner/Documents/GitHub/SR16-ChargingDash/cmake/gcc-arm-none-eabi.cmake"
+			"type" : "FILEPATH",
+			"value" : "/Users/bhuvaneshselvaraj/Desktop/fsae_projects/SR16-ChargingDash/cmake/gcc-arm-none-eabi.cmake"
+		},
+		{
+			"name" : "CMAKE_UNAME",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "uname command"
+				}
+			],
+			"type" : "INTERNAL",
+			"value" : "/usr/bin/uname"
 		},
 		{
 			"name" : "CMAKE_VERBOSE_MAKEFILE",
@@ -1187,7 +1199,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "C:/Users/Owner/Documents/GitHub/SR16-ChargingDash/build/Debug"
+			"value" : "/Users/bhuvaneshselvaraj/Desktop/fsae_projects/SR16-ChargingDash/build/Debug"
 		},
 		{
 			"name" : "SR16-ChargingDash_IS_TOP_LEVEL",
@@ -1211,7 +1223,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "C:/Users/Owner/Documents/GitHub/SR16-ChargingDash"
+			"value" : "/Users/bhuvaneshselvaraj/Desktop/fsae_projects/SR16-ChargingDash"
 		}
 	],
 	"kind" : "cache",

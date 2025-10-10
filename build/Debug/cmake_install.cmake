@@ -1,8 +1,8 @@
-# Install script for directory: C:/Users/Owner/Documents/GitHub/SR16-ChargingDash
+# Install script for directory: /Users/bhuvaneshselvaraj/Desktop/fsae_projects/SR16-ChargingDash
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "C:/Program Files (x86)/SR16-ChargingDash")
+  set(CMAKE_INSTALL_PREFIX "/usr/local")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 
@@ -34,12 +34,12 @@ endif()
 
 # Set default install directory permissions.
 if(NOT DEFINED CMAKE_OBJDUMP)
-  set(CMAKE_OBJDUMP "C:/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/arm-none-eabi-objdump.exe")
+  set(CMAKE_OBJDUMP "/opt/ST/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/arm-none-eabi-objdump")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("C:/Users/Owner/Documents/GitHub/SR16-ChargingDash/build/Debug/cmake/stm32cubemx/cmake_install.cmake")
+  include("/Users/bhuvaneshselvaraj/Desktop/fsae_projects/SR16-ChargingDash/build/Debug/cmake/stm32cubemx/cmake_install.cmake")
 endif()
 
 if(CMAKE_INSTALL_COMPONENT)
@@ -50,5 +50,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "C:/Users/Owner/Documents/GitHub/SR16-ChargingDash/build/Debug/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/Users/bhuvaneshselvaraj/Desktop/fsae_projects/SR16-ChargingDash/build/Debug/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

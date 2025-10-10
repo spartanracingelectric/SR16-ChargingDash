@@ -6,41 +6,41 @@ float LIMIT_AMPS = 0;
 uint16_t MAX_ALLOWED_PWR = 10000;
 
 volatile bmsAndElconData currentBmsAndElconData = {0};
-charging_mode current_charging_mode = CHARGING_MODE_CONSTANT_CURRENT;
-charger_state current_charger_state = CHARGER_STATE_IDLE;
+chargingMode currentChargingMode = CHARGING_MODE_CONSTANT_CURRENT;
+chargerState currentChargerState = CHARGER_STATE_IDLE;
 
 
-void charger_update_charging_mode() {
-    if (current_charger_state == CHARGER_STATE_BALANCING) {
-        current_charging_mode = CHARGING_MODE_BALANCING;
+void Charger_updateChargingMode() {
+    if (currentChargerState == CHARGER_STATE_BALANCING) {
+        currentChargingMode = CHARGING_MODE_BALANCING;
         return;
     }
 
     if (currentBmsAndElconData.BMS_maxVolt >= UPPER_MAX_CELL_CV_THRESH) {
         if (currentBmsAndElconData.BMS_packImbalance >= MIN_ALLOWED_IMBAL) {
-            current_charging_mode = CHARGING_MODE_BALANCING;
+            currentChargingMode = CHARGING_MODE_BALANCING;
             return;
         }
         else {
-            current_charging_mode = CHARGING_MODE_MAINTENANCE;
+            currentChargingMode = CHARGING_MODE_MAINTENANCE;
             return;
         }
     }
 
     if (currentBmsAndElconData.BMS_maxVolt >= LOWER_MAX_CELL_CV_THRESH 
         && currentBmsAndElconData.BMS_maxVolt < UPPER_MAX_CELL_CV_THRESH) {
-        current_charging_mode = CHARGING_MODE_CURRENT_TAPER;
+        currentChargingMode = CHARGING_MODE_CURRENT_TAPER;
         return;
     }
 
     if (currentBmsAndElconData.BMS_maxVolt < LOWER_MAX_CELL_CV_THRESH) {
-        current_charging_mode = CHARGING_MODE_CONSTANT_CURRENT;
+        currentChargingMode = CHARGING_MODE_CONSTANT_CURRENT;
         return;
     }
 }
 
-bool charger_check_charging_conditions() {
-    if (current_charger_state == CHARGER_STATE_BALANCING) {
+bool Charger_checkChargerConditions() {
+    if (currentChargerState == CHARGER_STATE_BALANCING) {
         return (charger_is_charger_safe() && charger_is_hvil_switch_flipped());
     }
     else {
@@ -49,10 +49,10 @@ bool charger_check_charging_conditions() {
     }
 }
 
-void charger_handle_charging(CANMessage *charging_msg, CANMessage *balancing_msg) {
+void Charger_handleCharging(CANMessage *charging_msg, CANMessage *balancing_msg) {
     //If balancing or charging, always check charging conditions
-    if (current_charger_state != CHARGER_STATE_IDLE && !charger_check_charging_conditions()) {
-        current_charger_state = CHARGER_STATE_IDLE;
+    if (currentChargerState != CHARGER_STATE_IDLE && !charger_check_charging_conditions()) {
+        currentChargerState = CHARGER_STATE_IDLE;
         CAN_Charge(&charging_msg, LIMIT_VOLTS, LIMIT_AMPS, false);
         CAN_Balance(&balancing_msg, false);
         HAL_GPIO_WritePin(GPIOA, LED_BAL_Pin, GPIO_PIN_RESET);
@@ -60,33 +60,33 @@ void charger_handle_charging(CANMessage *charging_msg, CANMessage *balancing_msg
         return;
     }
 
-    if (current_charger_state == CHARGER_STATE_IDLE) {
+    if (currentChargerState == CHARGER_STATE_IDLE) {
         CAN_Charge(&charging_msg, LIMIT_VOLTS, LIMIT_AMPS, false);
         CAN_Balance(&balancing_msg, false);
         HAL_GPIO_WritePin(GPIOA, LED_BAL_Pin, GPIO_PIN_RESET);
         return;
     }
 
-    if (current_charger_state == CHARGER_STATE_CHARGING) {
+    if (currentChargerState == CHARGER_STATE_CHARGING) {
         charger_update_charging_mode();
-        if (current_charging_mode == CHARGING_MODE_BALANCING) {
+        if (currentChargingMode == CHARGING_MODE_BALANCING) {
             CAN_Charge(charging_msg, LIMIT_VOLTS, LIMIT_AMPS, false);
             CAN_Balance(balancing_msg, true);
             HAL_GPIO_WritePin(GPIOA, LED_BAL_Pin, GPIO_PIN_SET);
         }
-        else if (current_charging_mode == CHARGING_MODE_MAINTENANCE) {
+        else if (currentChargingMode == CHARGING_MODE_MAINTENANCE) {
             CAN_Charge(charging_msg, currentBmsAndElconData.BMS_sumOfCells, MAINT_AMPS, false);
             CAN_Balance(balancing_msg, false);
             HAL_GPIO_WritePin(GPIOA, LED_BAL_Pin, GPIO_PIN_RESET);
 
         }
-        else if (current_charging_mode == CHARGING_MODE_CURRENT_TAPER) {
+        else if (currentChargingMode == CHARGING_MODE_CURRENT_TAPER) {
             float current = LIMIT_AMPS + ((MAINT_AMPS - LIMIT_AMPS) / (UPPER_MAX_CELL_CV_THRESH - LOWER_MAX_CELL_CV_THRESH) * (currentBmsAndElconData.BMS_maxVolt - LOWER_MAX_CELL_CV_THRESH));
             CAN_Charge(charging_msg, LIMIT_VOLTS, current, true);
             CAN_Balance(balancing_msg, false);
             HAL_GPIO_WritePin(GPIOA, LED_BAL_Pin, GPIO_PIN_RESET);
         }
-        else if (current_charging_mode == CHARGING_MODE_CONSTANT_CURRENT) {
+        else if (currentChargingMode == CHARGING_MODE_CONSTANT_CURRENT) {
             CAN_Charge(charging_msg, LIMIT_VOLTS, LIMIT_AMPS, true);
             CAN_Balance(balancing_msg, false);
             HAL_GPIO_WritePin(GPIOA, LED_BAL_Pin, GPIO_PIN_RESET);
@@ -98,9 +98,9 @@ void charger_handle_charging(CANMessage *charging_msg, CANMessage *balancing_msg
         }
     }
     
-    if (current_charger_state == CHARGER_STATE_BALANCING)  {
+    if (currentChargerState == CHARGER_STATE_BALANCING)  {
         charger_update_charging_mode();
-        if (current_charging_mode == CHARGING_MODE_BALANCING) {
+        if (currentChargingMode == CHARGING_MODE_BALANCING) {
             CAN_Charge(charging_msg, LIMIT_VOLTS, LIMIT_AMPS, false);
             CAN_Balance(balancing_msg, true);
             HAL_GPIO_WritePin(GPIOA, LED_BAL_Pin, GPIO_PIN_SET);
@@ -108,7 +108,7 @@ void charger_handle_charging(CANMessage *charging_msg, CANMessage *balancing_msg
     }
 }
 
-bool charger_is_charger_safe() {
+bool Charger_isChargerSafe() {
     GPIO_PinState IN_HVIL_CHAR_Pin_State;
     GPIO_PinState IN_HVIL_ESTOP_Pin_State = HAL_GPIO_ReadPin(IN_HVIL_ESTOP_GPIO_Port, IN_HVIL_ESTOP_Pin);
     GPIO_PinState IN_HVIL_TERM_Pin_State = HAL_GPIO_ReadPin(IN_HVIL_TERM_GPIO_Port, IN_HVIL_TERM_Pin);
@@ -129,7 +129,7 @@ bool charger_is_charger_safe() {
     return false;
 }
 
-bool charger_is_hvil_switch_flipped() {
+bool Charger_isHvilSwitchFlipped() {
     GPIO_PinState IN_HVIL_FSW_STATE = HAL_GPIO_ReadPin(IN_HVIL_FSW_GPIO_Port, IN_HVIL_FSW_Pin);
     if (IN_HVIL_FSW_STATE) {
         return true;
@@ -139,7 +139,7 @@ bool charger_is_hvil_switch_flipped() {
     }
 }
 
-bool charger_is_ready_to_charge_switch_flipped() {
+bool Charger_isReadyToChargeSwitchFlipped() {
     GPIO_PinState RTC_SW_STATE = HAL_GPIO_ReadPin(IN_RTC_SW_GPIO_Port, IN_RTC_SW_Pin);
     if (RTC_SW_STATE) {
         return false;
@@ -149,7 +149,7 @@ bool charger_is_ready_to_charge_switch_flipped() {
     }
 }
 
-void charger_print_bms_and_elcon_data(const volatile bmsAndElconData *d) {
+void Charger_printBmsAndElconData(const volatile bmsAndElconData *d) {
     printf("BMS_avgVolt       = %f V\n", d->BMS_avgVolt);
     printf("BMS_sumOfCells    = %fV\n", d->BMS_sumOfCells);
     printf("BMS_minVolt       = %f V\n", d->BMS_minVolt);

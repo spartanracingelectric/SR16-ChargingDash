@@ -16,13 +16,13 @@ typedef enum {
     CHARGING_MODE_CURRENT_TAPER,
     CHARGING_MODE_MAINTENANCE,
     CHARGING_MODE_BALANCING,
-} charging_mode;
+} chargingMode;
 
 typedef enum {
     CHARGER_STATE_IDLE,
     CHARGER_STATE_CHARGING,
     CHARGER_STATE_BALANCING,
-} charger_state;
+} chargerState;
 
 typedef struct {
     float BMS_avgVolt;
@@ -53,11 +53,11 @@ extern float LIMIT_VOLTS;
 extern float LIMIT_AMPS;
 extern uint16_t MAX_ALLOWED_PWR;
 
-void charger_update_charging_mode();
-void charger_handle_charging(CANMessage *charging_msg, CANMessage *balancing_msg);
-bool charger_is_charger_safe();
-bool charger_is_hvil_switch_flipped();
-bool charger_is_ready_to_charge_switch_flipped();
-void charger_print_bms_and_elcon_data(const volatile bmsAndElconData *d);
+void Charger_updateChargingMode();
+void Charger_handleCharging(CANMessage *charging_msg, CANMessage *balancing_msg);
+bool Charger_isChargerSafe();
+bool Charger_isHvilSwitchFlipped();
+bool Charger_isReadyToChargeSwitchFlipped();
+void Charger_printBmsAndElconData(const volatile bmsAndElconData *d);
 
 #endif

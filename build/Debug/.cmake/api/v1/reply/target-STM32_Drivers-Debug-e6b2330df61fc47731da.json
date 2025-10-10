@@ -103,7 +103,7 @@
 			"compileCommandFragments" : 
 			[
 				{
-					"fragment" : " -mcpu=cortex-m3  -Wall -Wextra -Wpedantic -fdata-sections -ffunction-sections -mcpu=cortex-m3  -Wall -Wextra -Wpedantic -fdata-sections -ffunction-sections -O0 -g3 -std=gnu11"
+					"fragment" : " -mcpu=cortex-m3  -Wall -Wextra -Wpedantic -fdata-sections -ffunction-sections -mcpu=cortex-m3  -Wall -Wextra -Wpedantic -fdata-sections -ffunction-sections -mcpu=cortex-m3  -Wall -Wextra -Wpedantic -fdata-sections -ffunction-sections -O0 -g3 -std=gnu11"
 				}
 			],
 			"defines" : 
@@ -125,23 +125,23 @@
 			[
 				{
 					"backtrace" : 2,
-					"path" : "C:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Core/Inc"
+					"path" : "/Users/bhuvaneshselvaraj/Desktop/fsae_projects/SR16-ChargingDash/Core/Inc"
 				},
 				{
 					"backtrace" : 2,
-					"path" : "C:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/STM32F1xx_HAL_Driver/Inc"
+					"path" : "/Users/bhuvaneshselvaraj/Desktop/fsae_projects/SR16-ChargingDash/Drivers/STM32F1xx_HAL_Driver/Inc"
 				},
 				{
 					"backtrace" : 2,
-					"path" : "C:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy"
+					"path" : "/Users/bhuvaneshselvaraj/Desktop/fsae_projects/SR16-ChargingDash/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy"
 				},
 				{
 					"backtrace" : 2,
-					"path" : "C:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/CMSIS/Device/ST/STM32F1xx/Include"
+					"path" : "/Users/bhuvaneshselvaraj/Desktop/fsae_projects/SR16-ChargingDash/Drivers/CMSIS/Device/ST/STM32F1xx/Include"
 				},
 				{
 					"backtrace" : 2,
-					"path" : "C:/Users/Owner/Documents/GitHub/SR16-ChargingDash/Drivers/CMSIS/Include"
+					"path" : "/Users/bhuvaneshselvaraj/Desktop/fsae_projects/SR16-ChargingDash/Drivers/CMSIS/Include"
 				}
 			],
 			"language" : "C",
