@@ -520,10 +520,10 @@ int main(void)
   {
 
     int fan_speed = READ_THERM(therm_outlet, THERM_RESIST);
-    FAN_SPD_CTRL(50);
+    FAN_SPD_CTRL(95);
 
     uint8_t data = currentBmsAndElconData.BMS_sumOfCells;
-    HAL_I2C_Master_Transmit(&hi2c2, 0x04 << 1, &data, 1, 10);
+    //HAL_I2C_Master_Transmit(&hi2c2, 0x04 << 1, &data, 1, 10);
 
     // TODO: CHECK ALL LEDS AND PERIPHERALS WORK
     //TODO: DOUBLE CHECK
@@ -865,7 +865,7 @@ static void MX_I2C2_Init(void)
 
   /* USER CODE END I2C2_Init 1 */
   hi2c2.Instance = I2C2;
-  hi2c2.Init.ClockSpeed = 100000;
+  hi2c2.Init.ClockSpeed = 50000;
   hi2c2.Init.DutyCycle = I2C_DUTYCYCLE_2;
   hi2c2.Init.OwnAddress1 = 0;
   hi2c2.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
@@ -1045,7 +1045,7 @@ static void MX_DMA_Init(void)
 
   /* DMA interrupt init */
   /* DMA1_Channel1_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 0, 0);
+  HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 1, 0);
   HAL_NVIC_EnableIRQ(DMA1_Channel1_IRQn);
 
 }
@@ -1134,10 +1134,10 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_Init(BTN_BCK_GPIO_Port, &GPIO_InitStruct);
 
   /* EXTI interrupt init*/
-  HAL_NVIC_SetPriority(EXTI2_IRQn, 0, 0);
+  HAL_NVIC_SetPriority(EXTI2_IRQn, 3, 0);
   HAL_NVIC_EnableIRQ(EXTI2_IRQn);
 
-  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 0, 0);
+  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 3, 0);
   HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
 
   /* USER CODE BEGIN MX_GPIO_Init_2 */

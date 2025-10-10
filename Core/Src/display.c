@@ -71,6 +71,9 @@ void SRE_Display_Nav() {
 	selectedButton = 0;
 	selectPressed = false;
 
+	static uint32_t lastDisplayUpdate = 0;  // Rate limit timer
+
+
 
 	char* buttons[] = {"Home", "Charging", "Balancing", "Battery", "Charger Stats", "Errors", "Restart"};
 	// char* buttons[] = {"Home", "Start Charging", "Start Balancing", "Battery", "Charger", "Errors"};
@@ -115,8 +118,14 @@ void SRE_Display_Nav() {
 		int numOfScreens = (numOfButtons+3)/4;
 		SRE_Display_Long_Scroll_Bar(currentScreen, numOfScreens);
 
-
-		ssd1306_UpdateScreen();
+		uint32_t currentTime = HAL_GetTick();
+        if (currentTime - lastDisplayUpdate >= 300) {
+            extern I2C_HandleTypeDef hi2c2;
+            if (HAL_I2C_GetState(&hi2c2) == HAL_I2C_STATE_READY) {
+                ssd1306_UpdateScreen();  
+                lastDisplayUpdate = currentTime;
+            }
+        }
 	}
 
 	if (selectPressed) {
@@ -299,8 +308,6 @@ void SRE_Display_Nav_Bar(char *buttons[], int numOfButtons, int firstButtonIndex
 		buttonIndex++;
 		x1 = x2 + 2;
 	}
-
-	ssd1306_UpdateScreen();
 }
 
 
@@ -473,10 +480,15 @@ void SRE_Display_Start_Charging() {
 		char *navBarButtons[] = {"Nav"};
 		SRE_Display_Nav_Bar(navBarButtons,1, navStartIndex);
 
-
-
-		ssd1306_UpdateScreen();
-
+		static uint32_t lastDisplayUpdate = 0;  // Rate limit timer
+		uint32_t currentTime = HAL_GetTick();
+        if (currentTime - lastDisplayUpdate >= 300) {
+            extern I2C_HandleTypeDef hi2c2;
+            if (HAL_I2C_GetState(&hi2c2) == HAL_I2C_STATE_READY) {
+                ssd1306_UpdateScreen();  
+                lastDisplayUpdate = currentTime;
+            }
+        }
 	}
 
 	if (selectPressed) {
@@ -804,7 +816,7 @@ void SRE_Display_Title_Bar(char title[]) {
 	static uint32_t previous_time = 0;
 
 	uint32_t current_time = HAL_GetTick();
-	if (current_time - previous_time >= 1000) {
+	if (current_time - previous_time >= 150) {
 		ssd1306_DrawPixel(85, 5, White);
 		previous_time = current_time;
 	}
