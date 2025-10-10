@@ -5,6 +5,7 @@
 .metadata/
 
 # Compile
+build/
 Debug/*
 debug/*
 Release/*
