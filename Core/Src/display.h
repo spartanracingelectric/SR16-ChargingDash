@@ -29,37 +29,40 @@ typedef enum {
 	DISPLAY_STATE_IN_CHARGING_STATS_ONE,
 	DISPLAY_STATE_IN_CHARGING_STATS_TWO,
 	DISPLAY_STATE_ERRORS
-} display_state;
+} displayState;
 
-extern display_state next_display_state;
-extern display_state current_display_state;
-extern bool select_pressed;
-extern int selected_option;
-extern bool back_pressed;
+extern displayState nextDisplyState;
+extern displayState currentDisplayState;
+extern bool selectPressed;
+extern int selectedOption;
+extern bool backPressed;
 
 void DISP_KanoaSplash();
 
-void display_init();
-display_state display_update_state();
-display_state display_navigation();
-display_state display_home();
-void display_draw_nav_bar(char *options[], int number_of_nav_bar_options, int first_nav_bar_option_index);
-display_state display_errors();
-display_state display_start_balancing();
-display_state display_in_charging_stats_one();
-display_state display_battery_stats_two();
-display_state display_in_charging_stats_two();
-display_state display_charging_profiles();
-void display_draw_short_scroll_bar(int current_view, int number_of_views);
-void display_draw_long_scroll_bar(int current_view, int number_of_views);
-display_state display_charger_stats();
-display_state display_battery_stats_one();
-display_state display_charging_initialization();
-display_state display_balancing_initialization();
-void display_draw_title_bar(char title[]);
-void display_draw_in_charging_symbol(int x, int y);
-void display_draw_error_symbol(int x, int y);
-void display_check_selected_option_bounds(int number_of_options);
-void display_wrap_selected_option(int number_of_options);
+void Display_init();
+displayState Display_updateState();
+displayState Display_displayNavigation();
+displayState Display_displayHome();
+displayState Display_displayErrors();
+displayState Display_displayStartBalancing();
+displayState Display_displayInChargingStatsOne();
+displayState Display_displayInChargingStatsTwo();
+displayState Display_displayChargingProfiles();
+displayState Display_displayChargerStats();
+displayState Display_displayBatteryStatsOne();
+displayState Display_displayBatteryStatsTwo();
+displayState Display_displayChargingInitialization();
+displayState Display_displayBalancingInitialization();
+void Display_drawNavBar(char *options[], int numberOfNavBarOptions, int firstNavBarOptionIndex);
+void Display_drawTitleBar(char title[]);
+void Display_drawInChargingSymbol(int x, int y);
+void Display_drawErrorSymbol(int x, int y);
+void Display_checkSelectedOptionBounds(int numberOfOptions);
+void Display_wrapSelectedOption(int numberOfOptions);
+void Display_drawShortScrollBar(int currentView, int numberOfViews);
+void Display_drawLongScrollBar(int currentView, int numberOfViews);
+void Display_clear();
+
+
 
 #endif

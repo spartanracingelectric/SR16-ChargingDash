@@ -47,8 +47,8 @@ typedef struct {
 } bmsAndElconData;
 
 extern volatile bmsAndElconData currentBmsAndElconData;
-extern charging_mode current_charging_mode;
-extern charger_state current_charger_state;
+extern chargingMode currentChargingMode;
+extern chargerState currentChargerState;
 extern float LIMIT_VOLTS;
 extern float LIMIT_AMPS;
 extern uint16_t MAX_ALLOWED_PWR;

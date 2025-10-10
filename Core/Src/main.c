@@ -215,7 +215,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   // INIT DISPLAY
-  display_init();
+  Display_init();
 
   // INIT CHARGING CAN STRUCT
   CANMessage charging_msg;
@@ -255,8 +255,8 @@ int main(void)
 
     // TODO: CHECK ALL LEDS AND PERIPHERALS WORK
     
-    display_update_state();
-    charger_handle_charging(&charging_msg, &balancing_msg);
+    Display_updateState();
+    Charger_handleCharging(&charging_msg, &balancing_msg);
    
     /* USER CODE END WHILE */
 
