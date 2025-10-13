@@ -62,6 +62,7 @@ void Display_wrapSelectedOption(int numberOfOptions);
 void Display_drawShortScrollBar(int currentView, int numberOfViews);
 void Display_drawLongScrollBar(int currentView, int numberOfViews);
 void Display_clear();
+void Display_pollKeys();
 
 
 

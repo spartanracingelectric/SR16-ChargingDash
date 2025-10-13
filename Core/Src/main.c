@@ -112,31 +112,6 @@ PUTCHAR_PROTOTYPE
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-// INTERRUPTS FOR KEYS
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
-    if (GPIO_Pin == BTN_UP_Pin || GPIO_Pin == BTN_DWN_Pin || GPIO_Pin == BTN_SEL_Pin || GPIO_Pin == BTN_BCK_Pin) {
-  	    // TODO: fix debouncing
-        buttonInterruptCurrentTime = HAL_GetTick();
-        int debounceTimeThreshold = 200;
-        int timeDifference = buttonInterruptCurrentTime - buttonInterruptPreviousTime;
-        if (timeDifference > debounceTimeThreshold) {
-            if (GPIO_Pin == BTN_UP_Pin) {
-                selectedOption--;
-            }   
-            else if (GPIO_Pin == BTN_DWN_Pin) {
-                selectedOption++;
-            } 
-            else if (GPIO_Pin == BTN_SEL_Pin) {
-                selectPressed = true;
-            } 
-            else if (GPIO_Pin == BTN_BCK_Pin) {
-                backPressed = true;
-            }
-            buttonInterruptPreviousTime= buttonInterruptCurrentTime;
-        }
-    }
-}
-
 // FAN SPEED CONTROL
 void FAN_SPD_CTRL(uint32_t fan_speed) {
   if (fan_speed <= 100) {
@@ -241,21 +216,35 @@ int main(void)
   // TEMP STUFF 1 END
 
   /* USER CODE END 2 */
-
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
 
     //int fan_speed = READ_THERM(therm_outlet, THERM_RESIST);
-    FAN_SPD_CTRL(50);
+    //FAN_SPD_CTRL(50);
 
     //uint8_t data = currentBmsAndElconData.BMS_sumOfCells;
     //HAL_I2C_Master_Transmit(&hi2c2, 0x04 << 1, &data, 1, 10);
 
     // TODO: CHECK ALL LEDS AND PERIPHERALS WORK
+    static uint32_t lastLedBlink = 0;
+    static uint32_t lastDisplayUpdate = 0;
+    uint32_t now = HAL_GetTick();
+    printf("in main while loop %d\n", now);
     
-    Display_updateState();
+    // Flash HV LED every 500ms
+    if (now - lastLedBlink >= 500) {
+        HAL_GPIO_TogglePin(GPIOA, LED_HV_Pin);
+        lastLedBlink = now;
+    }
+
+    Display_pollKeys();
+
+    if (now - lastDisplayUpdate >= 10) {
+      Display_updateState();
+      lastDisplayUpdate = now;
+    }
     //Charger_handleCharging(&charging_msg, &balancing_msg);
    
     /* USER CODE END WHILE */
@@ -686,22 +675,22 @@ static void MX_GPIO_Init(void)
 
   /*Configure GPIO pins : BTN_UP_Pin BTN_DWN_Pin BTN_SEL_Pin */
   GPIO_InitStruct.Pin = BTN_UP_Pin|BTN_DWN_Pin|BTN_SEL_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
   /*Configure GPIO pin : BTN_BCK_Pin */
   GPIO_InitStruct.Pin = BTN_BCK_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(BTN_BCK_GPIO_Port, &GPIO_InitStruct);
 
   /* EXTI interrupt init*/
-  HAL_NVIC_SetPriority(EXTI2_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(EXTI2_IRQn);
+  //HAL_NVIC_SetPriority(EXTI2_IRQn, 0, 0);
+  //HAL_NVIC_EnableIRQ(EXTI2_IRQn);
 
-  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
+  //HAL_NVIC_SetPriority(EXTI15_10_IRQn, 0, 0);
+  //HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
 
   /* USER CODE BEGIN MX_GPIO_Init_2 */
   /* USER CODE END MX_GPIO_Init_2 */
@@ -718,6 +707,7 @@ void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
+  HAL_GPIO_WritePin(GPIOA, LED_BAL_Pin, GPIO_PIN_SET);
   __disable_irq();
   while (1)
   {
