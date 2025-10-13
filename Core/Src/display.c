@@ -158,22 +158,21 @@ displayState Display_displayNavigation() {
 			case 1: return DISPLAY_STATE_CHARGING_PROFILES;
 			case 2: return DISPLAY_STATE_START_BALANCING;
 			case 3: return DISPLAY_STATE_BATTERY_STATS_ONE;
-			case 4: return DISPLAY_STATE_BATTERY_STATS_TWO;
-			case 5: return DISPLAY_STATE_CHARGER_STATS;
-			case 6: return DISPLAY_STATE_ERRORS;
-			case 7: NVIC_SystemReset();
+			case 4: return DISPLAY_STATE_CHARGER_STATS;
+			case 5: return DISPLAY_STATE_ERRORS;
+			case 6: NVIC_SystemReset();
 		}
 	}
 	return DISPLAY_STATE_NAVIGATION;
 }
 
-
+//TODO: FINISH
 displayState Display_displayHome() {
 	char stateOfCharge[50];
 	char balancingStatus[50];
 
 	//TODO READ CHARGER TEMP
-	char chargerTemp[] = "Charger Tmp: 100.1C";
+	char chargerTemp[] = "Charger Tmp: N/A";
 	int numberOfOptions = 1;
 
 	Display_clear();
@@ -201,7 +200,6 @@ displayState Display_displayHome() {
 		Display_checkSelectedOptionBounds(numberOfOptions);
 		switch(selectedOption) {
 			case 0: return DISPLAY_STATE_NAVIGATION;
-			case 1: return DISPLAY_STATE_BATTERY_STATS_ONE;
 		}
 	}
 	return DISPLAY_STATE_HOME;
@@ -433,13 +431,13 @@ void Display_drawLongScrollBar(int currentView, int numberOfViews) {
 displayState Display_displayChargerStats() {
 	char inletTempString[50];
 	char outletTempString[50];
-	int numberOfOptions = 2;
+	int numberOfOptions = 1;
 
 	Display_clear();
 	Display_wrapSelectedOption(numberOfOptions);
 
-	//sprintf(inletTempString, "Inlet Tmp:%.2f", READ_THERM(therm_inlet, THERM_RESIST));
-	//sprintf(outletTempString, "Outlet Tmp:%.2f", READ_THERM(therm_outlet, THERM_RESIST));
+	sprintf(inletTempString, "Inlet Tmp: N/A");
+	sprintf(outletTempString, "Outlet Tmp: N/A");
 
 	Display_drawTitleBar("Charger Stats");
 
@@ -449,8 +447,8 @@ displayState Display_displayChargerStats() {
 	ssd1306_SetCursor(1, 23);
 	ssd1306_WriteString(outletTempString, Font_6x8, White);
 
-	char *navBarOptions[] = {"Nav", "Batt"};
-	int numberOfNavBarOptions = 2;
+	char *navBarOptions[] = {"Nav"};
+	int numberOfNavBarOptions = 1;
 	int firstNavBarOptionIndex = 0;
 	Display_drawNavBar(navBarOptions, numberOfNavBarOptions, firstNavBarOptionIndex);
 
@@ -460,7 +458,6 @@ displayState Display_displayChargerStats() {
 		Display_checkSelectedOptionBounds(numberOfOptions);
 		switch (selectedOption) {
 			case 0: return DISPLAY_STATE_NAVIGATION;
-			case 1: return DISPLAY_STATE_BATTERY_STATS_ONE;
 		}
 	}
 	return DISPLAY_STATE_CHARGER_STATS;
