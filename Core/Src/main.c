@@ -118,7 +118,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
   	    // TODO: fix debouncing
         buttonInterruptCurrentTime = HAL_GetTick();
         int debounceTimeThreshold = 200;
-        int timeDifference = buttonInterruptPreviousTime - buttonInterruptCurrentTime;
+        int timeDifference = buttonInterruptCurrentTime - buttonInterruptPreviousTime;
         if (timeDifference > debounceTimeThreshold) {
             if (GPIO_Pin == BTN_UP_Pin) {
                 selectedOption--;
@@ -247,16 +247,16 @@ int main(void)
   while (1)
   {
 
-    int fan_speed = READ_THERM(therm_outlet, THERM_RESIST);
+    //int fan_speed = READ_THERM(therm_outlet, THERM_RESIST);
     FAN_SPD_CTRL(50);
 
-    uint8_t data = currentBmsAndElconData.BMS_sumOfCells;
-    HAL_I2C_Master_Transmit(&hi2c2, 0x04 << 1, &data, 1, 10);
+    //uint8_t data = currentBmsAndElconData.BMS_sumOfCells;
+    //HAL_I2C_Master_Transmit(&hi2c2, 0x04 << 1, &data, 1, 10);
 
     // TODO: CHECK ALL LEDS AND PERIPHERALS WORK
     
     Display_updateState();
-    Charger_handleCharging(&charging_msg, &balancing_msg);
+    //Charger_handleCharging(&charging_msg, &balancing_msg);
    
     /* USER CODE END WHILE */
 

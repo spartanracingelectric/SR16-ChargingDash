@@ -130,9 +130,9 @@ displayState Display_displayNavigation() {
 
 	Display_drawTitleBar("Navigation");
 
-	for (int i = startIndex; i < startIndex + 4 && i < selectedOption; i++) {
+	for (int i = startIndex; i < startIndex + 4 && i < numberOfOptions; i++) {
 		ssd1306_SetCursor(3, y1);
-		if (selectedOption== i) {
+		if (selectedOption == i) {
 			ssd1306_FillRectangle(1,y2, 122, y3, White);
 			ssd1306_WriteString(options[i], Font_6x8, Black);
 		}
@@ -146,7 +146,7 @@ displayState Display_displayNavigation() {
 		y3 = y2 + 10;
 	}
 
-	int numberOfViews = (numberOfOptions +3 ) / 4; //3 options per view, rounds up to ensure there is enough views
+	int numberOfViews = (numberOfOptions + 3) / 4; //3 options per view, rounds up to ensure there is enough views
 	Display_drawLongScrollBar(currentView, numberOfViews);
 
 	ssd1306_UpdateScreen();
