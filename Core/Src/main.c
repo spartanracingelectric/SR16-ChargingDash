@@ -144,6 +144,29 @@ void print_i2c_state(I2C_HandleTypeDef *hi2c)
             break;
     }
 }
+
+void i2c_force_reset(void) {
+    printf("Forcing I2C reset...\n");
+    
+    // 1. Abort any ongoing operation
+    HAL_I2C_Master_Abort_IT(&hi2c2, SSD1306_I2C_ADDR);
+    HAL_Delay(10);
+    
+    // 2. Force reset I2C peripheral
+    __HAL_RCC_I2C2_FORCE_RESET();
+    HAL_Delay(10);
+    __HAL_RCC_I2C2_RELEASE_RESET();
+    HAL_Delay(10);
+    
+    // 3. Reinitialize I2C
+    MX_I2C2_Init();
+    HAL_Delay(10);
+    
+    // 4. Reinitialize display
+    ssd1306_Init();
+    
+    printf("I2C reset complete\n");
+}
 /* USER CODE END 0 */
 
 /**
@@ -195,9 +218,9 @@ int main(void)
   while (1)
   {
     uint32_t now = HAL_GetTick();
-    if (now - lastBlink >= 500)  // 500 ms interval
+    if (now - lastBlink >= 100)  // 500 ms interval
     {
-      printf("Number of key presses: %d\n", button_press_count);
+      //printf("Number of key presses: %d\n", button_press_count);
       lastBlink = now;
 
       HAL_GPIO_TogglePin(GPIOA, LED_BAL_Pin);  
@@ -206,9 +229,17 @@ int main(void)
       ssd1306_Fill(Black);    
       if (showText) {
         ssd1306_SetCursor(1, 1);
-        ssd1306_WriteString("TEST", Font_6x8, White);
+        char buffer[32];
+        sprintf(buffer, "TEST: %lu", button_press_count);
+        ssd1306_WriteString(buffer, Font_6x8, White);
       }
-      ssd1306_UpdateScreen();     
+      ssd1306_UpdateScreen(); 
+      if (ssd1306_GetLastError() != HAL_OK) {
+        for (int i = 0; i < 10; i++) {
+          printf("I2C BUSY detected! Forcing reset...\n");
+        }
+          i2c_force_reset();
+      }    
       print_i2c_state(&hi2c2);   
     }
     /* USER CODE END WHILE */

@@ -1,9 +1,12 @@
 #include "ssd1306.h"
 #include <math.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>  // For memcpy
 
 #if defined(SSD1306_USE_I2C)
+
+static uint8_t ssd1306_last_error = 0;
 
 void ssd1306_Reset(void) {
     /* for I2C - do nothing */
@@ -11,12 +14,19 @@ void ssd1306_Reset(void) {
 
 // Send a byte to the command register
 void ssd1306_WriteCommand(uint8_t byte) {
-    HAL_I2C_Mem_Write(&SSD1306_I2C_PORT, SSD1306_I2C_ADDR, 0x00, 1, &byte, 1, HAL_MAX_DELAY);
+    HAL_StatusTypeDef status = HAL_I2C_Mem_Write(&SSD1306_I2C_PORT, SSD1306_I2C_ADDR, 0x00, 1, &byte, 1, 100);
+    ssd1306_last_error = status;  
 }
 
 // Send data
 void ssd1306_WriteData(uint8_t* buffer, size_t buff_size) {
-    HAL_I2C_Mem_Write(&SSD1306_I2C_PORT, SSD1306_I2C_ADDR, 0x40, 1, buffer, buff_size, HAL_MAX_DELAY);
+    HAL_StatusTypeDef status = HAL_I2C_Mem_Write(&SSD1306_I2C_PORT, SSD1306_I2C_ADDR, 0x40, 1, buffer, buff_size, HAL_MAX_DELAY);
+    ssd1306_last_error = status;  
+
+}
+
+uint8_t ssd1306_GetLastError() {
+    return ssd1306_last_error;
 }
 
 #elif defined(SSD1306_USE_SPI)
@@ -190,6 +200,10 @@ void ssd1306_UpdateScreen(void) {
         ssd1306_WriteCommand(0x10 + SSD1306_X_OFFSET_UPPER);
         ssd1306_WriteData(&SSD1306_Buffer[SSD1306_WIDTH*i],SSD1306_WIDTH);
     }
+
+    // if (errors > 0) {
+    //     printf("ssd1306_UpdateScreen: %d errors!\n", errors);
+    // }
 }
 
 /*
