@@ -149,7 +149,7 @@ displayState Display_displayNavigation() {
 	int numberOfViews = (numberOfOptions + 3) / 4; //3 options per view, rounds up to ensure there is enough views
 	Display_drawLongScrollBar(currentView, numberOfViews);
 
-	ssd1306_UpdateScreen();
+	Display_updateScreen();
 	
 	if (selectPressed) {
 		Display_checkSelectedOptionBounds(numberOfOptions);
@@ -164,6 +164,36 @@ displayState Display_displayNavigation() {
 		}
 	}
 	return DISPLAY_STATE_NAVIGATION;
+}
+
+void Display_forceI2CReset() {
+    printf("Forcing I2C reset...\n");
+    
+	//Abort any ongoing operations
+    HAL_I2C_Master_Abort_IT(&hi2c2, SSD1306_I2C_ADDR);
+    HAL_Delay(10);
+    
+    //Force reset I2C peripheral
+    __HAL_RCC_I2C2_FORCE_RESET();
+    HAL_Delay(10);
+    __HAL_RCC_I2C2_RELEASE_RESET();
+    HAL_Delay(10);
+    
+    //Reinitialize I2C
+    MX_I2C2_Init();
+    HAL_Delay(10);
+    
+    //Reinitialize display
+    ssd1306_Init();
+    
+    printf("I2C reset complete\n");
+}
+
+void Display_updateScreen() {
+	ssd1306_UpdateScreen();
+	if (ssd1306_Custom_GetLastStatus() != HAL_OK) {
+		Display_forceI2CReset();
+	}
 }
 
 //TODO: FINISH
@@ -194,7 +224,7 @@ displayState Display_displayHome() {
 	int firstNavBarOptionIndex= 0;
 	Display_drawNavBar(navBarOptions, numberOfOptions, firstNavBarOptionIndex);
 
-	ssd1306_UpdateScreen();
+	Display_updateScreen();
 
 	if (selectPressed) {
 		Display_checkSelectedOptionBounds(numberOfOptions);
@@ -361,7 +391,7 @@ displayState Display_displayChargingProfiles() {
 	int numberOfNavBarOptions = 1;
 	Display_drawNavBar(navBarOptions, numberOfNavBarOptions, navStartIndex);
 
-	ssd1306_UpdateScreen();
+	Display_updateScreen();
 
 	if (selectPressed) {
 	    // Make sure the selected option is within the valid range of profiles
@@ -385,17 +415,17 @@ displayState Display_displayChargingInitialization() {
 	if (!Charger_isChargerSafe()) {
     	ssd1306_SetCursor(5, 5);
 		ssd1306_WriteString("HVIL ERROR", Font_6x8, White);
-		ssd1306_UpdateScreen();
+		Display_updateScreen();
 	}
 	else if (!Charger_isHvilSwitchFlipped()) {
 		ssd1306_SetCursor(5, 5);
 		ssd1306_WriteString("PLEASE FLIP HV", Font_6x8, White);
-		ssd1306_UpdateScreen();
+		Display_updateScreen();
 	}
 	else if (!Charger_isReadyToChargeSwitchFlipped()) {
 		ssd1306_SetCursor(5, 5);
 		ssd1306_WriteString("PLEASE FLIP RTC", Font_6x8, White);
-		ssd1306_UpdateScreen();
+		Display_updateScreen();
 	}
 	else {
 		currentChargerState = CHARGER_STATE_CHARGING;
@@ -452,7 +482,7 @@ displayState Display_displayChargerStats() {
 	int firstNavBarOptionIndex = 0;
 	Display_drawNavBar(navBarOptions, numberOfNavBarOptions, firstNavBarOptionIndex);
 
-	ssd1306_UpdateScreen();
+	Display_updateScreen();
 
 	if (selectPressed) {
 		Display_checkSelectedOptionBounds(numberOfOptions);
@@ -497,7 +527,7 @@ displayState Display_displayBatteryStatsOne(){
 
 	Display_drawNavBar(navBarOptions, numberOfOptions, firstNavBarOptionIndex);
 
-	ssd1306_UpdateScreen();
+	Display_updateScreen();
 	
 
 	if (selectPressed) {
@@ -547,7 +577,7 @@ displayState Display_displayBatteryStatsTwo(){
 	int firstNavBarOptionIndex = 0;
 	Display_drawNavBar(navBarOptions, numberOfOptions, firstNavBarOptionIndex);
 
-	ssd1306_UpdateScreen();
+	Display_updateScreen();
 	
 
 	if (selectPressed) {
@@ -577,7 +607,7 @@ displayState Display_displayStartBalancing() {
 	Display_drawNavBar(navBarOptions, numberOfOptions, navBarStartIndex);
 
 
-	ssd1306_UpdateScreen();
+	Display_updateScreen();
 	
 	if (selectPressed) {
 		Display_checkSelectedOptionBounds(numberOfOptions);
@@ -596,12 +626,12 @@ displayState Display_displayBalancingInitialization() {
 	if (!Charger_isChargerSafe()) {
     	ssd1306_SetCursor(5, 5);
 		ssd1306_WriteString("HVIL ERROR", Font_6x8, White);
-		ssd1306_UpdateScreen();
+		Display_updateScreen();
 	}
 	else if (!Charger_isReadyToChargeSwitchFlipped()) {
 		ssd1306_SetCursor(5, 5);
 		ssd1306_WriteString("PLEASE FLIP RTC", Font_6x8, White);
-		ssd1306_UpdateScreen();
+		Display_updateScreen();
 	}
 	else {
 		currentChargerState = CHARGER_STATE_BALANCING;
@@ -819,7 +849,7 @@ displayState Display_displayErrors() {
 	int numberOfNavBarOptions = 1;
 	Display_drawNavBar(navBarOptions, numberOfNavBarOptions, navBarStartIndex);
 
-	ssd1306_UpdateScreen();
+	Display_updateScreen();
 
 	if (selectPressed) {
 		Display_checkSelectedOptionBounds(numberOfOptions);
