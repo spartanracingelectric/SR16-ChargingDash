@@ -46,42 +46,6 @@ void Display_init() {
 	ssd1306_Init();
 }
 
-void Display_pollKeys() {
-    static bool lastKeyUp = false;
-    static bool lastKeyDown = false;
-    static bool lastKeySelect = false;
-    static bool lastKeyBack = false;
-
-	static uint32_t previousTime = 0;
-	uint32_t currentTime = HAL_GetTick();
-	uint32_t keyDebounce = 50;
-
-	if (currentTime - previousTime < keyDebounce) {
-		return;
-	}
-	previousTime = currentTime;
-
-
-	bool keyUp = (HAL_GPIO_ReadPin(GPIOC, BTN_UP_Pin) == GPIO_PIN_RESET);
-    bool keyDown = (HAL_GPIO_ReadPin(GPIOC, BTN_DWN_Pin) == GPIO_PIN_RESET);
-    bool keySelect = (HAL_GPIO_ReadPin(GPIOC, BTN_SEL_Pin) == GPIO_PIN_RESET);
-    bool keyBack = (HAL_GPIO_ReadPin(GPIOB, BTN_BCK_Pin) == GPIO_PIN_RESET);
-
-	int numberOfKeysPressed = keyUp + keyDown + keySelect + keyBack;
-
-	if (numberOfKeysPressed == 1) {
-		if (keyUp && !lastKeyUp) selectedOption--;
-		else if (keyDown && !lastKeyDown) selectedOption++;
-		else if (keySelect && !lastKeySelect) selectPressed = true;
-		else if (keyBack && !lastKeyBack) backPressed = true;
-	}
-
-	lastKeyUp = keyUp;
-	lastKeyDown = keyDown;
-	lastKeySelect = keySelect;
-	lastKeyBack = keyBack;
-}
-
 displayState Display_updateState() {
 	if (currentDisplayState != nextDisplayState) {
 		selectedOption = 0;
