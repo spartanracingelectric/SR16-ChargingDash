@@ -54,15 +54,15 @@ void Charger_handleCharging(CANMessage *charging_msg, CANMessage *balancing_msg)
     if ((currentChargerState == CHARGER_STATE_CHARGING || currentChargerState == CHARGER_STATE_BALANCING)
         && !Charger_checkChargerConditions()) {
         currentChargerState = CHARGER_STATE_IDLE;
-        CAN_Charge(&charging_msg, LIMIT_VOLTS, LIMIT_AMPS, false);
-        CAN_Balance(&balancing_msg, false);
+        CAN_Charge(charging_msg, LIMIT_VOLTS, LIMIT_AMPS, false);
+        CAN_Balance(balancing_msg, false);
         HAL_GPIO_WritePin(GPIOA, LED_BAL_Pin, GPIO_PIN_RESET);
         return;
     }
 
     if (currentChargerState == CHARGER_STATE_IDLE) {
-        CAN_Charge(&charging_msg, LIMIT_VOLTS, LIMIT_AMPS, false);
-        CAN_Balance(&balancing_msg, false);
+        CAN_Charge(charging_msg, LIMIT_VOLTS, LIMIT_AMPS, false);
+        CAN_Balance(balancing_msg, false);
         HAL_GPIO_WritePin(GPIOA, LED_BAL_Pin, GPIO_PIN_RESET);
         return;
     }
