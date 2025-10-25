@@ -308,7 +308,7 @@ displayState Display_displayInChargingStatsTwo() {
 	Display_clear();
 	Display_wrapSelectedOption(numberOfOptions);
 
-	bool isBalancing = (currentChargingMode == CHARGING_MODE_BALANCING);
+	bool isBalancing = (currentChargerState == CHARGER_STATE_BALANCING);
 
 	Display_drawTitleBar(isBalancing ? "Balancing 2" : "Charging 2");
 
@@ -683,22 +683,25 @@ void Display_drawTitleBar(char title[]) {
 	//Flashing status symbols 
 	// ssd1306_FillRectangle(70, 0, 127, 9, Black);
 	// ssd1306_UpdateScreen();
-
+	bool isCharging = (currentChargingMode == CHARGING_MODE_CONSTANT_CURRENT || 
+						currentChargingMode == CHARGING_MODE_CURRENT_TAPER || 
+						currentChargingMode == CHARGING_MODE_MAINTENANCE);
+	bool isBalancing = (currentChargingMode == CHARGING_MODE_BALANCING);
 	if (isFault) {
 		Display_drawErrorSymbol(119,1);
-		if (currentChargerState == CHARGER_STATE_CHARGING) {
+		if (isCharging) {
 			Display_drawInChargingSymbol(92, 3);
 		}
-		else if (currentChargerState == CHARGER_STATE_BALANCING) {
+		else if (isBalancing) {
 			ssd1306_FillRectangle(91, 0, 109, 8, White);
 			ssd1306_SetCursor(92, 1);
 			ssd1306_WriteString("BAL", Font_6x8, Black);
 		}
 	}
-	else if (currentChargerState == CHARGER_STATE_CHARGING) {
+	else if (isCharging) {
 		Display_drawInChargingSymbol(109, 3);
 	}
-	else if (currentChargerState == CHARGER_STATE_BALANCING) {
+	else if (isBalancing) {
 		ssd1306_FillRectangle(108, 0, 126, 8, White);
 		ssd1306_SetCursor(109, 1);
 		ssd1306_WriteString("BAL", Font_6x8, Black);
@@ -755,7 +758,7 @@ displayState Display_displayInChargingStatsOne() {
 	Display_clear();
 	Display_wrapSelectedOption(numberOfOptions);
 	
-	bool isBalancing = (currentChargingMode == CHARGING_MODE_BALANCING);
+	bool isBalancing = (currentChargerState == CHARGER_STATE_BALANCING);
 	//Writes title
 	Display_drawTitleBar(isBalancing ? "Balancing 1" : "Charging 1");
 

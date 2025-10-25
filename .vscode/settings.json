@@ -2,6 +2,7 @@
   "files.associations": {
     "stm32f1xx_hal.h": "c",
     "stdio.h": "c",
-    "display.h": "c"
+    "display.h": "c",
+    "charger.h": "c"
   }
 }

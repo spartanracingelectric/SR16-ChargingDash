@@ -1,5 +1,6 @@
 #include "charger.h"
 #include "display.h"
+#include <stdio.h>
 
 float LIMIT_VOLTS = 0;
 float LIMIT_AMPS = 0;
