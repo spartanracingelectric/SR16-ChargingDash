@@ -27,8 +27,7 @@ void Charger_updateChargingMode() {
         }
     }
 
-    if (currentBmsAndElconData.BMS_maxVolt >= LOWER_MAX_CELL_CV_THRESH 
-        && currentBmsAndElconData.BMS_maxVolt < UPPER_MAX_CELL_CV_THRESH) {
+    if (currentBmsAndElconData.BMS_maxVolt >= LOWER_MAX_CELL_CV_THRESH) {
         currentChargingMode = CHARGING_MODE_CURRENT_TAPER;
         return;
     }
@@ -75,7 +74,7 @@ void Charger_handleCharging(CANMessage *charging_msg, CANMessage *balancing_msg)
             HAL_GPIO_WritePin(GPIOA, LED_BAL_Pin, GPIO_PIN_SET);
         }
         else if (currentChargingMode == CHARGING_MODE_MAINTENANCE) {
-            CAN_Charge(charging_msg, currentBmsAndElconData.BMS_sumOfCells, MAINT_AMPS, false);
+            CAN_Charge(charging_msg, currentBmsAndElconData.BMS_sumOfCells, MAINT_AMPS, true);
             CAN_Balance(balancing_msg, false);
             HAL_GPIO_WritePin(GPIOA, LED_BAL_Pin, GPIO_PIN_RESET);
         }
@@ -104,6 +103,11 @@ void Charger_handleCharging(CANMessage *charging_msg, CANMessage *balancing_msg)
             CAN_Charge(charging_msg, LIMIT_VOLTS, LIMIT_AMPS, false);
             CAN_Balance(balancing_msg, true);
             HAL_GPIO_WritePin(GPIOA, LED_BAL_Pin, GPIO_PIN_SET);
+        }
+        else {
+            CAN_Charge(charging_msg, LIMIT_VOLTS, LIMIT_AMPS, false);
+            CAN_Balance(balancing_msg, false);
+            HAL_GPIO_WritePin(GPIOA, LED_BAL_Pin, GPIO_PIN_RESET);
         }
         return;
     }
