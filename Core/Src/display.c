@@ -28,6 +28,32 @@ displayState nextDisplayState = DISPLAY_STATE_NAVIGATION;
 extern char codeBranch[10];
 extern char codeVersion[5];
 
+uint32_t buttonInterruptCurrentTime = 0;
+uint32_t buttonInterruptPreviousTime = 0;
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
+    if (GPIO_Pin == BTN_UP_Pin || GPIO_Pin == BTN_DWN_Pin || GPIO_Pin == BTN_SEL_Pin || GPIO_Pin == BTN_BCK_Pin) {
+  	    // TODO: fix debouncing
+        buttonInterruptCurrentTime = HAL_GetTick();
+        int debounceTimeThreshold = 200;
+        int timeDifference = buttonInterruptCurrentTime - buttonInterruptPreviousTime;
+        if (timeDifference > debounceTimeThreshold) {
+            if (GPIO_Pin == BTN_UP_Pin) {
+                selectedOption--;
+            }   
+            else if (GPIO_Pin == BTN_DWN_Pin) {
+                selectedOption++;
+            } 
+            else if (GPIO_Pin == BTN_SEL_Pin) {
+                selectPressed = true;
+            } 
+            else if (GPIO_Pin == BTN_BCK_Pin) {
+                backPressed = true;
+            }
+            buttonInterruptPreviousTime= buttonInterruptCurrentTime;
+        }
+    }
+}
+
 void DISP_KanoaSplash() {
 	ssd1306_Fill(Black);
 	ssd1306_UpdateScreen();

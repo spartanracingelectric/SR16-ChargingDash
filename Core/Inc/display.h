@@ -33,9 +33,6 @@ typedef enum {
 
 extern displayState nextDisplyState;
 extern displayState currentDisplayState;
-extern bool selectPressed;
-extern int selectedOption;
-extern bool backPressed;
 
 void DISP_KanoaSplash();
 

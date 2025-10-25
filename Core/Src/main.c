@@ -67,8 +67,7 @@ UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN PV */
 
-uint32_t buttonInterruptCurrentTime = 0;
-uint32_t buttonInterruptPreviousTime = 0;
+
 
 uint16_t THERM_RESIST = 12000;
 uint16_t *therm_inlet = NULL;
@@ -112,30 +111,7 @@ PUTCHAR_PROTOTYPE
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-// INTERRUPTS FOR KEYS
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
-    if (GPIO_Pin == BTN_UP_Pin || GPIO_Pin == BTN_DWN_Pin || GPIO_Pin == BTN_SEL_Pin || GPIO_Pin == BTN_BCK_Pin) {
-  	    // TODO: fix debouncing
-        buttonInterruptCurrentTime = HAL_GetTick();
-        int debounceTimeThreshold = 200;
-        int timeDifference = buttonInterruptCurrentTime - buttonInterruptPreviousTime;
-        if (timeDifference > debounceTimeThreshold) {
-            if (GPIO_Pin == BTN_UP_Pin) {
-                selectedOption--;
-            }   
-            else if (GPIO_Pin == BTN_DWN_Pin) {
-                selectedOption++;
-            } 
-            else if (GPIO_Pin == BTN_SEL_Pin) {
-                selectPressed = true;
-            } 
-            else if (GPIO_Pin == BTN_BCK_Pin) {
-                backPressed = true;
-            }
-            buttonInterruptPreviousTime= buttonInterruptCurrentTime;
-        }
-    }
-}
+
 
 // FAN SPEED CONTROL
 void FAN_SPD_CTRL(uint32_t fan_speed) {
