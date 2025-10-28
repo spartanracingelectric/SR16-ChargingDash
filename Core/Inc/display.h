@@ -31,7 +31,7 @@ typedef enum {
 	DISPLAY_STATE_ERRORS
 } displayState;
 
-extern displayState nextDisplyState;
+extern displayState nextDisplayState;
 extern displayState currentDisplayState;
 
 void DISP_KanoaSplash();

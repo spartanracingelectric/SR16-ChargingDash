@@ -6,6 +6,7 @@ float LIMIT_VOLTS = 0;
 float LIMIT_AMPS = 0;
 uint16_t MAX_ALLOWED_PWR = 10000;
 
+
 volatile bmsAndElconData currentBmsAndElconData = {0};
 chargingMode currentChargingMode = CHARGING_MODE_CONSTANT_CURRENT;
 chargerState currentChargerState = CHARGER_STATE_IDLE;
@@ -50,13 +51,14 @@ bool Charger_checkChargerConditions() {
 }
 
 void Charger_handleCharging(CANMessage *charging_msg, CANMessage *balancing_msg) {
-    //If balancing or charging, always check charging conditions
+    //If balancing or charging, always check charging conditions and fault status
     if ((currentChargerState == CHARGER_STATE_CHARGING || currentChargerState == CHARGER_STATE_BALANCING)
-        && !Charger_checkChargerConditions()) {
+        && (!Charger_checkChargerConditions() || Charger_checkFaultStatus())) {
         currentChargerState = CHARGER_STATE_IDLE;
         CAN_Charge(charging_msg, LIMIT_VOLTS, LIMIT_AMPS, false);
         CAN_Balance(balancing_msg, false);
         HAL_GPIO_WritePin(GPIOA, LED_BAL_Pin, GPIO_PIN_RESET);
+        nextDisplayState = DISPLAY_STATE_ERRORS;
         return;
     }
 
@@ -64,10 +66,8 @@ void Charger_handleCharging(CANMessage *charging_msg, CANMessage *balancing_msg)
         CAN_Charge(charging_msg, LIMIT_VOLTS, LIMIT_AMPS, false);
         CAN_Balance(balancing_msg, false);
         HAL_GPIO_WritePin(GPIOA, LED_BAL_Pin, GPIO_PIN_RESET);
-        return;
     }
-
-    if (currentChargerState == CHARGER_STATE_CHARGING) {
+    else if (currentChargerState == CHARGER_STATE_CHARGING) {
         Charger_updateChargingMode();
         if (currentChargingMode == CHARGING_MODE_BALANCING) {
             CAN_Charge(charging_msg, LIMIT_VOLTS, LIMIT_AMPS, false);
@@ -95,10 +95,8 @@ void Charger_handleCharging(CANMessage *charging_msg, CANMessage *balancing_msg)
             CAN_Balance(balancing_msg, false);
             HAL_GPIO_WritePin(GPIOA, LED_BAL_Pin, GPIO_PIN_RESET);
         }
-        return;
     }
-    
-    if (currentChargerState == CHARGER_STATE_BALANCING)  {
+    else if (currentChargerState == CHARGER_STATE_BALANCING)  {
         Charger_updateChargingMode();
         if (currentChargingMode == CHARGING_MODE_BALANCING) {
             CAN_Charge(charging_msg, LIMIT_VOLTS, LIMIT_AMPS, false);
@@ -110,7 +108,6 @@ void Charger_handleCharging(CANMessage *charging_msg, CANMessage *balancing_msg)
             CAN_Balance(balancing_msg, false);
             HAL_GPIO_WritePin(GPIOA, LED_BAL_Pin, GPIO_PIN_RESET);
         }
-        return;
     }
 }
 
@@ -155,6 +152,37 @@ bool Charger_isReadyToChargeSwitchFlipped() {
     }
     else {
         return true;
+    }
+}
+
+bool Charger_checkFaultStatus() {
+    static bool wasFaulting = false;
+    static uint32_t faultStart_ms = 0;
+
+    bool nowFaulting = false;
+    for (int i = 0; i < 5; i++) {
+        if (currentBmsAndElconData.ELCON_fault[i]) {
+            nowFaulting = true;
+            break;
+        }
+    }
+
+    uint32_t now = HAL_GetTick();
+    if (nowFaulting && !wasFaulting) {
+        faultStart_ms = now; //Timer starts when fault first appears. Timer will implicitly reset if it stops faulting
+    }
+    wasFaulting = nowFaulting;
+
+    if (nowFaulting) {
+        if (now - faultStart_ms >= 2000) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    else {
+        return false;
     }
 }
 

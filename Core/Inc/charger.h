@@ -58,6 +58,8 @@ void Charger_handleCharging(CANMessage *charging_msg, CANMessage *balancing_msg)
 bool Charger_isChargerSafe();
 bool Charger_isHvilSwitchFlipped();
 bool Charger_isReadyToChargeSwitchFlipped();
+bool Charger_checkFaultStatus();
 void Charger_printBmsAndElconData(const volatile bmsAndElconData *d);
+
 
 #endif
