@@ -796,7 +796,7 @@ displayState Display_displayInChargingStatsOne() {
 
 displayState Display_displayErrors() {
 	
-	const char *errorMessages[5] = {
+	static const char *elconErrorMessages[5] = {
 		"HW Fail",
 		"Charger Overtemp",
 		"Wrong Input Volt",
@@ -804,12 +804,27 @@ displayState Display_displayErrors() {
 		"Comms Timeout"
 	};
 
-	char currentErrors[5][100];
+	static const char *bmsErrorMessages[6] = {
+		"Cell Overtemp",
+		"Cell Imbalance",
+		"Cell Undervolt",
+		"Cell Overvolt",
+		"Pack Low Volt",
+		"Pack High Volt"
+	};
+
+	char currentErrors[11][100];
 	int currentErrorIndex = 0;
 
 	for (int i = 0; i < 5; i++) {
 		if (currentBmsAndElconData.ELCON_fault[i] == 1) {
-			sprintf(currentErrors[currentErrorIndex], "%s", errorMessages[i]);
+			sprintf(currentErrors[currentErrorIndex], "%s", elconErrorMessages[i]);
+			currentErrorIndex++;
+		}
+	}
+	for (int i = 0; i < 6; i++) {
+		if (currentBmsAndElconData.BMS_fault[i] == 1) {
+			sprintf(currentErrors[currentErrorIndex], "%s", bmsErrorMessages[i]);
 			currentErrorIndex++;
 		}
 	}

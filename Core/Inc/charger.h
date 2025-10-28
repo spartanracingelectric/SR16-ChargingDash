@@ -24,6 +24,7 @@ typedef enum {
     CHARGER_STATE_BALANCING,
 } chargerState;
 
+//TODO: Separate BMS and Elcon into different structs
 typedef struct {
     float BMS_avgVolt;
     float BMS_sumOfCells;
@@ -34,6 +35,15 @@ typedef struct {
     float BMS_maxTemp;
     float BMS_stateOfCharge; // TODO: not float
     float BMS_packImbalance;
+    bool  BMS_fault[6];
+    /*
+      Bit 0: Cell High Temp Fault
+      Bit 1: Cell Volt Imbalance Fault
+      Bit 2: Cell Low Volt Fault
+      Bit 3: Cell High Volt Fault
+      Bit 4: Pack Low Volt Fault
+      Bit 5: Pack High Volt Fault
+    */
     float ELCON_outVolt;
     float ELCON_outCurrent;
     bool ELCON_fault[5];
@@ -44,6 +54,7 @@ typedef struct {
     Bit 3: 0 -> batt volt detected, 1 -> batt volt not detected
     Bit 4: 0 -> comms good, 1 -> comms timeout
     */
+    
 } bmsAndElconData;
 
 extern volatile bmsAndElconData currentBmsAndElconData;

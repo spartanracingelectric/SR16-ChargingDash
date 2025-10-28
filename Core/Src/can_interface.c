@@ -105,45 +105,55 @@ void Set_CAN_Id(CANMessage *ptr, uint32_t id, bool isExtended) {
 }
 
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
-  if (HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &RxHeader, RxData) != HAL_OK) {
-    Error_Handler();
-  }
+	if (HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &RxHeader, RxData) != HAL_OK) {
+    	Error_Handler();
+  	}
 
-  bms_can_current_time = HAL_GetTick();
-  int time_difference = bms_can_current_time - bms_can_previous_time;
+  	bms_can_current_time = HAL_GetTick();
+  	int time_difference = bms_can_current_time - bms_can_previous_time;
 
-  if (RxHeader.IDE == CAN_ID_EXT && RxHeader.ExtId == elconBmsFilterIDs[3]) {
-    currentBmsAndElconData.ELCON_outVolt = ((RxData[0] << 8) | RxData[1]) * 0.1;
-    currentBmsAndElconData.ELCON_outCurrent = ((RxData[2] << 8) | RxData[3])* 0.1;
-    currentBmsAndElconData.ELCON_fault[4] = RxData[4] & 0x10;
-    currentBmsAndElconData.ELCON_fault[3] = RxData[4] & 0x08;
-    currentBmsAndElconData.ELCON_fault[2] = RxData[4] & 0x04;
-    currentBmsAndElconData.ELCON_fault[1] = RxData[4] & 0x02;
-    currentBmsAndElconData.ELCON_fault[0] = RxData[4] & 0x01;
-  }
+	if (RxHeader.IDE == CAN_ID_EXT && RxHeader.ExtId == elconBmsFilterIDs[3]) {
+		currentBmsAndElconData.ELCON_outVolt = ((RxData[0] << 8) | RxData[1]) * 0.1;
+		currentBmsAndElconData.ELCON_outCurrent = ((RxData[2] << 8) | RxData[3])* 0.1;
+		currentBmsAndElconData.ELCON_fault[4] = RxData[4] & 0x10;
+		currentBmsAndElconData.ELCON_fault[3] = RxData[4] & 0x08;
+		currentBmsAndElconData.ELCON_fault[2] = RxData[4] & 0x04;
+		currentBmsAndElconData.ELCON_fault[1] = RxData[4] & 0x02;
+		currentBmsAndElconData.ELCON_fault[0] = RxData[4] & 0x01;
+	}
 
-  if (RxHeader.IDE == CAN_ID_STD && time_difference > bms_can_debounce_ms) {
-    if (RxHeader.StdId == elconBmsFilterIDs[0]) {
-      bmsFlags |= FLAG_600;
-      currentBmsAndElconData.BMS_sumOfCells = ((RxData[7] << 8) | RxData[6]) * 0.01;
-      currentBmsAndElconData.BMS_avgVolt = currentBmsAndElconData.BMS_sumOfCells / 96;
-      currentBmsAndElconData.BMS_packImbalance = ((RxData[3] << 8) | RxData[2]) * 0.0001;
-    } else if (RxHeader.StdId == elconBmsFilterIDs[1]) {
-      bmsFlags |= FLAG_621;
-      currentBmsAndElconData.BMS_stateOfCharge = RxData[2];
-    } else if (RxHeader.StdId == elconBmsFilterIDs[2]) {
-      bmsFlags |= FLAG_622;
-      currentBmsAndElconData.BMS_minTemp = RxData[5];
-      currentBmsAndElconData.BMS_maxTemp = RxData[4];
-      currentBmsAndElconData.BMS_minVolt = ((RxData[3] << 8) | RxData[2]) * 0.0001;
-      currentBmsAndElconData.BMS_maxVolt = ((RxData[1] << 8) | RxData[0]) * 0.0001;
-    }
+	if (RxHeader.IDE == CAN_ID_STD && time_difference > bms_can_debounce_ms) {
+		if (RxHeader.StdId == elconBmsFilterIDs[0]) {
+			bmsFlags |= FLAG_600;
+			currentBmsAndElconData.BMS_sumOfCells = ((RxData[7] << 8) | RxData[6]) * 0.01;
+			currentBmsAndElconData.BMS_avgVolt = currentBmsAndElconData.BMS_sumOfCells / 96;
+			currentBmsAndElconData.BMS_packImbalance = ((RxData[3] << 8) | RxData[2]) * 0.0001;
 
-    if (bmsFlags == (FLAG_600 | FLAG_621 | FLAG_622)) {
-      bms_can_previous_time = bms_can_current_time;
-      bmsFlags = 0;
-    }
-  }
+			uint8_t faultByte = RxData[1];
+			currentBmsAndElconData.BMS_fault[0] = ((faultByte >> 2) & 0x1); // Cell High Temp Fault
+			currentBmsAndElconData.BMS_fault[1] = ((faultByte >> 3) & 0x1); // Cell Volt Imbalance Fault
+			currentBmsAndElconData.BMS_fault[2] = ((faultByte >> 4) & 0x1); // Cell Low Volt Fault
+			currentBmsAndElconData.BMS_fault[3] = ((faultByte >> 5) & 0x1); // Cell High Volt Fault
+			currentBmsAndElconData.BMS_fault[4] = ((faultByte >> 6) & 0x1); // Pack Low Volt Fault
+			currentBmsAndElconData.BMS_fault[5] = ((faultByte >> 7) & 0x1); // Pack High Volt Fault
+		} 
+		else if (RxHeader.StdId == elconBmsFilterIDs[1]) {
+			bmsFlags |= FLAG_621;
+			currentBmsAndElconData.BMS_stateOfCharge = RxData[2];
+   		} 
+		else if (RxHeader.StdId == elconBmsFilterIDs[2]) {
+			bmsFlags |= FLAG_622;
+			currentBmsAndElconData.BMS_minTemp = RxData[5];
+			currentBmsAndElconData.BMS_maxTemp = RxData[4];
+			currentBmsAndElconData.BMS_minVolt = ((RxData[3] << 8) | RxData[2]) * 0.0001;
+			currentBmsAndElconData.BMS_maxVolt = ((RxData[1] << 8) | RxData[0]) * 0.0001;
+    	}
+
+		if (bmsFlags == (FLAG_600 | FLAG_621 | FLAG_622)) {
+			bms_can_previous_time = bms_can_current_time;
+			bmsFlags = 0;
+		}
+	}
 }
 
 void CAN_Balance(CANMessage *ptr, bool balancing_enabled) {
