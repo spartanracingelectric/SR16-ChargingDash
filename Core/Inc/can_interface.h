@@ -7,6 +7,7 @@
 #define FLAG_600 (1 << 0)
 #define FLAG_621 (1 << 1)
 #define FLAG_622 (1 << 2)
+#define FLAG_604 (1 << 3)
 
 typedef struct {
     CAN_TxHeaderTypeDef TxHeader;
@@ -17,7 +18,7 @@ typedef struct {
 extern CAN_HandleTypeDef hcan1;
 extern CAN_RxHeaderTypeDef RxHeader;
 extern uint8_t RxData[8];
-extern uint32_t elconBmsFilterIDs[4];
+extern uint32_t elconBmsFilterIDs[5];
 
 HAL_StatusTypeDef CAN_Start();
 HAL_StatusTypeDef CAN_Activate();

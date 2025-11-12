@@ -35,6 +35,7 @@ typedef struct {
     float BMS_maxTemp;
     float BMS_stateOfCharge; // TODO: not float
     float BMS_packImbalance;
+    float BMS_balanceStatus;
     bool  BMS_fault[6];
     /*
       Bit 0: Cell High Temp Fault

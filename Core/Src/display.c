@@ -329,14 +329,15 @@ displayState Display_displayInChargingStatsTwo() {
 	char *navBarOptions[1] = { isBalancing ? "Balancing 1" : "Charging 1" };
 	int firstNavBarOptonIndex = 0;
 	Display_drawNavBar(navBarOptions, numberOfOptions, firstNavBarOptonIndex);
+    Display_updateScreen();
 
 	if (selectPressed) {
 		Display_checkSelectedOptionBounds(numberOfOptions);
 		switch(selectedOption) {
-			case 0: return DISPLAY_STATE_IN_CHARGING_STATS_TWO;
+			case 0: return DISPLAY_STATE_IN_CHARGING_STATS_ONE;
 		}
 	}
-	return DISPLAY_STATE_IN_CHARGING_STATS_ONE;
+	return DISPLAY_STATE_IN_CHARGING_STATS_TWO;
 }
 
 displayState Display_displayChargingProfiles() {
@@ -675,6 +676,12 @@ void Display_drawTitleBar(char title[]) {
 			break;
 		}
 	}
+    for (int i = 0; i < 6; i++) {
+        if (currentBmsAndElconData.BMS_fault[i] == 1) {
+            isFault = true;
+            break;
+        }
+    }
 
 	ssd1306_SetCursor(1, 1);
 	ssd1306_WriteString(title, Font_6x8, White);
@@ -683,10 +690,10 @@ void Display_drawTitleBar(char title[]) {
 	//Flashing status symbols 
 	// ssd1306_FillRectangle(70, 0, 127, 9, Black);
 	// ssd1306_UpdateScreen();
-	bool isCharging = (currentChargingMode == CHARGING_MODE_CONSTANT_CURRENT || 
+	bool isCharging = currentChargerState != CHARGER_STATE_IDLE && (currentChargingMode == CHARGING_MODE_CONSTANT_CURRENT || 
 						currentChargingMode == CHARGING_MODE_CURRENT_TAPER || 
 						currentChargingMode == CHARGING_MODE_MAINTENANCE);
-	bool isBalancing = (currentChargingMode == CHARGING_MODE_BALANCING);
+	bool isBalancing = currentBmsAndElconData.BMS_balanceStatus;
 	if (isFault) {
 		Display_drawErrorSymbol(119,1);
 		if (isCharging) {
@@ -784,6 +791,7 @@ displayState Display_displayInChargingStatsOne() {
 
 	int firstNavBarOptionIndex = 0;
 	Display_drawNavBar(navBarOptions, numberOfOptions, firstNavBarOptionIndex);
+    Display_updateScreen();
 
 	if (selectPressed) {
 		Display_checkSelectedOptionBounds(numberOfOptions);

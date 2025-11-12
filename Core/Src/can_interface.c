@@ -8,11 +8,12 @@ int bms_can_current_time = 0;
 int bms_can_previous_time = 0;
 int bms_can_debounce_ms = 1000;
 
-uint32_t elconBmsFilterIDs[4] = {
+uint32_t elconBmsFilterIDs[5] = {
   0x600, // BMS imbalance
   0x621, // BMS soc
   0x622, // BMS volt/temp high+low
   0x18FF50E5, // Elcon
+  0x604, //BMS balance status
 };
 
 CAN_RxHeaderTypeDef RxHeader;
@@ -87,11 +88,24 @@ void CAN_SettingsInit(CANMessage *canMsgPtr, bool isExtended, uint16_t dlc_lengt
   filter3.FilterMaskIdHigh = 0xFFFF;
   filter3.FilterMaskIdLow  = 0xFFFF;
 
+  // ----- Filter 4: BMS Balance Status 0x604 -----
+  CAN_FilterTypeDef filter4 = {0};
+  filter4.FilterBank = 4;
+  filter4.FilterMode = CAN_FILTERMODE_IDMASK;
+  filter4.FilterScale = CAN_FILTERSCALE_32BIT;
+  filter4.FilterFIFOAssignment = CAN_FILTER_FIFO0;
+  filter4.FilterActivation = ENABLE;
+  filter4.FilterIdHigh     = (elconBmsFilterIDs[4] << 5) & 0xFFFF;
+  filter4.FilterIdLow      = 0;
+  filter4.FilterMaskIdHigh = 0xFFFF;
+  filter4.FilterMaskIdLow  = 0xFFFF;
+
   // Apply filters
   HAL_CAN_ConfigFilter(&hcan1, &filter0);
   HAL_CAN_ConfigFilter(&hcan1, &filter1);
   HAL_CAN_ConfigFilter(&hcan1, &filter2);
   HAL_CAN_ConfigFilter(&hcan1, &filter3);
+  HAL_CAN_ConfigFilter(&hcan1, &filter4);
 
   HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING);
 }
@@ -148,8 +162,12 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
 			currentBmsAndElconData.BMS_minVolt = ((RxData[3] << 8) | RxData[2]) * 0.0001;
 			currentBmsAndElconData.BMS_maxVolt = ((RxData[1] << 8) | RxData[0]) * 0.0001;
     	}
+        else if (RxHeader.StdId == elconBmsFilterIDs[4]) {
+			bmsFlags |= FLAG_604;
+            currentBmsAndElconData.BMS_balanceStatus = (RxData[0] & 0x01) ? 1 : 0;
+        }
 
-		if (bmsFlags == (FLAG_600 | FLAG_621 | FLAG_622)) {
+		if (bmsFlags == (FLAG_600 | FLAG_621 | FLAG_622 | FLAG_604)) {
 			bms_can_previous_time = bms_can_current_time;
 			bmsFlags = 0;
 		}

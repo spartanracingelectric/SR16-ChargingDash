@@ -233,7 +233,7 @@ int main(void)
     printf("WE ARE HERE");
     Display_updateState();
     Charger_printPinStates();
-    //Charger_handleCharging(&charging_msg, &balancing_msg);
+    Charger_handleCharging(&charging_msg, &balancing_msg);
    
     /* USER CODE END WHILE */
 
