@@ -4,6 +4,7 @@
 
 #include <string.h>
 #include <stdbool.h>
+#include <stdint.h>
 
 #include "ssd1306.h"
 #include "ssd1306_fonts.h"
