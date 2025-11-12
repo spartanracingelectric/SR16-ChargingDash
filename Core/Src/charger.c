@@ -44,10 +44,11 @@ bool Charger_checkChargerConditions() {
     if (currentChargerState == CHARGER_STATE_BALANCING) {
         return (Charger_isChargerSafe() && Charger_isReadyToChargeSwitchFlipped());
     }
-    else {
+    else if (currentChargerState == CHARGER_STATE_CHARGING) {
         return (Charger_isChargerSafe() && Charger_isHvilSwitchFlipped()
         && Charger_isReadyToChargeSwitchFlipped());
     }
+    return false;
 }
 
 void Charger_handleCharging(CANMessage *charging_msg, CANMessage *balancing_msg) {
@@ -111,13 +112,27 @@ void Charger_handleCharging(CANMessage *charging_msg, CANMessage *balancing_msg)
     }
 }
 
+void Charger_printPinStates()
+{
+    GPIO_PinState IN_HVIL_ESTOP_Pin_State = HAL_GPIO_ReadPin(IN_HVIL_ESTOP_GPIO_Port, IN_HVIL_ESTOP_Pin);
+    GPIO_PinState IN_HVIL_TERM_Pin_State = HAL_GPIO_ReadPin(IN_HVIL_TERM_GPIO_Port, IN_HVIL_TERM_Pin);
+    GPIO_PinState IN_HVIL_ACUM_Pin_State = HAL_GPIO_ReadPin(IN_HVIL_ACUM_GPIO_Port, IN_HVIL_ACUM_Pin);
+    GPIO_PinState IN_HVIL_FSW_STATE = HAL_GPIO_ReadPin(IN_HVIL_FSW_GPIO_Port, IN_HVIL_FSW_Pin);
+    GPIO_PinState RTC_SW_STATE = HAL_GPIO_ReadPin(IN_RTC_SW_GPIO_Port, IN_RTC_SW_Pin);
+    printf("Charger Pin States\n");
+    printf("IN_HVIL_ESTOP: %s\n", IN_HVIL_ESTOP_Pin_State == GPIO_PIN_SET ? "SET" : "RESET");
+    printf("IN_HVIL_TERM : %s\n", IN_HVIL_TERM_Pin_State  == GPIO_PIN_SET ? "SET" : "RESET");
+    printf("IN_HVIL_ACUM : %s\n", IN_HVIL_ACUM_Pin_State  == GPIO_PIN_SET ? "SET" : "RESET");
+    printf("IN_HVIL_FSW  : %s\n", IN_HVIL_FSW_STATE       == GPIO_PIN_SET ? "SET" : "RESET");
+    printf("RTC_SW       : %s\n", RTC_SW_STATE            == GPIO_PIN_SET ? "SET" : "RESET");
+}
+
 //TODO: Check these conditions
 bool Charger_isChargerSafe() {
     GPIO_PinState IN_HVIL_CHAR_Pin_State;
     GPIO_PinState IN_HVIL_ESTOP_Pin_State = HAL_GPIO_ReadPin(IN_HVIL_ESTOP_GPIO_Port, IN_HVIL_ESTOP_Pin);
     GPIO_PinState IN_HVIL_TERM_Pin_State = HAL_GPIO_ReadPin(IN_HVIL_TERM_GPIO_Port, IN_HVIL_TERM_Pin);
     GPIO_PinState IN_HVIL_ACUM_Pin_State = HAL_GPIO_ReadPin(IN_HVIL_ACUM_GPIO_Port, IN_HVIL_ACUM_Pin);
-
     if (IN_HVIL_ESTOP_Pin_State == GPIO_PIN_SET ||
         IN_HVIL_CHAR_Pin_State  == GPIO_PIN_SET ||
         IN_HVIL_TERM_Pin_State  == GPIO_PIN_SET ||

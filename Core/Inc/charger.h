@@ -71,6 +71,8 @@ bool Charger_isHvilSwitchFlipped();
 bool Charger_isReadyToChargeSwitchFlipped();
 bool Charger_checkFaultStatus();
 void Charger_printBmsAndElconData(const volatile bmsAndElconData *d);
+void Charger_printPinStates();
+
 
 
 #endif
