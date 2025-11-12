@@ -230,9 +230,7 @@ int main(void)
     //HAL_I2C_Master_Transmit(&hi2c2, 0x04 << 1, &data, 1, 10);
 
     // TODO: CHECK ALL LEDS AND PERIPHERALS WORK
-    printf("WE ARE HERE");
     Display_updateState();
-    Charger_printPinStates();
     Charger_handleCharging(&charging_msg, &balancing_msg);
    
     /* USER CODE END WHILE */
